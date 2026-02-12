@@ -8,7 +8,7 @@ const Navbar = () => {
   const [openDropdown, setOpenDropdown] = useState(false);
 
   return (
-    <nav className="fixed w-full z-50 bg-gradient-to-b from-black/70 to-black/40 backdrop-blur-xl text-white font-[Outfit] border-b border-white/40 pt-15">
+    <nav className="fixed w-full z-50 bg-black backdrop-blur-xl text-white font-[Outfit] border-b border-white/40 pt-15">
       
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-start lg:items-center justify-between">
 
@@ -20,7 +20,7 @@ const Navbar = () => {
             <img
               src={logo}
               alt="Logo Alaluf"
-              className="h-10 w-auto object-contain hover:opacity-80 transition"
+              className="h-10 w-auto object-contain hover:opacity-80 transition "
             />
           </a>
 
@@ -33,7 +33,7 @@ const Navbar = () => {
               onMouseEnter={() => setOpenDropdown(true)}
               onMouseLeave={() => setOpenDropdown(false)}
             >
-              <span className="cursor-pointer hover:text-teal-400 transition duration-300">
+              <span className="cursor-pointer hover:text-teal-400 transition duration-300 font-semibold ">
                 Servicios
               </span>
 
@@ -44,9 +44,9 @@ const Navbar = () => {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 15 }}
       transition={{ duration: 0.25 }}
-      className="absolute top-12 -left-5 bg-black/25 backdrop-blur-2xl p-6 rounded-2xl shadow-2xl w-60 border border-white/10"
+      className="absolute top-12 -left-6 bg-black/25 backdrop-blur-2xl p-6 rounded-2xl shadow-2xl w-60 border border-white/10"
     >
-      <ul className="space-y-4 text-sm">
+      <ul className="space-y-4 text-base font-medium">
         <li className="relative cursor-pointer transition hover:text-teal-400 
                        before:content-['>'] before:absolute before:-left-4 before:opacity-0 hover:before:opacity-100">
           Asesoría Inmobiliaria
@@ -63,6 +63,10 @@ const Navbar = () => {
                        before:content-['>'] before:absolute before:-left-4 before:opacity-0 hover:before:opacity-100">
           Tasación y Evaluación de Activos
         </li>
+        <li className="relative cursor-pointer transition hover:text-teal-400 
+                       before:content-['>'] before:absolute before:-left-4 before:opacity-0 hover:before:opacity-100">
+          Inversiones Inmobiliarias
+        </li>        
       </ul>
     </motion.div>
   )}
@@ -70,15 +74,15 @@ const Navbar = () => {
 
             </div>
 
-            <a href="#" className="hover:text-teal-400 transition duration-300">
+            <a href="#" className="hover:text-teal-400 transition duration-300 font-semibold">
               Nosotros
             </a>
 
-            <a href="#" className="hover:text-teal-400 transition duration-300">
+            <a href="#" className="hover:text-teal-400 transition duration-300 font-semibold">
               Newsletter
             </a>
 
-            <a href="#" className="hover:text-teal-400 transition duration-300">
+            <a href="#" className="hover:text-teal-400 transition duration-300 font-semibold">
               Contacto
             </a>
 
