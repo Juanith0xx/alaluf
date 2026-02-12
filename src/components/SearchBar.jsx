@@ -26,7 +26,7 @@ const SearchBar = () => {
 
   return (
     <div
-      className="relative rounded-md overflow-visible bg-cover bg-center pt-12 pb-100"
+      className="relative rounded-md overflow-visible bg-cover bg-center pb-100"
       style={{ backgroundImage: `url(${fondo})` }}
     >
       <div className="bg-gray-300/40 p-6 flex flex-wrap items-center gap-2 justify-center font-[Outfit]">

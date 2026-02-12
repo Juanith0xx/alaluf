@@ -8,14 +8,14 @@ const Navbar = () => {
   const [openDropdown, setOpenDropdown] = useState(false);
 
   return (
-    <nav className="fixed w-full z-50 bg-black/50 text-white font-[Outfit] pt-14">
+    <nav className="fixed w-full z-50 bg-black/50 text-white font-[Outfit] pt-10">
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-start lg:items-center justify-between">
 
         {/* LEFT SIDE (Logo + Line + Menu) */}
         <div className="flex flex-col lg:flex-row items-start lg:items-center flex-1">
 
           {/* Logo */}
-          <a href="/" className="flex items-center -ml-64">
+          <a href="/" className="flex items-center -ml-49">
             <img
               src={logo}
               alt="Logo Alaluf"
@@ -32,7 +32,7 @@ const Navbar = () => {
               onMouseEnter={() => setOpenDropdown(true)}
               onMouseLeave={() => setOpenDropdown(false)}
             >
-              <span className="cursor-pointer hover:text-teal-400 transition duration-300 font-semibold ">
+              <span className="cursor-pointer hover:text-teal-400 transition duration-300 font-medium ">
                 Servicios
               </span>
 
@@ -67,21 +67,21 @@ const Navbar = () => {
               </AnimatePresence>
             </div>
 
-            <a href="#" className="hover:text-teal-400 transition duration-300 font-semibold">
+            <a href="#" className="hover:text-teal-400 transition duration-300 font-medium">
               Nosotros
             </a>
 
-            <a href="#" className="hover:text-teal-400 transition duration-300 font-semibold">
+            <a href="#" className="hover:text-teal-400 transition duration-300 font-medium">
               Newsletter
             </a>
 
-            <a href="#" className="hover:text-teal-400 transition duration-300 font-semibold">
+            <a href="#" className="hover:text-teal-400 transition duration-300 font-medium">
               Contacto
             </a>
 
             <a
               href="https://alaluf.cl/mialaluf/"
-              className="hover:text-teal-400 transition duration-300 font-semibold"
+              className="hover:text-teal-400 transition duration-300 font-medium"
             >
               Mi Alaluf
             </a>
@@ -108,7 +108,7 @@ const Navbar = () => {
       </div>
 
       {/* Línea blanca centrada con márgenes laterales */}
-      <div className="border-b-2 border-white/70 mx-23 mr-85"></div>
+      <div className="border-b-1 border-white/70 "></div>
 
       {/* Mobile Menu */}
       <AnimatePresence>
