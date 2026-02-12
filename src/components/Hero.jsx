@@ -19,7 +19,7 @@ const slides = [
     image: Comercial,
     titulo: (
       <>
-        <span className="text-[#0091A4]">UBICACIONES</span> COMERCIALES QUE POTENCIAN TU <span className="text-[#0091A4]">NEGOCIO</span>
+        <span className="text-[#0091A4] font-bold">UBICACIONES</span> COMERCIALES QUE POTENCIAN TU <span className="text-[#0091A4] font-bold">NEGOCIO</span>
       </>
     ),
     descripcion: "Asesoramos decisiones en oficinas, locales y activos comerciales de alto impacto.",
@@ -28,19 +28,19 @@ const slides = [
     image: Recidencial,
     titulo: (
       <>
-        ENCUENTRA <span className="text-[#0091A4]">RESIDENCIALES</span> SEGURAS
+      <span className="text-[#0091A4] font-bold">ENCUENTRA</span> EL LUGAR DONDE <span className="text-[#0091A4] font-bold">QUIERES</span> VIVIR
       </>
     ),
-    descripcion: "Hogares y apartamentos con excelente plusvalía.",
+    descripcion: "Experiencia y acompañamiento en la compra y arriendo de casas y departamentos.",
   },
   {
     image: Inversion,
     titulo: (
       <>
-        MAXIMIZA TU <span className="text-[#0091A4]">INVERSION</span>
+      <span className="text-[#0091A4] font-bold ">INVERTIR</span> CON SEGURIDAD EMPIEZA CON UNA BUENA <span className="text-[#0091A4] font-bold">ASESORIA</span>
       </>
     ),
-    descripcion: "Asesoría completa para inversiones inteligentes.",
+    descripcion: "Identificamos oportunidades de renta y desarrollo con análisis y respaldo profesional.",
   },
 ];
 
@@ -83,7 +83,7 @@ const Hero = () => {
 
       {/* Texto sobre hero con animación */}
       <motion.div
-        className="absolute z-20 top-1/3 left-18 max-w-lg text-white"
+        className="absolute z-20 top-1/3 left-50 max-w-lg text-white"
         key={current}
         variants={textVariants}
         initial="hidden"
@@ -98,7 +98,7 @@ const Hero = () => {
       </motion.div>
 
       {/* Indicadores laterales */}
-      <div className="absolute left-5 top-1/2 transform -translate-y-1/2 z-20 flex flex-col gap-3">
+      <div className="absolute left-38 top-1/2 transform -translate-y-1/2 z-20 flex flex-col gap-3">
         {slides.map((_, index) => (
           <button
             key={index}

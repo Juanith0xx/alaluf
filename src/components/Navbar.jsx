@@ -8,7 +8,7 @@ const Navbar = () => {
   const [openDropdown, setOpenDropdown] = useState(false);
 
   return (
-    <nav className="fixed w-full z-50 bg-black/50 text-white font-[Outfit] pt-16">
+    <nav className="fixed w-full z-50 bg-black/50 text-white font-[Outfit] pt-14">
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-start lg:items-center justify-between">
 
         {/* LEFT SIDE (Logo + Line + Menu) */}
@@ -43,7 +43,7 @@ const Navbar = () => {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 15 }}
                     transition={{ duration: 0.25 }}
-                    className="absolute top-12 -left-6 bg-black/25 backdrop-blur-2xl p-6 rounded-2xl shadow-2xl w-60 border border-white/10"
+                    className="absolute top-12 -left-6 bg-black/50 backdrop-blur-2xl p-6  shadow-2xl w-60 border border-white/10"
                   >
                     <ul className="space-y-4 text-base font-medium">
                       <li className="relative cursor-pointer transition hover:text-teal-400 before:content-['>'] before:absolute before:-left-4 before:opacity-0 hover:before:opacity-100">
