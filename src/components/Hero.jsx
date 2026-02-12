@@ -10,37 +10,69 @@ const slides = [
     image: Industrial,
     titulo: (
       <>
-        <span className="text-[#0091A4] font-bold">ESPACIOS</span> INDUSTRIALES QUE <span className="text-[#0091A4] font-bold">IMPULSAN</span> TU OPERACION
+      <div className="text-lg font-[Outfit]">Industrial</div>
+        <span className="text-[#0091A4] font-bold">ESPACIOS</span> <br></br>
+        <span className="text-white font-bold">INDUSTRIALES</span> <br></br> 
+        QUE IMPULSAN TU <br>
+        </br><span className="text-[#0091A4] font-bold"> OPERACION</span>
       </>
     ),
-    descripcion: "Más de 40 años conectando empresas con bodegas, centros logísticos y terrenos estratégicos en Chile.",
+    descripcion:(
+       <p className="font-[Outfit] text-lg text-white">
+    Más de 40 años conectando empresas con bodegas, <br />
+    ventros logísticos y terrenos estratégicos en Chile.
+  </p>
+    ),
   },
   {
     image: Comercial,
     titulo: (
       <>
-        <span className="text-[#0091A4] font-bold">UBICACIONES</span> COMERCIALES QUE POTENCIAN TU <span className="text-[#0091A4] font-bold">NEGOCIO</span>
+      <div className="text-lg font-[Outfit]">Comercial</div>
+        <span className="text-[#0091A4] font-bold">UBICACIONES</span> <span className="text-white font-bold">COMERCIALES</span>
+        <br></br> QUE POTENCIAN TU <span className="text-[#0091A4] font-bold">NEGOCIO</span>
       </>
+    ),  
+    descripcion: (
+       <p className="font-[Outfit] text-lg text-white">
+    Asesoramos decisiones en oficinas, locales y <br />
+    activos comerciales de alto impacto.
+  </p>
     ),
-    descripcion: "Asesoramos decisiones en oficinas, locales y activos comerciales de alto impacto.",
   },
   {
     image: Recidencial,
     titulo: (
       <>
-      <span className="text-[#0091A4] font-bold">ENCUENTRA</span> EL LUGAR DONDE <span className="text-[#0091A4] font-bold">QUIERES</span> VIVIR
+      <div className="text-lg font-[Outfit]">Residencial</div>
+      <span className="text-[#0091A4] font-bold">ENCUENTRA</span> <br></br> <span className="text-white font-bold">EL LUGAR</span><br></br>
+      DONDE QUIERES <span className="text-[#0091A4] font-bold">VIVIR</span>
       </>
     ),
-    descripcion: "Experiencia y acompañamiento en la compra y arriendo de casas y departamentos.",
+    descripcion: (
+       <p className="font-[Outfit] text-lg text-white">
+    Experiencia y acompañamiento en la compra <br />
+    y arriendo de casas y departamento.
+  </p>
+    ),
   },
   {
     image: Inversion,
     titulo: (
       <>
-      <span className="text-[#0091A4] font-bold ">INVERTIR</span> CON SEGURIDAD EMPIEZA CON UNA BUENA <span className="text-[#0091A4] font-bold">ASESORIA</span>
+      <div className="text-lg font-[Outfit]">Terrenos</div>
+      <span className="text-[#0091A4] font-bold ">INVERTIR</span> CON <br>
+      </br>SEGURIDAD <br>
+      </br>EMPIEZA CON UNA <br></br>
+      BUENA <span className="text-[#0091A4] font-bold">ASESORÍA</span>
       </>
     ),
-    descripcion: "Identificamos oportunidades de renta y desarrollo con análisis y respaldo profesional.",
+    descripcion: (
+       <p className="font-[Outfit] text-lg text-white">
+    Identificamos oportunidades de renta y  <br />
+    desarrollo con análisis y respaldo profesional.
+  </p>
+    ),
   },
 ];
 
@@ -83,7 +115,7 @@ const Hero = () => {
 
       {/* Texto sobre hero con animación */}
       <motion.div
-        className="absolute z-20 top-1/3 left-50 max-w-lg text-white"
+        className="absolute z-20 top-1/5 left-50 max-w-lg text-white"
         key={current}
         variants={textVariants}
         initial="hidden"
@@ -91,7 +123,7 @@ const Hero = () => {
         exit="exit"
       >
         <h1 className="text-2xl mb-4 font-[Outfit]">{slides[current].titulo}</h1>
-        <p className="mb-6 font-medium font-[Outfit] text-2xl">{slides[current].descripcion}</p>
+        <p className="mb-6 font-light font-[Outfit] text-lg">{slides[current].descripcion}</p>
         <button className="px-6 py-2 border-[1px] border-white text-white rounded-lg font-semibold hover:bg-white/10 transition-colors duration-300 font-[Outfit]">
           Ver Proyectos
         </button>
