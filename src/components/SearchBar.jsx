@@ -32,15 +32,15 @@ const SearchBar = () => {
       <div className="bg-gray-300/40 p-6 flex flex-wrap items-center gap-2 justify-center font-[Outfit]">
 
         {/* Acciones */}
-        <button className="px-8 py-5 border border-gray-400 bg-gray-800/20 text-white w-full sm:w-auto">
+        <button className="px-8 py-5 border border-gray-400 bg-gray-800/50 text-white w-full sm:w-auto">
           Comprar
         </button>
 
-        <button className="px-8 py-5 border border-gray-400 bg-gray-800/20 text-white w-full sm:w-auto">
+        <button className="px-8 py-5 border border-gray-400 bg-gray-800/50 text-white w-full sm:w-auto">
           Vender
         </button>
 
-        <button className="px-8 py-5 border border-gray-400 bg-gray-800/20 text-white w-full sm:w-auto">
+        <button className="px-8 py-5 border border-gray-400 bg-gray-800/50 text-white w-full sm:w-auto">
           Arrendar
         </button>
 
@@ -48,7 +48,7 @@ const SearchBar = () => {
         <div className="relative w-full sm:w-56">
           <button
             onClick={() => setOpenDropdown(!openDropdown)}
-            className="px-8 py-5 border border-gray-400 bg-gray-800/20 text-white rounded flex items-center justify-between w-full"
+            className="px-8 py-5 border border-gray-400 bg-gray-800/50 text-white rounded flex items-center justify-center w-full"
           >
             {tipoPropiedad}
           </button>
@@ -114,11 +114,11 @@ const SearchBar = () => {
         <input
           type="text"
           placeholder="Ingresa comuna o ciudad"
-          className="px-8 py-5 border border-gray-400 bg-gray-800/20 text-white rounded placeholder-white focus:outline-none focus:border-cyan-400 w-full sm:w-auto"
+          className="px-8 py-5 border border-gray-400 bg-gray-800/50 text-white text-center rounded placeholder-white focus:outline-none  focus:border-cyan-400 w-full sm:w-auto"
         />
 
         {/* Buscar */}
-        <button className="px-8 py-5 border border-gray-400 bg-gray-800/20 text-white rounded flex items-center gap-2 w-full sm:w-auto justify-center transition hover:border-cyan-400">
+        <button className="px-8 py-5 border border-gray-400 bg-gray-800/50 text-white rounded flex items-center gap-2 w-full sm:w-auto justify-center transition hover:border-cyan-400">
           Buscar <Search size={20} />
         </button>
 
