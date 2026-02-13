@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, MapPin } from "lucide-react";
-import fondo from "../assets/Marmol.jpg";
+import { Search, MapPin, ChevronDown, Check } from "lucide-react";
 
 const SearchBar = () => {
-  const [tipoPropiedad, setTipoPropiedad] = useState("Tipo de propiedad");
+  const [tipoPropiedad, setTipoPropiedad] = useState(null);
   const [openDropdown, setOpenDropdown] = useState(false);
+  const dropdownRef = useRef(null);
 
   const propiedades = [
     { nombre: "Comercial" },
@@ -24,67 +24,85 @@ const SearchBar = () => {
     { nombre: "Licitaciones" },
   ];
 
+  // 🔥 Cerrar al hacer click fuera
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setOpenDropdown(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   return (
-    <div
-      className="relative -mt-32 z-30 rounded-md overflow-visible bg-cover bg-center bg-transparent "
-     
-    >
-      <div className="bg-gray-300/40 p-6 flex flex-wrap items-center gap-2 justify-center font-[Outfit]">
+    <div className="relative -mt-32 z-30 rounded-md">
+      <div className="bg-gray-300/40 backdrop-blur-md p-6 flex flex-wrap items-center gap-2 justify-center font-[Outfit]">
 
         {/* Acciones */}
-        <button className="px-8 py-5 border border-gray-400 bg-gray-800/50 text-white w-full sm:w-auto">
-          Comprar
-        </button>
-
-        <button className="px-8 py-5 border border-gray-400 bg-gray-800/50 text-white w-full sm:w-auto">
-          Vender
-        </button>
-
-        <button className="px-8 py-5 border border-gray-400 bg-gray-800/50 text-white w-full sm:w-auto">
-          Arrendar
-        </button>
+        {["Comprar", "Vender", "Arrendar"].map((accion, i) => (
+          <button
+            key={i}
+            className="px-8 py-5 border border-gray-400 bg-gray-800/50 text-white w-full sm:w-auto hover:border-cyan-400 transition"
+          >
+            {accion}
+          </button>
+        ))}
 
         {/* Dropdown */}
-        <div className="relative w-full sm:w-56">
+        <div className="relative w-full sm:w-56" ref={dropdownRef}>
           <button
             onClick={() => setOpenDropdown(!openDropdown)}
-            className="px-8 py-5 border border-gray-400 bg-gray-800/50 text-white rounded flex items-center justify-center w-full"
+            className="px-8 py-5 border border-gray-400 bg-gray-800/50 text-white rounded flex items-center justify-between w-full hover:border-cyan-400 transition"
           >
-            {tipoPropiedad}
+            <span>
+              {tipoPropiedad || "Tipo de propiedad"}
+            </span>
+
+            <ChevronDown
+              size={18}
+              className={`transition-transform duration-300 ${
+                openDropdown ? "rotate-180" : ""
+              }`}
+            />
           </button>
 
           <AnimatePresence>
             {openDropdown && (
               <motion.div
-                initial={{ opacity: 0, y: 30 }}
+                initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 15 }}
+                exit={{ opacity: 0, y: 10 }}
                 transition={{ duration: 0.25 }}
-                className="absolute top-full mt-2 left-0 bg-black/30 backdrop-blur-2xl p-4 shadow-2xl w-full border border-white/10 rounded z-20"
+                className="absolute top-full mt-2 left-0 bg-black/70 backdrop-blur-2xl p-4 shadow-2xl w-full border border-white/10 rounded z-50"
               >
-                <ul className="space-y-2 text-base font-medium relative">
+                <ul className="space-y-2 text-base font-medium">
                   {propiedades.map((prop, i) => (
                     <li key={i} className="relative group">
 
                       {/* Item principal */}
                       <button
                         onClick={() => {
-                          setTipoPropiedad(prop.nombre);
-                          if (!prop.sub) setOpenDropdown(false);
+                          if (!prop.sub) {
+                            setTipoPropiedad(prop.nombre);
+                            setOpenDropdown(false);
+                          }
                         }}
-                        className="w-full text-left px-4 py-2 hover:text-teal-400 transition flex items-center gap-2"
+                        className="w-full text-left px-4 py-2 hover:text-cyan-400 transition flex items-center justify-between"
                       >
-                        {prop.sub && (
-                          <span className="text-gray-400 group-hover:text-teal-400 transition">
-                            &gt;
-                          </span>
+                        <span className="flex items-center gap-2">
+                          {prop.nombre}
+                        </span>
+
+                        {tipoPropiedad === prop.nombre && (
+                          <Check size={16} className="text-cyan-400" />
                         )}
-                        {prop.nombre}
                       </button>
 
-                      {/* Submenu derecho */}
+                      {/* Submenu */}
                       {prop.sub && (
-                        <ul className="absolute top-0 left-full ml-4 hidden group-hover:block bg-black/50 backdrop-blur-2xl w-56 rounded border border-white/10 p-2 space-y-1 z-30">
+                        <ul className="absolute top-0 left-full ml-4 hidden group-hover:block bg-black/80 backdrop-blur-2xl w-56 rounded border border-white/10 p-2 space-y-1 z-50">
                           {prop.sub.map((subItem, j) => (
                             <li
                               key={j}
@@ -92,18 +110,32 @@ const SearchBar = () => {
                                 setTipoPropiedad(subItem);
                                 setOpenDropdown(false);
                               }}
-                              className="flex items-center gap-2 px-4 py-2 cursor-pointer hover:text-teal-400 transition group/sub"
+                              className="flex items-center justify-between px-4 py-2 cursor-pointer hover:text-cyan-400 transition"
                             >
-                              <span className="opacity-0 group-hover/sub:opacity-100 transition">
-                                &gt;
-                              </span>
                               {subItem}
+
+                              {tipoPropiedad === subItem && (
+                                <Check size={14} className="text-cyan-400" />
+                              )}
                             </li>
                           ))}
                         </ul>
                       )}
                     </li>
                   ))}
+
+                  {/* 🔥 Opción limpiar */}
+                  <li>
+                    <button
+                      onClick={() => {
+                        setTipoPropiedad(null);
+                        setOpenDropdown(false);
+                      }}
+                      className="w-full text-left px-4 py-2 text-gray-400 hover:text-red-400 transition border-t border-white/10 mt-2 pt-3"
+                    >
+                      Limpiar selección
+                    </button>
+                  </li>
                 </ul>
               </motion.div>
             )}
@@ -114,7 +146,7 @@ const SearchBar = () => {
         <input
           type="text"
           placeholder="Ingresa comuna o ciudad"
-          className="px-8 py-5 border border-gray-400 bg-gray-800/50 text-white text-center rounded placeholder-white focus:outline-none  focus:border-cyan-400 w-full sm:w-auto"
+          className="px-8 py-5 border border-gray-400 bg-gray-800/50 text-white text-center rounded placeholder-white focus:outline-none focus:border-cyan-400 w-full sm:w-auto"
         />
 
         {/* Buscar */}
