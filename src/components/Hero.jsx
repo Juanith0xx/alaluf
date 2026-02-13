@@ -10,68 +10,72 @@ const slides = [
     image: Industrial,
     titulo: (
       <>
-      <div className="text-lg font-[Outfit]">Industrial</div>
-        <span className="text-[#0091A4] font-bold">ESPACIOS</span> <br></br>
-        <span className="text-white font-bold">INDUSTRIALES</span> <br></br> 
-        QUE IMPULSAN TU <br>
-        </br><span className="text-[#0091A4] font-bold"> OPERACION</span>
+        <div className="text-lg font-[Outfit]">Industrial</div>
+        <span className="text-[#0091A4] font-bold">ESPACIOS</span> <br />
+        <span className="text-white font-bold">INDUSTRIALES</span> <br />
+        QUE IMPULSAN TU <br />
+        <span className="text-[#0091A4] font-bold">OPERACION</span>
       </>
     ),
-    descripcion:(
-       <p className="font-[Outfit] text-lg text-white">
-    Más de 40 años conectando empresas con bodegas, <br />
-    ventros logísticos y terrenos estratégicos en Chile.
-  </p>
+    descripcion: (
+      <p className="font-[Outfit] text-lg text-white">
+        Más de 40 años conectando empresas con bodegas, <br />
+        centros logísticos y terrenos estratégicos en Chile.
+      </p>
     ),
   },
   {
     image: Comercial,
     titulo: (
       <>
-      <div className="text-lg font-[Outfit]">Comercial</div>
-        <span className="text-[#0091A4] font-bold">UBICACIONES</span> <span className="text-white font-bold">COMERCIALES</span>
-        <br></br> QUE POTENCIAN TU <span className="text-[#0091A4] font-bold">NEGOCIO</span>
+        <div className="text-lg font-[Outfit]">Comercial</div>
+        <span className="text-[#0091A4] font-bold">UBICACIONES</span>{" "}
+        <span className="text-white font-bold">COMERCIALES</span>
+        <br /> QUE POTENCIAN TU{" "}
+        <span className="text-[#0091A4] font-bold">NEGOCIO</span>
       </>
-    ),  
+    ),
     descripcion: (
-       <p className="font-[Outfit] text-lg text-white">
-    Asesoramos decisiones en oficinas, locales y <br />
-    activos comerciales de alto impacto.
-  </p>
+      <p className="font-[Outfit] text-lg text-white">
+        Asesoramos decisiones en oficinas, locales y <br />
+        activos comerciales de alto impacto.
+      </p>
     ),
   },
   {
     image: Recidencial,
     titulo: (
       <>
-      <div className="text-lg font-[Outfit]">Residencial</div>
-      <span className="text-[#0091A4] font-bold">ENCUENTRA</span> <br></br> <span className="text-white font-bold">EL LUGAR</span><br></br>
-      DONDE QUIERES <span className="text-[#0091A4] font-bold">VIVIR</span>
+        <div className="text-lg font-[Outfit]">Residencial</div>
+        <span className="text-[#0091A4] font-bold">ENCUENTRA</span> <br />{" "}
+        <span className="text-white font-bold">EL LUGAR</span>
+        <br />
+        DONDE QUIERES <span className="text-[#0091A4] font-bold">VIVIR</span>
       </>
     ),
     descripcion: (
-       <p className="font-[Outfit] text-lg text-white">
-    Experiencia y acompañamiento en la compra <br />
-    y arriendo de casas y departamento.
-  </p>
+      <p className="font-[Outfit] text-lg text-white">
+        Experiencia y acompañamiento en la compra <br />
+        y arriendo de casas y departamentos.
+      </p>
     ),
   },
   {
     image: Inversion,
     titulo: (
       <>
-      <div className="text-lg font-[Outfit]">Terrenos</div>
-      <span className="text-[#0091A4] font-bold ">INVERTIR</span> CON <br>
-      </br>SEGURIDAD <br>
-      </br>EMPIEZA CON UNA <br></br>
-      BUENA <span className="text-[#0091A4] font-bold">ASESORÍA</span>
+        <div className="text-lg font-[Outfit]">Terrenos</div>
+        <span className="text-[#0091A4] font-bold">INVERTIR</span> CON <br />
+        SEGURIDAD <br />
+        EMPIEZA CON UNA <br />
+        BUENA <span className="text-[#0091A4] font-bold">ASESORÍA</span>
       </>
     ),
     descripcion: (
-       <p className="font-[Outfit] text-lg text-white">
-    Identificamos oportunidades de renta y  <br />
-    desarrollo con análisis y respaldo profesional.
-  </p>
+      <p className="font-[Outfit] text-lg text-white">
+        Identificamos oportunidades de renta y <br />
+        desarrollo con análisis y respaldo profesional.
+      </p>
     ),
   },
 ];
@@ -79,7 +83,6 @@ const slides = [
 const Hero = () => {
   const [current, setCurrent] = useState(0);
 
-  // Cambio automático cada 8 segundos
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrent((prev) => (prev + 1) % slides.length);
@@ -87,9 +90,8 @@ const Hero = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // Variantes para animación de texto
   const textVariants = {
-    hidden: { x: -50, opacity: 0 },   // empieza desde la izquierda
+    hidden: { x: -50, opacity: 0 },
     visible: { x: 0, opacity: 1, transition: { duration: 1 } },
     exit: { x: 50, opacity: 0, transition: { duration: 0.5 } },
   };
@@ -110,8 +112,16 @@ const Hero = () => {
         />
       </AnimatePresence>
 
-      {/* Overlay de color oscuro para texto */}
-      <div className="absolute inset-0 bg-black/30 z-10"></div>
+      {/* Overlay con gradiente de Figma */}
+      <div
+        className="absolute inset-0 z-10"
+        style={{
+          background: `
+            linear-gradient(0deg, rgba(0,0,0,0.36), rgba(0,0,0,0.36)),
+            linear-gradient(250.6deg, rgba(0,0,0,0) 40.02%, rgba(0,0,0,0.6) 56.94%)
+          `,
+        }}
+      ></div>
 
       {/* Texto sobre hero con animación */}
       <motion.div
@@ -123,7 +133,9 @@ const Hero = () => {
         exit="exit"
       >
         <h1 className="text-2xl mb-4 font-[Outfit]">{slides[current].titulo}</h1>
-        <p className="mb-6 font-light font-[Outfit] text-lg">{slides[current].descripcion}</p>
+        <p className="mb-6 font-light font-[Outfit] text-lg">
+          {slides[current].descripcion}
+        </p>
         <button className="px-6 py-2 border-[1px] border-white text-white rounded-lg font-semibold hover:bg-white/10 transition-colors duration-300 font-[Outfit]">
           Ver Proyectos
         </button>
@@ -134,7 +146,9 @@ const Hero = () => {
         {slides.map((_, index) => (
           <button
             key={index}
-            className={`w-3 h-3 rounded-full ${index === current ? "bg-cyan-400" : "bg-white/50"}`}
+            className={`w-3 h-3 rounded-full ${
+              index === current ? "bg-cyan-400" : "bg-white/50"
+            }`}
             onClick={() => setCurrent(index)}
           />
         ))}
