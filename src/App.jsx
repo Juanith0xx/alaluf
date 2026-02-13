@@ -4,6 +4,7 @@ import './App.css'
 import Hero from './components/Hero'
 import SearchBar from './components/SearchBar'
 import SpecialArea from './components/SpecialArea'
+import StatsSection from './components/StatsSection'
 
 function App() {
   
@@ -14,6 +15,7 @@ function App() {
       <Hero />
       <SearchBar />
       <SpecialArea />
+      <StatsSection />
     </>
   )
 }

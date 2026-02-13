@@ -95,7 +95,7 @@ const EspecialPorArea = () => {
           <h2 className="text-2xl md:text-3xl font-light text-[#0091A4]">
             ESPECIAL POR ÁREA
           </h2>
-          <p className="text-gray-300 mt-2">
+          <p className="text-gray-300">
             Propiedades seleccionadas por nuestro equipo
           </p>
         </div>
