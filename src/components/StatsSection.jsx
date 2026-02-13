@@ -123,7 +123,7 @@ const StatsSection = () => {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: index * 0.2 }}
             viewport={{ once: true }}
-            className="space-y-4"
+            className="space-y-3"
           >
             {/* Ícono en PNG */}
             <img
@@ -140,8 +140,8 @@ const StatsSection = () => {
               />
             </h3>
 
-            <p className="font-medium tracking-wide font-[Outfit]">{stat.title}</p>
-            <p className="text-sm text-gray-400 font-[Outfit]">{stat.subtitle}</p>
+            <p className="font-medium tracking-wide font-[Outfit] mb-1">{stat.title}</p>
+            <p className="text-sm text-gray-400 font-[Outfit] ">{stat.subtitle}</p>
           </motion.div>
         ))}
       </div>
