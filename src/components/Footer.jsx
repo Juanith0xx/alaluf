@@ -1,4 +1,4 @@
-import bg from "../assets/marmol.jpg"
+import bg from "../assets/Marmol.jpg"
 import logo from "../assets/Logo_A.png"
 
 const Footer = () => {
