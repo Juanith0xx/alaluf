@@ -27,7 +27,7 @@ const EspecialPorArea = () => {
       ubicacion: "Las Condes, Santiago",
       size: "180 m2",
       precio: "12.500 UF",
-      img: propiedadImg2,
+      img: propiedadImg3,
     },
     {
       tipo: "Terreno",
@@ -35,7 +35,7 @@ const EspecialPorArea = () => {
       ubicacion: "Peñalolén, Santiago",
       size: "2.000 m2",
       precio: "25.000 UF",
-      img: propiedadImg3,
+      img: propiedadImg2,
     },
   ];
 

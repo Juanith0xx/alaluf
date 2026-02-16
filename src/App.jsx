@@ -5,6 +5,9 @@ import Hero from './components/Hero'
 import SearchBar from './components/SearchBar'
 import SpecialArea from './components/SpecialArea'
 import StatsSection from './components/StatsSection'
+import InfoSection from './components/InfoSection'
+import ExperienceSection from './components/ExperinceSection'
+import Footer from './components/Footer'
 
 function App() {
   
@@ -16,6 +19,9 @@ function App() {
       <SearchBar />
       <SpecialArea />
       <StatsSection />
+      <InfoSection />
+      <ExperienceSection />
+      <Footer />
     </>
   )
 }
