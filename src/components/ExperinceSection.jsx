@@ -1,4 +1,4 @@
-import bg from "../assets/marmol.jpg"
+import bg from "../assets/Marmol.jpg"
 import imgThree from "../assets/ciudad.jpg"
 import imgTwo from "../assets/volcan.jpg"
 import mapImage from "../assets/mapa.jpg" // 👈 agrega tu imagen aquí
