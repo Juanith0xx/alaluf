@@ -1,8 +1,7 @@
 import bg from "../assets/Marmol.jpg"
 import imgThree from "../assets/ciudad.jpg"
-import imgTwo from "../assets/volcan.jpg"
-import mapImage from "../assets/mapa.jpg" // 👈 agrega tu imagen aquí
-
+import imgTwo from "../assets/Volcan.jpg"
+import mapImage from "../assets/mapa.jpg"
 const ExperienceSection = () => {
   return (
     <section className="w-full text-white overflow-hidden font-[Outfit]">
