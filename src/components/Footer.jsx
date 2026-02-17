@@ -1,5 +1,6 @@
 import bg from "../assets/Marmol.jpg"
 import logo from "../assets/Logo_A.png"
+import { FaLinkedin, FaInstagram } from "react-icons/fa";
 
 const Footer = () => {
   return (
@@ -15,10 +16,30 @@ const Footer = () => {
           <div>
             <img src={logo} alt="Alaluf" className="h-10 mb-6" />
 
-            <p className="text-white/70 leading-relaxed text-sm">
+            <p className="text-white/70 leading-relaxed text-sm mb-6">
               Especialistas en propiedades industriales, comerciales y
               residenciales de alto valor desde 1994.
             </p>
+
+            {/* Redes sociales */}
+            <div className="flex flex-col gap-4">
+              <a
+                href="https://www.linkedin.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#05FFEA] hover:text-white transition text-4xl"
+              >
+                <FaLinkedin />
+              </a>
+              <a
+                href="https://www.instagram.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#05FFEA] hover:text-white transition text-4xl"
+              >
+                <FaInstagram />
+              </a>
+            </div>
           </div>
 
           {/* PROPIEDADES */}
@@ -76,7 +97,6 @@ const Footer = () => {
             </h4>
 
             <div className="space-y-6 text-sm text-white/70">
-
               {/* Teléfono */}
               <div className="flex items-start gap-4">
                 <div className="border border-[#24B6C1] p-2 rounded-lg flex items-center justify-center">
@@ -147,10 +167,8 @@ const Footer = () => {
                   </p>
                 </div>
               </div>
-
             </div>
           </div>
-
         </div>
 
         {/* Línea inferior */}

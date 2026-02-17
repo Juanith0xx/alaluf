@@ -115,7 +115,7 @@ const StatsSection = () => {
       {/* Overlay elegante */}
       <div className="absolute inset-0" />
 
-      <div className="relative z-10 max-w-7xl mx-auto px-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-14 text-center text-white">
+      <div className="relative z-10 max-w-7xl mx-auto px-46 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 text-center text-white">
         {stats.map((stat, index) => (
           <motion.div
             key={index}

@@ -66,7 +66,7 @@ const ExperienceSection = () => {
 
           {/* CLIENTES */}
           <div className="mt-24 text-center">
-            <h3 className="text-lg tracking-widest font-bold">
+            <h3 className="text-2xl font-light tracking-widest font-bold">
               NUESTROS <span className="text-[#24B6C1]">CLIENTES</span>
             </h3>
 
@@ -98,8 +98,8 @@ const ExperienceSection = () => {
       <div className="bg-[#0f0f0f] py-28 px-6">
         <div className="max-w-7xl mx-auto">
 
-          <h2 className="text-center text-2xl  mb-20 tracking-widest font-bold">
-            ESTAMOS <span className="text-[#24B6C1] font-bold">EN TODO CHILE</span>
+          <h2 className="text-center text-2xl  mb-20 tracking-widest font-light">
+            ESTAMOS <span className="text-[#24B6C1]">EN TODO CHILE</span>
           </h2>
 
           <div className="grid md:grid-cols-2 gap-20 items-start">

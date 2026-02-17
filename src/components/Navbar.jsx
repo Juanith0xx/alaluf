@@ -3,11 +3,16 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Search } from "lucide-react";
 import logo from "../assets/Logo_A.png";
 
+/* =========================
+   DESKTOP NAVBAR
+========================= */
 const NavbarDesktop = ({ openDropdown, setOpenDropdown }) => (
   <nav className="fixed w-full z-50 bg-black/50 text-white font-[Outfit] pt-8 hidden lg:block">
-    <div className="max-w-7xl mx-auto px-6 py-4 flex items-start lg:items-center justify-between">
-      {/* LEFT SIDE */}
-      <div className="flex flex-col lg:flex-row items-start lg:items-center flex-1">
+    <div className="max-w-7xl mx-auto px-6 py-4 flex items-center">
+
+      {/* LEFT SECTION (Logo + Links) */}
+      <div className="flex items-center flex-1">
+
         {/* Logo */}
         <a href="/" className="flex items-center -ml-3">
           <img
@@ -17,69 +22,77 @@ const NavbarDesktop = ({ openDropdown, setOpenDropdown }) => (
           />
         </a>
 
-        {/* Desktop Menu */}
-        <div className="hidden lg:flex items-center gap-12 text-[15px] tracking-wide ml-auto">
-          {/* Servicios Dropdown */}
-          <div
-            className="relative"
-            onMouseEnter={() => setOpenDropdown(true)}
-            onMouseLeave={() => setOpenDropdown(false)}
-          >
-            <span className="cursor-pointer hover:text-teal-400 transition duration-300 font-medium">
-              Servicios
-            </span>
+        {/* Menu Links */}
+        <div className="flex items-center text-[15px] tracking-wide ml-auto gap-11">
 
-            <AnimatePresence>
-              {openDropdown && (
-                <motion.div
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 15 }}
-                  transition={{ duration: 0.25 }}
-                  className="absolute top-12 -left-6 bg-black/50 backdrop-blur-2xl p-6 shadow-2xl w-60 border border-white/10"
-                >
-                  <ul className="space-y-4 text-base font-medium">
-                    <li className="relative cursor-pointer transition hover:text-teal-400 before:content-['>'] before:absolute before:-left-4 before:opacity-0 hover:before:opacity-100">
-                      Asesoría Inmobiliaria
-                    </li>
-                    <li className="relative cursor-pointer transition hover:text-teal-400 before:content-['>'] before:absolute before:-left-4 before:opacity-0 hover:before:opacity-100">
-                      Gestión de Licitaciones
-                    </li>
-                    <li className="relative cursor-pointer transition hover:text-teal-400 before:content-['>'] before:absolute before:-left-4 before:opacity-0 hover:before:opacity-100">
-                      Administración de Arriendos
-                    </li>
-                    <li className="relative cursor-pointer transition hover:text-teal-400 before:content-['>'] before:absolute before:-left-4 before:opacity-0 hover:before:opacity-100">
-                      Tasación y Evaluación de Activos
-                    </li>
-                    <li className="relative cursor-pointer transition hover:text-teal-400 before:content-['>'] before:absolute before:-left-4 before:opacity-0 hover:before:opacity-100">
-                      Inversiones Inmobiliarias
-                    </li>
-                  </ul>
-                </motion.div>
-              )}
-            </AnimatePresence>
+          {/* Links Left */}
+          <div className="flex items-center gap-12">
+
+            {/* Servicios Dropdown */}
+            <div
+              className="relative"
+              onMouseEnter={() => setOpenDropdown(true)}
+              onMouseLeave={() => setOpenDropdown(false)}
+            >
+              <span className="cursor-pointer hover:text-teal-400 transition duration-300 font-medium">
+                Servicios
+              </span>
+
+              <AnimatePresence>
+                {openDropdown && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 15 }}
+                    transition={{ duration: 0.25 }}
+                    className="absolute top-12 -left-6 bg-black/50 backdrop-blur-2xl p-6 shadow-2xl w-60 border border-white/10"
+                  >
+                    <ul className="space-y-4 text-base font-medium">
+                      <li className="relative cursor-pointer transition hover:text-teal-400 before:content-['>'] before:absolute before:-left-4 before:opacity-0 hover:before:opacity-100">
+                        Asesoría Inmobiliaria
+                      </li>
+                      <li className="relative cursor-pointer transition hover:text-teal-400 before:content-['>'] before:absolute before:-left-4 before:opacity-0 hover:before:opacity-100">
+                        Gestión de Licitaciones
+                      </li>
+                      <li className="relative cursor-pointer transition hover:text-teal-400 before:content-['>'] before:absolute before:-left-4 before:opacity-0 hover:before:opacity-100">
+                        Administración de Arriendos
+                      </li>
+                      <li className="relative cursor-pointer transition hover:text-teal-400 before:content-['>'] before:absolute before:-left-4 before:opacity-0 hover:before:opacity-100">
+                        Tasación y Evaluación de Activos
+                      </li>
+                      <li className="relative cursor-pointer transition hover:text-teal-400 before:content-['>'] before:absolute before:-left-4 before:opacity-0 hover:before:opacity-100">
+                        Inversiones Inmobiliarias
+                      </li>
+                    </ul>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            <a href="#" className="hover:text-teal-400 transition duration-300 font-medium">
+              Nosotros
+            </a>
+            <a href="#" className="hover:text-teal-400 transition duration-300 font-medium">
+              Newsletter
+            </a>
+            <a href="#" className="hover:text-teal-400 transition duration-300 font-medium">
+              Contacto
+            </a>
           </div>
 
-          <a href="#" className="hover:text-teal-400 transition duration-300 font-medium">
-            Nosotros
-          </a>
-          <a href="#" className="hover:text-teal-400 transition duration-300 font-medium">
-            Newsletter
-          </a>
-          <a href="#" className="hover:text-teal-400 transition duration-300 font-medium">
-            Contacto
-          </a>
+          {/* Mi Alaluf separado hacia la derecha */}
           <a
             href="https://alaluf.cl/mialaluf/"
-            className="hover:text-teal-400 transition duration-300 font-medium"
+            className="ml-auto hover:text-teal-400 transition duration-300 font-medium"
           >
             Mi Alaluf
           </a>
+
         </div>
       </div>
 
-      {/* Search */}
-      <div className="hidden lg:flex items-center bg-white/10 px-4 py-2 rounded-xl backdrop-blur-md border border-white/10 hover:border-teal-400/50 transition ml-20">
+      {/* SEARCH */}
+      <div className="hidden lg:flex items-center bg-white/10 px-4 py-2 rounded-xl backdrop-blur-md border border-white/10 hover:border-teal-400/50 transition ml-10">
         <input
           type="text"
           placeholder="Ingresar código"
@@ -87,14 +100,21 @@ const NavbarDesktop = ({ openDropdown, setOpenDropdown }) => (
         />
         <Search size={18} className="ml-2 opacity-70" />
       </div>
+
     </div>
-    <div className="border-b-1 border-white/70"></div>
+
+    <div className="border-b border-white/20"></div>
   </nav>
 );
 
+
+/* =========================
+   MOBILE NAVBAR
+========================= */
 const NavbarMobile = ({ openMenu, setOpenMenu }) => (
   <nav className="fixed w-full z-50 bg-black/60 text-white font-[Outfit] pt-6 lg:hidden">
     <div className="flex items-center justify-between px-6 py-4">
+      
       {/* Logo */}
       <a href="/" className="flex items-center">
         <img
@@ -127,7 +147,9 @@ const NavbarMobile = ({ openMenu, setOpenMenu }) => (
             <a href="#" className="hover:text-teal-400 transition">Nosotros</a>
             <a href="#" className="hover:text-teal-400 transition">Newsletter</a>
             <a href="#" className="hover:text-teal-400 transition">Contacto</a>
-            <a href="#" className="hover:text-teal-400 transition font-semibold">Mi Alaluf</a>
+            <a href="#" className="hover:text-teal-400 transition font-semibold">
+              Mi Alaluf
+            </a>
 
             {/* Mobile Search */}
             <div className="flex items-center bg-white/10 px-4 py-2 rounded-xl mt-4">
@@ -145,14 +167,24 @@ const NavbarMobile = ({ openMenu, setOpenMenu }) => (
   </nav>
 );
 
+
+/* =========================
+   MAIN NAVBAR
+========================= */
 const Navbar = () => {
   const [openMenu, setOpenMenu] = useState(false);
   const [openDropdown, setOpenDropdown] = useState(false);
 
   return (
     <>
-      <NavbarDesktop openDropdown={openDropdown} setOpenDropdown={setOpenDropdown} />
-      <NavbarMobile openMenu={openMenu} setOpenMenu={setOpenMenu} />
+      <NavbarDesktop
+        openDropdown={openDropdown}
+        setOpenDropdown={setOpenDropdown}
+      />
+      <NavbarMobile
+        openMenu={openMenu}
+        setOpenMenu={setOpenMenu}
+      />
     </>
   );
 };
