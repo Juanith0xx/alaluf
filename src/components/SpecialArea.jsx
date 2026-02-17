@@ -92,7 +92,7 @@ const EspecialPorArea = () => {
 
         {/* Título principal */}
         <div className="text-center mb-12 font-[Outfit]">
-          <h2 className="text-2xl md:text-3xl font-light text-[#0091A4]">
+          <h2 className="text-2xl md:text-[36px] font-medium text-[#0091A4]">
             ESPECIAL POR ÁREA
           </h2>
           <p className="text-gray-300">

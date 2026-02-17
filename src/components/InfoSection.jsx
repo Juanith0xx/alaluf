@@ -9,7 +9,7 @@ const InfoSection = () => {
           
           {/* Card */}
           <div className="bg-black text-white p-8 md:p-12 rounded-sm shadow-2xl md:absolute md:left-0 md:w-[700px] z-10">
-            <h2 className="text-2xl md:text-3xl font-light font-[Outfit] mb-4">
+            <h2 className="text-2xl md:text-[36px] font-medium font-[Outfit] mb-4">
               Comercialice su propiedad
             </h2>
             <p className="text-sm md:text-base font-[Outfit] text-white/80 leading-relaxed mb-6">
@@ -46,7 +46,7 @@ const InfoSection = () => {
 
           {/* Card */}
           <div className="bg-[#e9e9e9] p-8 md:p-12 rounded-sm shadow-xl md:absolute md:right-0 md:w-[650px] z-10">
-            <h2 className="text-2xl md:text-5xl font-light mb-4 text-gray-800 font-[Outfit] whitespace-nowrap">
+            <h2 className="text-2xl md:text-[36px] font-medium mb-4 text-gray-800 font-[Outfit] whitespace-nowrap">
               ¿Tienes alguna pregunta?
             </h2>
             <p className="text-sm md:text-xl text-gray-600 leading-relaxed font-light mb-6 font-[Outfit]">

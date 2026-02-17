@@ -66,7 +66,7 @@ const ExperienceSection = () => {
 
           {/* CLIENTES */}
           <div className="mt-24 text-center">
-            <h3 className="text-2xl font-light tracking-widest font-bold">
+            <h3 className="text-[36px] font-medium tracking-widest">
               NUESTROS <span className="text-[#24B6C1]">CLIENTES</span>
             </h3>
 
@@ -95,29 +95,29 @@ const ExperienceSection = () => {
       {/* ========================= */}
       {/* BLOQUE 2 — COBERTURA */}
       {/* ========================= */}
-      <div className="bg-[#0f0f0f] py-28 px-6">
+      <div className="bg-[#0f0f0f] py-10 px-6">
         <div className="max-w-7xl mx-auto">
 
-          <h2 className="text-center text-2xl  mb-20 tracking-widest font-light">
+          <h2 className="text-center text-[36px] mb-32 tracking-widest font-medium">
             ESTAMOS <span className="text-[#24B6C1]">EN TODO CHILE</span>
           </h2>
 
-          <div className="grid md:grid-cols-2 gap-20 items-start">
+          <div className="md:col-span-1 grid md:grid-cols-2 -mr-30 items-start">
 
             {/* IZQUIERDA — Imagen + Regiones */}
-            <div className="grid md:grid-cols-2 gap-10 items-start">
+            <div className="grid md:grid-cols-2 gap-1 items-start">
 
               {/* Imagen */}
               <div>
                 <img
                   src={mapImage}
                   alt="Mapa de cobertura en Chile"
-                  className="w-full h-full object-cover rounded-3xl shadow-2xl -mt-20 "
+                  className="w-[68%] object-cover rounded-3xl shadow-2xl -mt-28 "
                 />
               </div>
 
               {/* Regiones */}
-              <div className="text-white/60 space-y-4">
+              <div className="text-white/60 space-y-4 -ml-14">
                 <p className="font-semibold text-white mb-6">
                   Zonas de cobertura
                 </p>
@@ -143,7 +143,12 @@ const ExperienceSection = () => {
             </div>
 
            {/* DERECHA — Formulario */}
-<div className="bg-white text-gray-800 rounded-[60px] p-14 shadow-2xl">
+<div className="bg-white text-gray-800 rounded-tl-[80px] rounded-b-none p-12 shadow-2xl -mt-23 -ml-34">
+
+  {/* Título */}
+  <h2 className="text-2xl md:text-3xl font-medium mb-10 text-start font-[Outfit]">
+    Cuéntanos cómo podemos ayudarte
+  </h2>
 
   <form className="space-y-8 font-[Outfit]">
 
@@ -152,11 +157,10 @@ const ExperienceSection = () => {
       {/* Tipo de propiedad */}
       <div className="space-y-2">
         <label className="text-sm font-semibold">
-          Tipo de propiedad
+          Estoy Interesado(a) en
         </label>
-        <select className="w-full bg-gray-100 border border-gray-200 rounded-xl px-4 py-4 text-gray-500 focus:outline-none focus:ring-2 focus:ring-[#24B6C1] mt-2">
-          <option>Selecciona
-          </option>
+        <select className="w-full bg-white border border-gray-200 px-6 py-2 text-gray-500 focus:outline-none focus:ring-2 focus:ring-[#24B6C1] mt-2">
+          <option>Selecciona</option>
           <option value="residencial">Residencial</option>
           <option value="oficina">Oficina</option>
           <option value="retail">Retail</option>
@@ -164,30 +168,6 @@ const ExperienceSection = () => {
           <option value="terreno-proyecto">Terreno para Proyecto</option>
           <option value="administracion-arriendos">Administración de Arriendos</option>
         </select>
-      </div>
-
-      {/* Rango precio */}
-      <div className="space-y-2">
-        <label className="text-sm font-semibold">
-          Rango de precio (UF)
-        </label>
-        <input
-          type="text"
-          placeholder="Ej: 10.000 - 50.000"
-          className="w-full bg-gray-100 border border-gray-200 rounded-xl px-4 py-4 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#24B6C1] mt-2"
-        />
-      </div>
-
-      {/* Superficie */}
-      <div className="space-y-2">
-        <label className="text-sm font-semibold">
-          Superficie (m2)
-        </label>
-        <input
-          type="text"
-          placeholder="Ej: Mínimo 2.000 m2"
-          className="w-full bg-gray-100 border border-gray-200 rounded-xl px-4 py-4 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#24B6C1] mt-2"
-        />
       </div>
 
       {/* Nombre */}
@@ -198,7 +178,7 @@ const ExperienceSection = () => {
         <input
           type="text"
           placeholder="Tu nombre"
-          className="w-full bg-gray-100 border border-gray-200 rounded-xl px-4 py-4 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#24B6C1] mt-2"
+          className="w-full bg-white border border-gray-200 px-6 py-2 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#24B6C1] mt-2"
         />
       </div>
 
@@ -210,7 +190,7 @@ const ExperienceSection = () => {
         <input
           type="email"
           placeholder="tu@email.com"
-          className="w-full bg-gray-100 border border-gray-200 rounded-xl px-4 py-4 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#24B6C1] mt-2"
+          className="w-full bg-white border border-gray-200 px-6 py-2 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#24B6C1] mt-2"
         />
       </div>
 
@@ -222,7 +202,7 @@ const ExperienceSection = () => {
         <input
           type="text"
           placeholder="+56 9 1234 5678"
-          className="w-full bg-gray-100 border border-gray-200 rounded-xl px-4 py-4 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#24B6C1] mt-2"
+          className="w-full bg-white border border-gray-200 px-6 py-2 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#24B6C1] mt-2"
         />
       </div>
 
@@ -234,7 +214,7 @@ const ExperienceSection = () => {
         <textarea
           rows="5"
           placeholder="Describe la propiedad que buscas, ubicación preferida, uso previsto, etc."
-          className="w-full bg-gray-100 border border-gray-200 rounded-xl px-4 py-4 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#24B6C1] mt-2"
+          className="w-full bg-white border border-gray-200 px-4 py-4 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#24B6C1] mt-2"
         />
       </div>
 
@@ -243,7 +223,7 @@ const ExperienceSection = () => {
     {/* Botón */}
     <button
   type="submit"
-  className="group bg-[#158F9B] hover:bg-[#127C86] text-white px-6 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 flex items-center justify-center gap-2 mx-auto"
+  className="group bg-[#158F9B] hover:bg-[#127C86] text-white px-41 py-2.5 rounded-lg  text-sm font-light transition-all duration-300 flex items-center justify-center gap-2 mx-auto"
 >
   <svg
     xmlns="http://www.w3.org/2000/svg"
