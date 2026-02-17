@@ -8,6 +8,7 @@ import StatsSection from './components/StatsSection'
 import InfoSection from './components/InfoSection'
 import ExperienceSection from './components/ExperinceSection'
 import Footer from './components/Footer'
+import WhatsAppBubble from './components/WhatsAppBubble'
 
 function App() {
   
@@ -22,6 +23,7 @@ function App() {
       <InfoSection />
       <ExperienceSection />
       <Footer />
+       <WhatsAppBubble />
     </>
   )
 }
