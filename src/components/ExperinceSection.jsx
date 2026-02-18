@@ -161,12 +161,12 @@ const ExperienceSection = () => {
         </label>
         <select className="w-full bg-white border border-gray-200 px-6 py-2 text-gray-500 focus:outline-none focus:ring-2 focus:ring-[#24B6C1] mt-2">
           <option>Selecciona</option>
-          <option value="residencial">Residencial</option>
-          <option value="oficina">Oficina</option>
-          <option value="retail">Retail</option>
-          <option value="industrial">Industrial</option>
-          <option value="terreno-proyecto">Terreno para Proyecto</option>
-          <option value="administracion-arriendos">Administración de Arriendos</option>
+          <option value="propiedad">Publicar una Propiedad</option>
+          <option value="licitar">Licitar una Propiedad</option>
+          <option value="arriendo">Administracion de Arriendo</option>
+          <option value="tasar">Tasa o evaluar un activo</option>
+          <option value="inversiones">Inversiones Inmobiliarias</option>
+          <option value="contacto">Hablar con un asesor</option>
         </select>
       </div>
 
@@ -213,7 +213,7 @@ const ExperienceSection = () => {
         </label>
         <textarea
           rows="5"
-          placeholder="Describe la propiedad que buscas, ubicación preferida, uso previsto, etc."
+          placeholder="Descríbenos tu requerimiento específico para poder ayudarte."
           className="w-full bg-white border border-gray-200 px-4 py-4 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#24B6C1] mt-2"
         />
       </div>
