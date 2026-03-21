@@ -10,17 +10,20 @@ const slides = [
     image: Industrial,
     titulo: (
       <>
-        <div className="text-lg font-[Outfit]">Industrial</div>
-        <span className="text-[#0091A4] font-bold">ESPACIOS</span> <br />
-        <span className="text-white font-bold">INDUSTRIALES</span> <br />
-        QUE IMPULSAN TU <br />
-        <span className="text-[#0091A4] font-bold">OPERACION</span>
+        <div className="text-lg font-[Outfit] mb-2">Industrial</div>
+        <div className="flex flex-col gap-1">
+          <span className="text-white font-bold text-3xl md:text-5xl lg:text-6xl whitespace-nowrap">
+            ESPACIOS INDUSTRIALES,
+          </span>
+          <span className="text-[#0091A4] font-bold text-3xl md:text-5xl lg:text-6xl whitespace-nowrap uppercase">
+            QUE IMPULSAN TU OPERACION
+          </span>
+        </div>
       </>
     ),
     descripcion: (
-      <p className="font-[Outfit] text-lg text-white">
-        Más de 40 años conectando empresas con bodegas, <br />
-        centros logísticos y terrenos estratégicos en Chile.
+   <p className="font-[Outfit] text-lg text-white mt-4 max-w-xl whitespace-nowrap">
+        Bodegas, centros logísticos y terrenos industriales. El área donde más operaciones hemos cerrado, con los clientes más exigentes <br></br>del mercado chileno.
       </p>
     ),
   },
@@ -28,17 +31,23 @@ const slides = [
     image: Comercial,
     titulo: (
       <>
-        <div className="text-lg font-[Outfit]">Comercial</div>
-        <span className="text-[#0091A4] font-bold">UBICACIONES</span>{" "}
-        <span className="text-white font-bold">COMERCIALES</span>
-        <br /> QUE POTENCIAN TU{" "}
-        <span className="text-[#0091A4] font-bold">NEGOCIO</span>
+        <div className="text-lg font-[Outfit] mb-2">Comercial</div>
+        <div className="flex flex-col gap-1">
+          <span className="text-white font-bold text-3xl md:text-5xl lg:text-6xl whitespace-nowrap">
+            ANALIZAMOS,
+          </span>
+          <span className="text-[#0091A4] font-bold text-3xl md:text-5xl lg:text-6xl whitespace-nowrap uppercase">
+            DÓNDE CRECER MEJOR
+          </span>
+          <span className="text-white font-bold text-3xl md:text-5xl lg:text-6xl whitespace-nowrap">
+            TU NEGOCIO.
+          </span>
+        </div>
       </>
     ),
     descripcion: (
-      <p className="font-[Outfit] text-lg text-white">
-        Asesoramos decisiones en oficinas, locales y <br />
-        activos comerciales de alto impacto.
+   <p className="font-[Outfit] text-lg text-white mt-4 max-w-xl whitespace-nowrap">
+        Más que locales, oficinas y edificios corporativos, analizamos y recomendamos las mejores decisiones comerciales para empresas. 
       </p>
     ),
   },
@@ -46,17 +55,31 @@ const slides = [
     image: Recidencial,
     titulo: (
       <>
-        <div className="text-lg font-[Outfit]">Residencial</div>
-        <span className="text-[#0091A4] font-bold">ENCUENTRA</span> <br />{" "}
-        <span className="text-white font-bold">EL LUGAR</span>
-        <br />
-        DONDE QUIERES <span className="text-[#0091A4] font-bold">VIVIR</span>
+        <div className="text-lg font-[Outfit] mb-2">Comercial</div>
+        <div className="flex flex-col gap-1">
+          <span className="text-white font-bold text-3xl md:text-5xl lg:text-6xl whitespace-nowrap">
+            LOS QUE VIVEN MEJOR,
+            <span className="text-[#0091A4] font-bold text-3xl md:text-5xl lg:text-6xl whitespace-nowrap uppercase">
+           ELIGIERON BIEN.
+          </span>
+          </span>
+
+         <span className="text-[#0091A4] font-bold text-3xl md:text-5xl lg:text-6xl whitespace-nowrap">
+  VIVIR{" "} {/* <-- El espacio en React se puede forzar con {" "} */}
+  <span className="text-white font-bold text-3xl md:text-5xl lg:text-6xl whitespace-nowrap uppercase">
+    BIEN EMPIEZA{" "}
+  </span> 
+  <span className="text-[#0091A4] font-bold text-3xl md:text-5xl lg:text-6xl whitespace-nowrap uppercase">
+    POR INVERTIR BIEN.
+  </span>       
+</span>
+        </div>
       </>
     ),
     descripcion: (
-      <p className="font-[Outfit] text-lg text-white">
-        Experiencia y acompañamiento en la compra <br />
-        y arriendo de casas y departamentos.
+   <p className="font-[Outfit] text-lg text-white mt-4 max-w-xl whitespace-nowrap">
+        Con casas y departamentos en el sector oriente, te acompañamos desde que decides buscar, hasta las llaves en la mano, con el <br></br>
+criterio de quien sabe negociar y conoce cada barrio desde hace 45 años. 
       </p>
     ),
   },
@@ -64,17 +87,20 @@ const slides = [
     image: Inversion,
     titulo: (
       <>
-        <div className="text-lg font-[Outfit]">Terrenos</div>
-        <span className="text-[#0091A4] font-bold">INVERTIR</span> CON <br />
-        SEGURIDAD <br />
-        EMPIEZA CON UNA <br />
-        BUENA <span className="text-[#0091A4] font-bold">ASESORÍA</span>
+        <div className="text-lg font-[Outfit] mb-2">Terreno</div>
+        <div className="flex flex-col gap-1">
+          <span className="text-white font-bold text-3xl md:text-5xl lg:text-6xl whitespace-nowrap">
+            ESTUDIAMOS EL SUELO,
+          </span>
+          <span className="text-[#0091A4] font-bold text-3xl md:text-5xl lg:text-6xl whitespace-nowrap uppercase">
+            Y VEMOS EL POTENCIAL QUE OTROS NO VEN.
+          </span>
+        </div>
       </>
     ),
     descripcion: (
-      <p className="font-[Outfit] text-lg text-white">
-        Identificamos oportunidades de renta y <br />
-        desarrollo con análisis y respaldo profesional.
+   <p className="font-[Outfit] text-lg text-white mt-4 max-w-xl whitespace-nowrap">
+        Terrenos para desarrollo, industrial y proyectos, 45 años de criterio inmobiliario detrás de cada recomendación. 
       </p>
     ),
   },

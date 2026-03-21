@@ -9,15 +9,18 @@ import fondo from "../assets/Marmol.jpg";
 const stats = [
   {
     icon: awardIcon,
-    value: 30,
     suffix: "+",
+    value: 45,
     title: (
         <>
-        AÑOS DE <br></br> 
-        EXPERIENCIA
+        AÑOS EN GESTIÓN<br></br> 
+        INMOBILIARIA
         </>
     ),
-    subtitle: "Trayectoria consolidada",
+    subtitle: <>
+    Trayectoria y,<br></br>
+    visión experta
+    </>
   },
   {
     icon: buildingIcon,
@@ -25,10 +28,14 @@ const stats = [
     suffix: "+",
     title: (
         <>
-        PROPIEDADES <br></br>
-        TRANSADAS
+        PROPIEDADES EN <br></br>
+        CARTERA
         </>),
-    subtitle: "En los últimos 5 años",
+
+    subtitle: <>
+    Manejo de,<br></br>
+    Multiactivos
+    </>
   },
   {
     icon: usersIcon,
@@ -40,7 +47,10 @@ const stats = [
         CORPORATIVOS
         </>
     ), 
-    subtitle: "Confían en nosotros",
+    subtitle: <>
+    Confían en,<br></br>
+    nosotros
+    </>
   },
   {
     icon: trendingIcon,
@@ -48,11 +58,14 @@ const stats = [
     prefix: "#",
     title:(
         <>
-        LÍDERES <br></br> 
-        EN INDUSTRIAL
+       LIDERES EN GESTIÓN <br></br> 
+      INDUSTRIAL
         </>
     ),
-    subtitle: "Mercado Nacional",
+     subtitle: <>
+    Mercado,<br></br>
+    Nacional
+    </>
   },
 ];
 
