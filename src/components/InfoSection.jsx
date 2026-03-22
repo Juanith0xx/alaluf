@@ -10,18 +10,18 @@ const InfoSection = () => {
           {/* Card */}
           <div className="bg-black text-white p-8 md:p-12 rounded-sm shadow-2xl md:absolute md:left-0 md:w-[700px] z-10">
             <h2 className="text-2xl md:text-[36px] font-medium font-[Outfit] mb-4">
-              Comercialice su propiedad
+              <span>Tienes un activo.</span><br></br>
+              <span className="text-[#0091A4]">Alaluf lo gestiona con criterio y
+                <br></br> visión a futuro.</span>
             </h2>
             <p className="text-sm md:text-base font-[Outfit] text-white/80 leading-relaxed mb-6">
-              Desde casas rurales hasta oficinas en la ciudad, terrenos agrícolas y promociones de obra nueva,
-              le ayudamos a encontrar el comprador ideal para su propiedad.
-              Ya sea para vender, alquilar o simplemente averiguar el valor de su propiedad,
-              actuaremos como su asesor.
+              Tu propiedad merece más que un aviso en un portal. En Alaluf,
+              cada propiedad entra como un activo y sale como una decisión
+              bien tomada. Diseñamos contigo la estrategia correcta — para
+              vender, arrendar, invertir, licitar o administrar con el resultado que
+              mereces.
             </p>
-            <button className="text-[#05FFEA] font-semibold flex items-center gap-2 hover:gap-3 transition-all">
-              MÁS INFORMACIÓN →
-            </button>
-          </div>
+            </div>
 
           {/* Imagen */}
           <div className="w-full md:w-[70%] md:ml-auto">
@@ -50,11 +50,12 @@ const InfoSection = () => {
               ¿Tienes alguna pregunta?
             </h2>
             <p className="text-sm md:text-xl text-gray-600 leading-relaxed font-light mb-6 font-[Outfit]">
-              Te escuchamos. Sean cuales sean tus ambiciones inmobiliarias,
-              estamos aquí para ayudarte.
+              <span className="font-bold">Lo primero es entenderte a ti:</span> tus objetivos, tu
+              situación y asesorarte en el camino más inteligente para
+              llegar donde quieres.
             </p>
-            <button className="text-[#24B6C1] font-semibold font-[Outfit] flex items-center gap-2 hover:gap-3 transition-all">
-              PONTE EN CONTACTO CON NOSOTROS →
+            <button className="text-[#24B6C1] font-light font-[Outfit] flex items-center gap-2 hover:gap-3 transition-all">
+              INICIAR LA CONVERSACIÓN
             </button>
           </div>
 

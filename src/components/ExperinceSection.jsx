@@ -2,6 +2,20 @@ import bg from "../assets/Marmol.jpg"
 import imgThree from "../assets/ciudad.jpg"
 import imgTwo from "../assets/Volcan.jpg"
 import mapImage from "../assets/mapa.jpg"
+
+// =========================================================================
+// 1. IMPORTANTE: Reemplaza estas rutas con las rutas reales de tus archivos de logo.
+// Asumimos que tienes una carpeta 'assets/logos/' dentro de 'src/'.
+// Si no tienes los logos, puedes usar placeholders temporales como comento abajo.
+// =========================================================================
+import logoFalabella from "../assets/logos/falabella.png"
+import logoCencosud from "../assets/logos/cencosud.png"
+import logoSmu from "../assets/logos/smu.png"
+import logoRipley from "../assets/logos/ripley.png"
+import logoSodimac from "../assets/logos/sodimac.png"
+import logoParqueArauco from "../assets/logos/parque.png"
+// =========================================================================
+
 const ExperienceSection = () => {
   return (
     <section className="w-full text-white overflow-hidden font-[Outfit]">
@@ -35,7 +49,7 @@ const ExperienceSection = () => {
                     WebkitTextFillColor: "transparent",
                   }}
                 >
-                  3
+                  4
                 </span>
 
                 <span
@@ -47,7 +61,7 @@ const ExperienceSection = () => {
                     WebkitTextFillColor: "transparent",
                   }}
                 >
-                  2
+                  5
                 </span>
               </h1>
             </div>
@@ -55,10 +69,10 @@ const ExperienceSection = () => {
             {/* Texto */}
             <div className="text-center md:text-left">
               <p className="text-xs md:text-sm tracking-[0.25em] text-[#24B6C1] font-bold mt-41">
-                AÑOS DE TRAYECTORIA COMPROBADA
+                AÑOS JUNTO A LAS EMPRESAS MÁS <br></br>IMPORTANTES DE CHILE.
               </p>
-              <p className="text-xs md:text-sm tracking-[0.25em] text-white mt-1 font-bold">
-                EN EL MERCADO CHILENO
+              <p className="text-xs md:text-sm  text-white mt-2">
+                Las empresas más importantes de Chile confían en<br></br>nuestro criterio.
               </p>
             </div>
 
@@ -70,21 +84,32 @@ const ExperienceSection = () => {
               NUESTROS <span className="text-[#24B6C1]">CLIENTES</span>
             </h3>
 
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 mt-10 text-white/60 tracking-wider place-items-center">
+            {/* IMPORTANTE: He actualizado la cuadrícula. 
+              Usamos flexbox para centrar mejor logos de diferentes anchos. 
+            */}
+            <div className="flex flex-wrap justify-center items-center gap-12 mt-16 px-4">
               {[
-                "Grupo Falabella",
-                "Cencosud",
-                "SMU",
-                "Ripley",
-                "Sodimac",
-                "Parque Arauco"
+                { name: "Grupo Falabella", logo: logoFalabella },
+                { name: "Cencosud", logo: logoCencosud },
+                { name: "SMU", logo: logoSmu },
+                { name: "Ripley", logo: logoRipley },
+                { name: "Sodimac", logo: logoSodimac },
+                { name: "Parque Arauco", logo: logoParqueArauco }
               ].map((cliente, i) => (
-                <span
-                  key={i}
-                  className="text-lg hover:text-white transition duration-300 cursor-pointer"
+                // El contenedor controla el tamaño máximo del logo y el efecto hover
+                <div 
+                  key={i} 
+                  className="w-40 h-20 flex items-center justify-center opacity-60 hover:opacity-100 transition duration-300 cursor-pointer p-2"
+                  title={cliente.name} // Muestra el nombre al pasar el mouse
                 >
-                  {cliente}
-                </span>
+                  <img 
+                    src={cliente.logo} 
+                    alt={`Logo de ${cliente.name}`}
+                    className="max-w-full max-h-full object-contain filter brightness-0 invert" 
+                    // brightness-0 invert hace que el logo se vuelva blanco, ideal para fondos oscuros. 
+                    // Quita estas clases si tus logos ya tienen color y quieres mantenerlo.
+                  />
+                </div>
               ))}
             </div>
           </div>
@@ -147,7 +172,7 @@ const ExperienceSection = () => {
 
   {/* Título */}
   <h2 className="text-2xl md:text-3xl font-medium mb-10 text-start font-[Outfit]">
-    Cuéntanos cómo podemos ayudarte
+    Lo primero es entenderte.
   </h2>
 
   <form className="space-y-8 font-[Outfit]">
@@ -157,16 +182,17 @@ const ExperienceSection = () => {
       {/* Tipo de propiedad */}
       <div className="space-y-2">
         <label className="text-sm font-semibold">
-          Estoy Interesado(a) en
+          ¿Qué estás buscando?
         </label>
         <select className="w-full bg-white border border-gray-200 px-6 py-2 text-gray-500 focus:outline-none focus:ring-2 focus:ring-[#24B6C1] mt-2">
           <option>Selecciona</option>
-          <option value="propiedad">Publicar una Propiedad</option>
-          <option value="licitar">Licitar una Propiedad</option>
-          <option value="arriendo">Administracion de Arriendo</option>
-          <option value="tasar">Tasa o evaluar un activo</option>
-          <option value="inversiones">Inversiones Inmobiliarias</option>
-          <option value="contacto">Hablar con un asesor</option>
+          <option value="propiedad">Comprar una propiedad</option>
+          <option value="licitar">Arrendar una propiedad</option>
+          <option value="arriendo">Vender o arrendar lo que tengo</option>
+          <option value="tasar">Asesoría de inversión</option>
+          <option value="inversiones">Licitación o terreno </option>
+          <option value="arriendo">Administración de arriendos</option>
+          <option value="contacto">No sé por dónde empezar</option>
         </select>
       </div>
 
@@ -209,11 +235,11 @@ const ExperienceSection = () => {
       {/* Textarea */}
       <div className="md:col-span-2 space-y-2">
         <label className="text-sm font-semibold">
-          Cuéntanos tus requerimientos
+          Hablemos de lo que necesitas.
         </label>
         <textarea
           rows="5"
-          placeholder="Descríbenos tu requerimiento específico para poder ayudarte."
+          placeholder="Cuéntanos qué tienes en mente — una propiedad, una inversión o simplemente una duda que quieres resolver."
           className="w-full bg-white border border-gray-200 px-4 py-4 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#24B6C1] mt-2"
         />
       </div>
@@ -239,7 +265,7 @@ const ExperienceSection = () => {
     <path d="M22 2L15 22L11 13L2 9L22 2Z" />
   </svg>
 
-  Enviar requerimiento
+  Iniciar Conversación
 </button>
 
 

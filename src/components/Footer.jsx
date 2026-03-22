@@ -1,6 +1,7 @@
 import bg from "../assets/Marmol.jpg"
 import logo from "../assets/Logo_A.png"
-import { FaLinkedin, FaInstagram } from "react-icons/fa";
+import { FaLinkedin, FaInstagram, FaYoutube, } from "react-icons/fa";
+import { FaSquareFacebook } from "react-icons/fa6";
 
 const Footer = () => {
   return (
@@ -38,6 +39,22 @@ const Footer = () => {
                 className="text-[#05FFEA] hover:text-white transition text-4xl"
               >
                 <FaInstagram />
+              </a>
+              <a
+                href="https://www.instagram.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#05FFEA] hover:text-white transition text-4xl"
+              >
+                <FaYoutube />
+              </a>
+              <a
+                href="https://www.instagram.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#05FFEA] hover:text-white transition text-4xl"
+              >
+                <FaSquareFacebook />
               </a>
             </div>
           </div>

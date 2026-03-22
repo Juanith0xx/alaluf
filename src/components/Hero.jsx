@@ -16,7 +16,7 @@ const slides = [
             ESPACIOS INDUSTRIALES,
           </span>
           <span className="text-[#0091A4] font-bold text-3xl md:text-5xl lg:text-6xl whitespace-nowrap uppercase">
-            QUE IMPULSAN TU OPERACION
+            QUE IMPULSAN TU OPERACIÓN
           </span>
         </div>
       </>

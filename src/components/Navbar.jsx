@@ -49,19 +49,25 @@ const NavbarDesktop = ({ openDropdown, setOpenDropdown }) => (
                   >
                     <ul className="space-y-4 text-base font-medium">
                       <li className="relative cursor-pointer transition hover:text-teal-400 before:content-['>'] before:absolute before:-left-4 before:opacity-0 hover:before:opacity-100">
-                        Asesoría Inmobiliaria
+                        Licitaciones
                       </li>
                       <li className="relative cursor-pointer transition hover:text-teal-400 before:content-['>'] before:absolute before:-left-4 before:opacity-0 hover:before:opacity-100">
-                        Gestión de Licitaciones
+                        Industrial
+                      </li>
+                      <li className="relative cursor-pointer transition hover:text-teal-400 before:content-['>'] before:absolute before:-left-4 before:opacity-0 hover:before:opacity-100">
+                        Comercial
+                      </li>
+                      <li className="relative cursor-pointer transition hover:text-teal-400 before:content-['>'] before:absolute before:-left-4 before:opacity-0 hover:before:opacity-100">
+                        Residencial
                       </li>
                       <li className="relative cursor-pointer transition hover:text-teal-400 before:content-['>'] before:absolute before:-left-4 before:opacity-0 hover:before:opacity-100">
                         Administración de Arriendos
                       </li>
                       <li className="relative cursor-pointer transition hover:text-teal-400 before:content-['>'] before:absolute before:-left-4 before:opacity-0 hover:before:opacity-100">
-                        Tasación y Evaluación de Activos
+                        Tasación de Activos
                       </li>
-                      <li className="relative cursor-pointer transition hover:text-teal-400 before:content-['>'] before:absolute before:-left-4 before:opacity-0 hover:before:opacity-100">
-                        Inversiones Inmobiliarias
+                       <li className="relative cursor-pointer transition hover:text-teal-400 before:content-['>'] before:absolute before:-left-4 before:opacity-0 hover:before:opacity-100">
+                        Club Deals e Inversiones
                       </li>
                     </ul>
                   </motion.div>
