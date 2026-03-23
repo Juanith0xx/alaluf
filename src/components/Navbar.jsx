@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Search } from "lucide-react";
 import logo from "../assets/Logo_A.png";
+import { Link } from 'react-router-dom';
 
 /* =========================
    DESKTOP NAVBAR
@@ -49,10 +50,14 @@ const NavbarDesktop = ({ openDropdown, setOpenDropdown }) => (
                   >
                     <ul className="space-y-4 text-base font-medium">
                       <li className="relative cursor-pointer transition hover:text-teal-400 before:content-['>'] before:absolute before:-left-4 before:opacity-0 hover:before:opacity-100">
+                      <Link to="/licitaciones" className="block w-full">
                         Licitaciones
+                      </Link>                         
                       </li>
                       <li className="relative cursor-pointer transition hover:text-teal-400 before:content-['>'] before:absolute before:-left-4 before:opacity-0 hover:before:opacity-100">
-                        Industrial
+                      <Link to="/industrial" className="block w-full">
+                      Industrial
+                      </Link>                          
                       </li>
                       <li className="relative cursor-pointer transition hover:text-teal-400 before:content-['>'] before:absolute before:-left-4 before:opacity-0 hover:before:opacity-100">
                         Comercial
