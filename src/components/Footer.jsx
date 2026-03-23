@@ -16,12 +16,6 @@ const Footer = () => {
           {/* LOGO */}
           <div>
             <img src={logo} alt="Alaluf" className="h-10 mb-6" />
-
-            <p className="text-white/70 leading-relaxed text-sm mb-6">
-              Especialistas en propiedades industriales, comerciales y
-              residenciales de alto valor desde 1994.
-            </p>
-
             {/* Redes sociales */}
             <div className="flex flex-col gap-4">
               <a

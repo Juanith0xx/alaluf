@@ -4,12 +4,13 @@ import awardIcon from "../assets/icons/award.png";
 import buildingIcon from "../assets/icons/building.png";
 import usersIcon from "../assets/icons/users.png";
 import trendingIcon from "../assets/icons/trending.png";
+import refreshIcon from "../assets/icons/refresh.png"
 import fondo from "../assets/Marmol.jpg";
 
 const stats = [
   {
     icon: awardIcon,
-    suffix: "+",
+    prefix: "+",
     value: 45,
     title: (
         <>
@@ -18,14 +19,14 @@ const stats = [
         </>
     ),
     subtitle: <>
-    Trayectoria y,<br></br>
+    Trayectoria y<br></br>
     visión experta
     </>
   },
   {
     icon: buildingIcon,
-    value: 1200,
-    suffix: "+",
+    value: 2000,
+    prefix: "+",
     title: (
         <>
         PROPIEDADES EN <br></br>
@@ -39,8 +40,9 @@ const stats = [
   },
   {
     icon: usersIcon,
+    prefix: "+",
     value: 450,
-    suffix: "+",
+    
     title: (
         <>
         CLIENTES <br></br> 
@@ -48,7 +50,7 @@ const stats = [
         </>
     ), 
     subtitle: <>
-    Confían en,<br></br>
+    Confían en<br></br>
     nosotros
     </>
   },
@@ -63,10 +65,28 @@ const stats = [
         </>
     ),
      subtitle: <>
-    Mercado,<br></br>
+    Mercado<br></br>
     Nacional
     </>
+  }, 
+  {
+    icon: refreshIcon ,
+    value: 360,
+    suffix: "°",
+    title:(
+        <>
+       COBERTURA<br></br> 
+      INMOBILIARIA
+        </>
+    ),
+     subtitle: <>
+    En todo Chile <br></br>
+    conocemos el <br></br>
+    potencial
+    </>
   },
+
+
 ];
 
 const AnimatedNumber = ({ value, prefix = "", suffix = "" }) => {
@@ -128,7 +148,7 @@ const StatsSection = () => {
       {/* Overlay elegante */}
       <div className="absolute inset-0" />
 
-      <div className="relative z-10 max-w-7xl mx-auto px-46 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 text-center text-white">
+      <div className="relative z-10 max-w-7xl mx-auto px-46 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 text-center text-white">
         {stats.map((stat, index) => (
           <motion.div
             key={index}

@@ -16,7 +16,7 @@ const slides = [
             ESPACIOS INDUSTRIALES,
           </span>
           <span className="text-[#0091A4] font-bold text-3xl md:text-5xl lg:text-6xl whitespace-nowrap uppercase">
-            QUE IMPULSAN TU OPERACIÓN
+            QUE IMPULSAN TU OPERACIÓN.
           </span>
         </div>
       </>
@@ -34,13 +34,10 @@ const slides = [
         <div className="text-lg font-[Outfit] mb-2">Comercial</div>
         <div className="flex flex-col gap-1">
           <span className="text-white font-bold text-3xl md:text-5xl lg:text-6xl whitespace-nowrap">
-            ANALIZAMOS,
+            ANALIZAMOS DÓNDE CRECER
           </span>
           <span className="text-[#0091A4] font-bold text-3xl md:text-5xl lg:text-6xl whitespace-nowrap uppercase">
-            DÓNDE CRECER MEJOR
-          </span>
-          <span className="text-white font-bold text-3xl md:text-5xl lg:text-6xl whitespace-nowrap">
-            TU NEGOCIO.
+            CRECER MEJOR TU NEGOCIO.
           </span>
         </div>
       </>
@@ -55,24 +52,14 @@ const slides = [
     image: Recidencial,
     titulo: (
       <>
-        <div className="text-lg font-[Outfit] mb-2">Comercial</div>
+        <div className="text-lg font-[Outfit] mb-2">Residencial</div>
         <div className="flex flex-col gap-1">
           <span className="text-white font-bold text-3xl md:text-5xl lg:text-6xl whitespace-nowrap">
-            LOS QUE VIVEN MEJOR,
+           VIVEN BIEN
+           </span>
             <span className="text-[#0091A4] font-bold text-3xl md:text-5xl lg:text-6xl whitespace-nowrap uppercase">
-           ELIGIERON BIEN.
-          </span>
-          </span>
-
-         <span className="text-[#0091A4] font-bold text-3xl md:text-5xl lg:text-6xl whitespace-nowrap">
-  VIVIR{" "} {/* <-- El espacio en React se puede forzar con {" "} */}
-  <span className="text-white font-bold text-3xl md:text-5xl lg:text-6xl whitespace-nowrap uppercase">
-    BIEN EMPIEZA{" "}
-  </span> 
-  <span className="text-[#0091A4] font-bold text-3xl md:text-5xl lg:text-6xl whitespace-nowrap uppercase">
-    POR INVERTIR BIEN.
-  </span>       
-</span>
+           EMPIEZA POR INVERTIR BIEN.
+              </span>
         </div>
       </>
     ),

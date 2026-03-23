@@ -1,13 +1,14 @@
 import imagen from "../assets/hero6.jpg";
+import img2 from "../assets/imagen_1.png"; // Ya la tenías importada, ahora la usaremos
+
 const InfoSection = () => {
   return (
-    <section className="w-full bg-[#f3f3f3] py-16 md:py-24">
+    <section className="w-full bg-[#f3f3f3] py-12 md:py-15">
       <div className="max-w-7xl mx-auto px-6 space-y-20">
 
-        {/* BLOQUE 1 */}
+        {/* BLOQUE 1 - Usa "imagen" */}
         <div className="relative flex flex-col md:flex-row items-center gap-10">
           
-          {/* Card */}
           <div className="bg-black text-white p-8 md:p-12 rounded-sm shadow-2xl md:absolute md:left-0 md:w-[700px] z-10">
             <h2 className="text-2xl md:text-[36px] font-medium font-[Outfit] mb-4">
               <span>Tienes un activo.</span><br></br>
@@ -21,30 +22,28 @@ const InfoSection = () => {
               vender, arrendar, invertir, licitar o administrar con el resultado que
               mereces.
             </p>
-            </div>
+          </div>
 
-          {/* Imagen */}
-          <div className="w-full md:w-[70%] md:ml-auto">
+          <div className="w-full md:w-[50%] md:ml-auto">
             <img
-              src={imagen}
-              alt="Propiedad"
-              className="w-full h-[300px] md:h-[380px] object-cover"
+              src={img2} // PRIMERA IMAGEN
+              alt="Gestión de activos"
+              className="w-full h-[320px] md:h-[380px] object-cover"
             />
           </div>
         </div>
-        {/* BLOQUE 2 */}
+
+        {/* BLOQUE 2 - Usa "img2" */}
         <div className="relative flex flex-col md:flex-row items-center gap-10">
           
-          {/* Imagen */}
           <div className="w-full md:w-[56%]">
             <img
-              src={imagen}
-              alt="Contacto"
+              src={imagen} // SEGUNDA IMAGEN (img2)
+              alt="Contacto y asesoría"
               className="w-full h-[300px] md:h-[380px] object-cover"
             />
           </div>
 
-          {/* Card */}
           <div className="bg-[#e9e9e9] p-8 md:p-12 rounded-sm shadow-xl md:absolute md:right-0 md:w-[650px] z-10">
             <h2 className="text-2xl md:text-[36px] font-medium mb-4 text-gray-800 font-[Outfit] whitespace-nowrap">
               ¿Tienes alguna pregunta?
