@@ -37,7 +37,7 @@ const slides = [
             ANALIZAMOS DÓNDE CRECER
           </span>
           <span className="text-[#0091A4] font-bold text-3xl md:text-5xl lg:text-6xl whitespace-nowrap uppercase">
-            CRECER MEJOR TU NEGOCIO.
+            MEJOR TU NEGOCIO.
           </span>
         </div>
       </>
@@ -55,7 +55,7 @@ const slides = [
         <div className="text-lg font-[Outfit] mb-2">Residencial</div>
         <div className="flex flex-col gap-1">
           <span className="text-white font-bold text-3xl md:text-5xl lg:text-6xl whitespace-nowrap">
-           VIVEN BIEN
+           VIVIR BIEN,
            </span>
             <span className="text-[#0091A4] font-bold text-3xl md:text-5xl lg:text-6xl whitespace-nowrap uppercase">
            EMPIEZA POR INVERTIR BIEN.
@@ -80,7 +80,10 @@ criterio de quien sabe negociar y conoce cada barrio desde hace 45 años.
             ESTUDIAMOS EL SUELO,
           </span>
           <span className="text-[#0091A4] font-bold text-3xl md:text-5xl lg:text-6xl whitespace-nowrap uppercase">
-            Y VEMOS EL POTENCIAL QUE OTROS NO VEN.
+            Y VEMOS EL POTENCIAL 
+          </span>
+          <span className="text-[#0091A4] font-bold text-3xl md:text-5xl lg:text-6xl whitespace-nowrap uppercase">
+            QUE OTROS NO VEN.
           </span>
         </div>
       </>

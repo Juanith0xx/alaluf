@@ -12,10 +12,17 @@ import Industrial from './pages/Industrial';
 import Footer from './components/Footer';
 import WhatsAppBubble from './components/WhatsAppBubble';
 import Comercial from './pages/Comercial';
+import Residencial from './pages/Residencial';
+import AdministracionActivo from './pages/AdministracionActivo';
+import TasacionActivos from './pages/TasacionActivo';
+import ClubDealsInversiones from './pages/ClubDealsInversiones';
+import ScrollToTop from './components/ScrollToTop';
+
 
 function App() {
   return (
     <Router>
+      <ScrollToTop />
       <Navbar />
       <Routes>
         {/* PAGINA PRINCIPAL */}
@@ -34,6 +41,12 @@ function App() {
         <Route path="/licitaciones" element={<Licitaciones />} />
         <Route path="/industrial" element={<Industrial />} />
         <Route path="/comercial" element={<Comercial />} />
+        <Route path="/residencial" element={<Residencial />} />
+        <Route path="/administracion-activo" element={<AdministracionActivo />} />
+        <Route path="/tasacion-activo" element={<TasacionActivos />} />
+        <Route path="/club_deals_inversiones" element={<ClubDealsInversiones/>} />
+
+
 
       </Routes>
       <Footer />

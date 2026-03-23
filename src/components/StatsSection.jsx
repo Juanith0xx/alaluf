@@ -34,7 +34,7 @@ const stats = [
         </>),
 
     subtitle: <>
-    Manejo de,<br></br>
+    Manejo de<br></br>
     Multiactivos
     </>
   },

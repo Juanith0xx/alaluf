@@ -60,19 +60,29 @@ const NavbarDesktop = ({ openDropdown, setOpenDropdown }) => (
                       </Link>                          
                       </li>
                       <li className="relative cursor-pointer transition hover:text-teal-400 before:content-['>'] before:absolute before:-left-4 before:opacity-0 hover:before:opacity-100">
+                      <Link to="/comercial" className="block w-full">
                         Comercial
+                      </Link>  
                       </li>
                       <li className="relative cursor-pointer transition hover:text-teal-400 before:content-['>'] before:absolute before:-left-4 before:opacity-0 hover:before:opacity-100">
+                      <Link to="/residencial" className="block w-full">
                         Residencial
+                        </Link>
                       </li>
                       <li className="relative cursor-pointer transition hover:text-teal-400 before:content-['>'] before:absolute before:-left-4 before:opacity-0 hover:before:opacity-100">
+                      <Link to="/administracion-activo" className="block w-full">
                         Administración de Arriendos
+                        </Link>
                       </li>
                       <li className="relative cursor-pointer transition hover:text-teal-400 before:content-['>'] before:absolute before:-left-4 before:opacity-0 hover:before:opacity-100">
+                      <Link to="/tasacion-activo" className="block w-full">
                         Tasación de Activos
+                      </Link>
                       </li>
                        <li className="relative cursor-pointer transition hover:text-teal-400 before:content-['>'] before:absolute before:-left-4 before:opacity-0 hover:before:opacity-100">
+                      <Link to="/club_deals_inversiones" className="block w-full">
                         Club Deals e Inversiones
+                        </Link>
                       </li>
                     </ul>
                   </motion.div>

@@ -19,7 +19,7 @@ const Footer = () => {
             {/* Redes sociales */}
             <div className="flex flex-col gap-4">
               <a
-                href="https://www.linkedin.com"
+                href="https://www.linkedin.com/search/results/all/?keywords=alaluf&origin=RICH_QUERY_SUGGESTION&heroEntityKey=urn%3Ali%3Aorganization%3A2179616&position=1"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-[#05FFEA] hover:text-white transition text-4xl"
@@ -27,7 +27,7 @@ const Footer = () => {
                 <FaLinkedin />
               </a>
               <a
-                href="https://www.instagram.com"
+                href=" https://www.instagram.com/alaluf_residencial/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-[#05FFEA] hover:text-white transition text-4xl"
@@ -35,7 +35,7 @@ const Footer = () => {
                 <FaInstagram />
               </a>
               <a
-                href="https://www.instagram.com"
+                href="https://www.youtube.com/@AlalufPropiedades"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-[#05FFEA] hover:text-white transition text-4xl"
@@ -43,7 +43,7 @@ const Footer = () => {
                 <FaYoutube />
               </a>
               <a
-                href="https://www.instagram.com"
+                href="https://www.facebook.com/AlalufPropiedades"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-[#05FFEA] hover:text-white transition text-4xl"
@@ -61,12 +61,13 @@ const Footer = () => {
 
             <ul className="space-y-3 text-white/60 text-sm">
               {[
-                "Propiedades Industriales",
-                "Bodegas y Galpones",
-                "Locales Comerciales",
-                "Oficinas Corporativas",
-                "Residencial Alto Valor",
-                "Terrenos y Licitaciones"
+                "Licitaciones",
+                "Industrial",
+                "Comercial",
+                "Residencial",
+                "Administracion de Arriendo",
+                "Tasación de Activos",
+                "Club de Deals e Inversiones"
               ].map((item, i) => (
                 <li key={i} className="hover:text-white transition cursor-pointer">
                   {item}

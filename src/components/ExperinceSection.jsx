@@ -36,7 +36,7 @@ const ExperienceSection = () => {
               <h1
                 className="font-extrabold flex -space-x-1"
                 style={{
-                  fontSize: "clamp(140px, 18vw, 360px)",
+                  fontSize: "clamp(160px, 25vw, 550px)",
                   lineHeight: "0.85",
                 }}
               >

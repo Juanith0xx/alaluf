@@ -106,7 +106,7 @@ const Licitaciones = () => {
       <section className="py-16 px-6 md:px-20">
         <div className="container mx-auto max-w-7xl">
           <div className="bg-[#0091A4] text-center text-white rounded-2xl p-10 md:p-14 flex flex-col items-center shadow-2xl transition-transform hover:scale-[1.01]">
-            <h4 className="text-3xl md:text-4xl font-extrabold mb-4">Accede antes que el mercado</h4>
+            <h4 className="text-3xl md:text-4xl font-medium mb-4">Accede antes que el mercado</h4>
             <p className="text-lg md:text-xl font-medium max-w-4xl mb-10">
               Recibe oportunidades de licitación que no se publican abiertamente. Solo para inversionistas calificados.
             </p>

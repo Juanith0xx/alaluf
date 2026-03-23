@@ -27,7 +27,7 @@ const Industrial = () => {
         <div 
           className="absolute z-20 w-auto"
           style={{ 
-            left: '4%',    // Ajusta este % para mover a la derecha/izquierda
+            left: '8%',    // Ajusta este % para mover a la derecha/izquierda
             bottom: '38%',  // Ajusta este % para mover arriba/abajo
           }}
         >
