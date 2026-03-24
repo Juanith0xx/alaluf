@@ -1,7 +1,7 @@
 import React from 'react';
 
 // Importación de imágenes
-import heroResidencial from '../assets/residencial.png'; 
+import heroResidencial from '../assets/residencia.jpeg'; 
 import fondoMarmol from '../assets/Marmol.jpg'; 
 
 const Residencial = () => {

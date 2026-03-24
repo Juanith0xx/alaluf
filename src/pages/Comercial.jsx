@@ -1,7 +1,7 @@
 import React from 'react';
 
 // Importación de imágenes
-import fondoComercial from '../assets/comercial.png'; 
+import fondoComercial from '../assets/comercial.jpeg'; 
 import fondoMarmol from '../assets/Marmol.jpg'; 
 
 const Comercial = () => {

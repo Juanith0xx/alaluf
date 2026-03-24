@@ -1,8 +1,15 @@
 import React from 'react';
 
 // Importación de imágenes
-import heroNosotros from '../assets/nosotros.png'; // Reemplazar con la ruta real de la imagen de las manos
+import heroNosotros from '../assets/nosotros.png'; 
 import fondoMarmol from '../assets/Marmol.jpg'; 
+
+// Importación de fotos del equipo
+import jackImage from '../assets/equipo/Jack_Alaluf2.png';
+import alejandraImage from '../assets/equipo/Ale_Alaluf.png';
+import leonorImage from '../assets/equipo/Leonor-Alvo.png';
+import natalieImage from '../assets/equipo/Natalie-Alaluf2.png';
+import danielImage from '../assets/equipo/DanielT.png';
 
 const Nosotros = () => {
   const pilares = [
@@ -23,28 +30,25 @@ const Nosotros = () => {
     }
   ];
 
+  const teamMembers = [
+    { name: "Jack Alaluf", title: "Director Ejecutivo", image: jackImage },
+    { name: "Alejandra Alaluf", title: "Gerente General", image: alejandraImage },
+    { name: "Leonor Alvo", title: "Directora", image: leonorImage },
+    { name: "Natalie Alaluf", title: "Gerente Industrial", image: natalieImage },
+    { name: "Daniel Troncoso", title: "Director Ejecutivo", image: danielImage },
+  ];
+
   return (
     <main 
       className="w-full min-h-screen bg-cover bg-center font-[Outfit] bg-fixed" 
       style={{ backgroundImage: `url(${fondoMarmol})` }}
     >
       
-      {/* SECCIÓN HERO - NOSOTROS */}
+      {/* SECCIÓN HERO */}
       <section className="relative w-full h-[300px] md:h-[400px] overflow-hidden border-b border-white/10">
-        <img 
-          src={heroNosotros} 
-          alt="Equipo Alaluf" 
-          className="absolute inset-0 w-full h-full object-cover z-0" 
-        />
+        <img src={heroNosotros} alt="Equipo Alaluf" className="absolute inset-0 w-full h-full object-cover z-0" />
         <div className="absolute inset-0 bg-black/40 z-10"></div>
-        
-        <div 
-          className="absolute z-20 w-auto"
-          style={{ 
-            left: '8%',    
-            bottom: '38%', 
-          }}
-        >
+        <div className="absolute z-20 w-auto" style={{ left: '8%', bottom: '38%' }}>
           <h1 className="text-white text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight uppercase drop-shadow-lg">
             NOSOTROS
           </h1>
@@ -61,21 +65,15 @@ const Nosotros = () => {
         </p>
       </section>
 
-      {/* SECCIÓN 3 PILARES - CARDS CON CABECERA CYAN INTEGRADA */}
+      {/* SECCIÓN 3 PILARES */}
       <section className="pb-20 px-6 md:px-12">
         <div className="mx-auto w-full max-w-[1400px]">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-12 w-full">
             {pilares.map((pilar, index) => (
-              <div 
-                key={index} 
-                className="bg-white text-gray-800 rounded-2xl flex flex-col shadow-2xl transition-transform hover:scale-[1.01] border border-white/20 w-full overflow-hidden" 
-              >
-                {/* Cabecera INTEGRADA en Color Cyan */}
+              <div key={index} className="bg-white text-gray-800 rounded-2xl flex flex-col shadow-2xl transition-transform hover:scale-[1.01] border border-white/20 w-full overflow-hidden">
                 <div className="bg-[#0091A4] text-center text-white py-4 px-6 font-bold tracking-widest uppercase text-sm md:text-base">
                   {pilar.id} · {pilar.title}
                 </div>
-                
-                {/* Cuerpo de la tarjeta */}
                 <div className="p-8 md:p-10 lg:p-12 flex flex-col flex-grow">
                   <p className="text-base md:text-lg leading-relaxed text-left text-gray-700 font-medium">
                     {pilar.content}
@@ -87,22 +85,45 @@ const Nosotros = () => {
         </div>
       </section>
 
-      {/* BANNER FINAL - EQUIPO */}
-      <section className="py-20 px-6 md:px-12">
+      {/* BANNER EQUIPO (AZUL) */}
+      <section className="py-8 px-6 md:px-12 relative z-10">
         <div className="mx-auto w-full max-w-5xl">
           <div className="bg-[#0091A4] text-white rounded-[2rem] p-10 md:p-14 text-center shadow-2xl">
-            <h3 className="text-3xl md:text-4xl font-bold mb-6">
-              El equipo detrás de cada decisión
-            </h3>
-            
+            <h3 className="!text-3xl md:text-4xl font-bold mb-6">El equipo detrás de cada decisión</h3>
             <p className="text-lg md:text-xl opacity-95 max-w-4xl mx-auto font-medium leading-relaxed">
-              En Alaluf, cada operación es acompañada por profesionales con experiencia, 
-              criterio y conocimiento profundo del mercado. <br className="hidden md:block" />
-              Más que intermediar, nuestro equipo asesora y resguarda cada decisión con la seriedad que implica.
+              En Alaluf, cada operación es acompañada por profesionales con experiencia, criterio y conocimiento profundo del mercado.
             </p>
           </div>
         </div>
       </section>
+
+      {/* DETALLE EQUIPO CON FONDO DE MÁRMOL (SIN BLOQUE BLANCO) */}
+      <section className="py-20 px-6 md:px-12 relative z-10 text-white">
+        <div className="container mx-auto max-w-7xl">
+          <p className="text-center text-lg md:text-xl leading-relaxed max-w-6xl mx-auto mb-20 text-gray-100 font-medium drop-shadow-sm">
+            Alaluf es una empresa familiar especialista en intermediación inmobiliaria con más de 40 años de experiencia. Asesoramos a nuestros clientes en operaciones de Corretaje, Inversiones, Desarrollo de Proyectos, Tasaciones, Estudios, Procesos de Licitación y Administración de Activos.
+          </p>
+
+          <div className="flex flex-wrap justify-center gap-x-12 gap-y-16 max-w-7xl mx-auto">
+            {teamMembers.map((member, index) => (
+              <div key={index} className="flex flex-col items-center text-center w-[200px] transition-transform hover:scale-105 duration-300">
+                <div className="relative mb-6">
+                  {/* Círculo decorativo cian detrás de la foto */}
+                  <div className="absolute -inset-2 bg-[#0091A4]/20 rounded-full blur-sm"></div>
+                  <img 
+                    src={member.image} 
+                    alt={member.name}
+                    className="relative w-36 h-36 rounded-full object-cover border-2 border-[#0091A4]/30 shadow-xl"
+                  />
+                </div>
+                <p className="text-xl font-bold mb-1 tracking-tight">{member.name}</p>
+                <p className="text-xs text-[#0091A4] font-bold uppercase tracking-[0.2em]">{member.title}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
     </main>
   );
 };

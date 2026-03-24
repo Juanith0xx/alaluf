@@ -1,7 +1,7 @@
 import React from 'react';
 
 // Importación de imágenes
-import fondoIndustrial from '../assets/industrial.png'; 
+import fondoIndustrial from '../assets/industria.png'; 
 import fondoMarmol from '../assets/Marmol.jpg'; 
 
 const Industrial = () => {
