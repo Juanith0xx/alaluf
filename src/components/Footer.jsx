@@ -11,49 +11,51 @@ const Footer = () => {
     >
       <div className="max-w-7xl mx-auto px-6 py-20">
 
-        <div className="grid md:grid-cols-4 gap-12">
+        {/* Rejilla de 3 columnas para un diseño equilibrado */}
+        <div className="grid md:grid-cols-3 gap-12">
 
-          {/* LOGO */}
-          <div>
-            <img src={logo} alt="Alaluf" className="h-10 mb-6" />
-            {/* Redes sociales */}
-            <div className="flex flex-col gap-4">
+          {/* COLUMNA 1: LOGO Y REDES (EN VERTICAL) */}
+          <div className="flex flex-col items-start">
+            <img src={logo} alt="Alaluf" className="h-10 mb-8" />
+            
+            {/* Contenedor vertical para redes sociales */}
+            <div className="flex flex-col gap-5">
               <a
-                href="https://www.linkedin.com/search/results/all/?keywords=alaluf&origin=RICH_QUERY_SUGGESTION&heroEntityKey=urn%3Ali%3Aorganization%3A2179616&position=1"
+                href="https://www.linkedin.com/..."
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[#05FFEA] hover:text-white transition text-4xl"
+                className="text-[#05FFEA] hover:text-white transition text-3xl"
               >
                 <FaLinkedin />
               </a>
               <a
-                href=" https://www.instagram.com/alaluf_residencial/"
+                href="https://www.instagram.com/..."
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[#05FFEA] hover:text-white transition text-4xl"
+                className="text-[#05FFEA] hover:text-white transition text-3xl"
               >
                 <FaInstagram />
               </a>
               <a
-                href="https://www.youtube.com/@AlalufPropiedades"
+                href="https://www.youtube.com/..."
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[#05FFEA] hover:text-white transition text-4xl"
+                className="text-[#05FFEA] hover:text-white transition text-3xl"
               >
                 <FaYoutube />
               </a>
               <a
-                href="https://www.facebook.com/AlalufPropiedades"
+                href="https://www.facebook.com/..."
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[#05FFEA] hover:text-white transition text-4xl"
+                className="text-[#05FFEA] hover:text-white transition text-3xl"
               >
                 <FaSquareFacebook />
               </a>
             </div>
           </div>
 
-          {/* PROPIEDADES */}
+          {/* COLUMNA 2: PROPIEDADES */}
           <div>
             <h4 className="font-semibold mb-6">
               Tipo de propiedades
@@ -76,33 +78,7 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* COBERTURA */}
-          <div>
-            <h4 className="font-semibold mb-6">
-              Zonas de cobertura
-            </h4>
-
-            <ul className="space-y-3 text-white/60 text-sm">
-              {[
-                "Santiago Centro",
-                "Las Condes",
-                "Vitacura",
-                "Quilicura",
-                "Lampa",
-                "Pudahuel",
-                "Colina",
-                "Región de Valparaíso",
-                "Concepción",
-                "La Serena"
-              ].map((item, i) => (
-                <li key={i} className="hover:text-white transition cursor-pointer">
-                  {item}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* CONTACTO */}
+          {/* COLUMNA 3: CONTACTO */}
           <div>
             <h4 className="font-semibold mb-6">
               Contacto
@@ -112,16 +88,7 @@ const Footer = () => {
               {/* Teléfono */}
               <div className="flex items-start gap-4">
                 <div className="border border-[#24B6C1] p-2 rounded-lg flex items-center justify-center">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#24B6C1"
-                    strokeWidth="1.8"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="w-4 h-4"
-                  >
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#24B6C1" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
                     <path d="M22 16.92V21a1 1 0 0 1-1.09 1A19.72 19.72 0 0 1 3 5.09 1 1 0 0 1 4 4h4.09a1 1 0 0 1 1 .75l.7 3.11a1 1 0 0 1-.27.95L8.09 10.91a16 16 0 0 0 6 6l2.1-1.43a1 1 0 0 1 .95-.27l3.11.7a1 1 0 0 1 .75 1z"/>
                   </svg>
                 </div>
@@ -134,16 +101,7 @@ const Footer = () => {
               {/* Email */}
               <div className="flex items-start gap-4">
                 <div className="border border-[#24B6C1] p-2 rounded-lg flex items-center justify-center">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#24B6C1"
-                    strokeWidth="1.8"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="w-4 h-4"
-                  >
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#24B6C1" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
                     <rect x="3" y="5" width="18" height="14" rx="2" />
                     <path d="M3 7l9 6 9-6" />
                   </svg>
@@ -157,33 +115,22 @@ const Footer = () => {
               {/* Dirección */}
               <div className="flex items-start gap-4">
                 <div className="border border-[#24B6C1] p-2 rounded-lg flex items-center justify-center">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#24B6C1"
-                    strokeWidth="1.8"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="w-4 h-4"
-                  >
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#24B6C1" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
                     <path d="M21 10c0 6-9 12-9 12S3 16 3 10a9 9 0 0 1 18 0z" />
                     <circle cx="12" cy="10" r="3" />
                   </svg>
                 </div>
                 <div>
                   <p className="text-white/50 text-xs">Oficina</p>
-                  <p>
-                    Av. Apoquindo 4775,<br />
-                    Las Condes, Santiago
-                  </p>
+                  <p>Av. Apoquindo 4775,<br />Las Condes, Santiago</p>
                 </div>
               </div>
             </div>
           </div>
+
         </div>
 
-        {/* Línea inferior */}
+        {/* Línea inferior de copyright */}
         <div className="border-t border-white/10 mt-16 pt-6 text-center text-xs text-white/40">
           © {new Date().getFullYear()} Alaluf. Todos los derechos reservados.
         </div>
