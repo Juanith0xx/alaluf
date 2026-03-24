@@ -90,9 +90,9 @@ const NavbarDesktop = ({ openDropdown, setOpenDropdown }) => (
               </AnimatePresence>
             </div>
 
-            <a href="#" className="hover:text-teal-400 transition duration-300 font-medium">
+            <Link to="/nosotros"  className="hover:text-teal-400 transition duration-300 font-medium">
               Nosotros
-            </a>
+             </Link>
             <a href="#" className="hover:text-teal-400 transition duration-300 font-medium">
               Newsletter
             </a>

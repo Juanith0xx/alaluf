@@ -34,10 +34,10 @@ const slides = [
         <div className="text-lg font-[Outfit] mb-2">Comercial</div>
         <div className="flex flex-col gap-1">
           <span className="text-white font-bold text-3xl md:text-5xl lg:text-6xl whitespace-nowrap">
-            ANALIZAMOS DÓNDE CRECER
+            ANALIZAMOS DÓNDE 
           </span>
           <span className="text-[#0091A4] font-bold text-3xl md:text-5xl lg:text-6xl whitespace-nowrap uppercase">
-            MEJOR TU NEGOCIO.
+            CRECE MEJOR TU NEGOCIO.
           </span>
         </div>
       </>

@@ -17,6 +17,7 @@ import AdministracionActivo from './pages/AdministracionActivo';
 import TasacionActivos from './pages/TasacionActivo';
 import ClubDealsInversiones from './pages/ClubDealsInversiones';
 import ScrollToTop from './components/ScrollToTop';
+import Nosotros from './pages/Nosotros';
 
 
 function App() {
@@ -45,6 +46,7 @@ function App() {
         <Route path="/administracion-activo" element={<AdministracionActivo />} />
         <Route path="/tasacion-activo" element={<TasacionActivos />} />
         <Route path="/club_deals_inversiones" element={<ClubDealsInversiones/>} />
+        <Route path="/nosotros" element={<Nosotros/>} />
 
 
 

@@ -2,6 +2,7 @@ import bg from "../assets/Marmol.jpg"
 import imgThree from "../assets/ciudad.jpg"
 import imgTwo from "../assets/Volcan.jpg"
 import mapImage from "../assets/mapa.jpg"
+import imgc from "../assets/chile.png"
 
 // =========================================================================
 // 1. IMPORTANTE: Reemplaza estas rutas con las rutas reales de tus archivos de logo.
@@ -42,7 +43,7 @@ const ExperienceSection = () => {
               >
                 <span
                   style={{
-                    backgroundImage: `url(${imgThree})`,
+                    backgroundImage: `url(${imgc})`,
                     backgroundSize: "cover",
                     backgroundPosition: "center",
                     WebkitBackgroundClip: "text",
@@ -54,7 +55,7 @@ const ExperienceSection = () => {
 
                 <span
                   style={{
-                    backgroundImage: `url(${imgTwo})`,
+                    backgroundImage: `url(${imgc})`,
                     backgroundSize: "cover",
                     backgroundPosition: "center",
                     WebkitBackgroundClip: "text",
