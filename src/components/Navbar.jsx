@@ -93,7 +93,7 @@ const NavbarDesktop = ({ openDropdown, setOpenDropdown }) => (
             <Link to="/nosotros"  className="hover:text-teal-400 transition duration-300 font-medium">
               Nosotros
              </Link>
-            <a href="#" className="hover:text-teal-400 transition duration-300 font-medium">
+            <a href="https://alaluf.cl/pressroom2.php" className="hover:text-teal-400 transition duration-300 font-medium">
               Newsletter
             </a>
             <a href="#" className="hover:text-teal-400 transition duration-300 font-medium">
