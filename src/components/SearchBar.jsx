@@ -11,6 +11,7 @@ import {
 const SearchBar = () => {
   const [tipoPropiedad, setTipoPropiedad] = useState(null);
   const [openDropdown, setOpenDropdown] = useState(false);
+  const [accionActiva, setAccionActiva] = useState("Comprar");
   const dropdownRef = useRef(null);
 
   const propiedades = [
@@ -51,36 +52,44 @@ const SearchBar = () => {
         setOpenDropdown(false);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   return (
-    <div className="relative -mt-32 z-30 rounded-md">
-      <div className="bg-gray-300/40 backdrop-blur-md p-6 flex flex-wrap items-center gap-2 justify-center font-[Outfit]">
+    <div className="relative -mt-80 z-30 px-4 pb-25">
+      {/* Contenedor Principal (Estilo Imagen 2) */}
+      <div className="max-w-6xl mx-auto bg-gray-200/20 backdrop-blur-md p-4 flex flex-wrap items-center gap-3 justify-center font-[Outfit] rounded-[40px] border border-white/20 shadow-2xl">
         
-        {/* Acciones */}
-        {["Comprar", "Vender", "Arrendar"].map((accion, i) => (
-          <button
-            key={i}
-            className="px-8 py-5 border border-gray-400 bg-gray-800/50 text-white w-full sm:w-auto hover:border-cyan-400 transition"
-          >
-            {accion}
-          </button>
-        ))}
+        {/* Acciones: Comprar, Vender, Arrendar */}
+        <div className="flex bg-black/20 p-1 rounded-xl border border-white/5">
+          {["Comprar", "Vender", "Arrendar"].map((accion) => (
+            <button
+              key={accion}
+              onClick={() => setAccionActiva(accion)}
+              className={`px-6 py-3 rounded-lg text-sm font-medium transition-all duration-300 ${
+                accionActiva === accion 
+                ? "bg-gray-500/60 text-white shadow-inner" 
+                : "text-white/60 hover:text-white"
+              }`}
+            >
+              {accion}
+            </button>
+          ))}
+        </div>
 
-        {/* Dropdown */}
+        {/* Dropdown: Tipo de propiedad */}
         <div className="relative w-full sm:w-56" ref={dropdownRef}>
           <button
             onClick={() => setOpenDropdown(!openDropdown)}
-            className="px-8 py-5 border border-gray-400 bg-gray-800/50 text-white rounded flex items-center justify-between w-full hover:border-cyan-400 transition"
+            className="px-5 py-4 bg-gray-600/60 text-white rounded-xl flex items-center justify-between w-full hover:bg-gray-600/80 transition-colors border border-white/10"
           >
-            <span>{tipoPropiedad || "Tipo de propiedad"}</span>
-
+            <span className="text-sm truncate font-medium">
+              {tipoPropiedad || "Tipo de propiedad"}
+            </span>
             <ChevronDown
-              size={18}
-              className={`transition-transform duration-300 ${
+              size={16}
+              className={`ml-2 text-[#24B6C1] transition-transform duration-300 ${
                 openDropdown ? "rotate-180" : ""
               }`}
             />
@@ -92,37 +101,19 @@ const SearchBar = () => {
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 10 }}
-                transition={{ duration: 0.25 }}
-                className="absolute top-full mt-2 left-0 bg-black/70 backdrop-blur-2xl p-4 shadow-2xl w-full border border-white/10 rounded z-50"
+                transition={{ duration: 0.2 }}
+                className="absolute top-full mt-3 left-0 bg-[#1a1a1a]/95 backdrop-blur-2xl p-3 shadow-2xl w-72 border border-white/10 rounded-2xl z-50"
               >
-                <ul className="space-y-2 text-base font-medium">
+                <ul className="space-y-1">
                   {propiedades.map((prop, i) => (
                     <li key={i} className="relative group">
-
-                      {/* Item principal */}
-                      <button
-                        className="w-full text-left px-4 py-2 hover:text-cyan-400 transition flex items-center justify-between group"
-                      >
-                        <span className="flex items-center gap-2">
-                          {/* Icono > animado */}
-                          {prop.sub && (
-                            <ChevronRight
-                              size={16}
-                              className="opacity-0 -translate-x-1 transition-all duration-200 group-hover:opacity-100 group-hover:translate-x-0"
-                            />
-                          )}
-
-                          {prop.nombre}
-                        </span>
-
-                        {tipoPropiedad === prop.nombre && (
-                          <Check size={16} className="text-cyan-400" />
-                        )}
+                      <button className="w-full text-left px-4 py-3 rounded-xl hover:bg-[#24B6C1]/10 hover:text-[#24B6C1] transition flex items-center justify-between group">
+                        <span className="text-sm font-medium">{prop.nombre}</span>
+                        {prop.sub && <ChevronRight size={14} className="text-gray-600 group-hover:text-[#24B6C1]" />}
                       </button>
 
-                      {/* Submenu lateral */}
                       {prop.sub && (
-                        <ul className="absolute top-0 left-full ml-4 hidden group-hover:block bg-black/80 backdrop-blur-2xl w-64 rounded border border-white/10 p-2 space-y-1 z-50">
+                        <ul className="absolute top-0 left-full ml-2 hidden group-hover:block bg-[#1a1a1a] backdrop-blur-2xl w-64 rounded-xl border border-white/10 p-2 shadow-2xl z-50">
                           {prop.sub.map((subItem, j) => (
                             <li
                               key={j}
@@ -130,28 +121,23 @@ const SearchBar = () => {
                                 setTipoPropiedad(subItem);
                                 setOpenDropdown(false);
                               }}
-                              className="flex items-center justify-between px-4 py-2 cursor-pointer hover:text-cyan-400 transition"
+                              className="flex items-center justify-between px-4 py-2.5 rounded-lg cursor-pointer text-sm text-gray-300 hover:bg-[#24B6C1]/10 hover:text-[#24B6C1] transition"
                             >
                               {subItem}
-
-                              {tipoPropiedad === subItem && (
-                                <Check size={14} className="text-cyan-400" />
-                              )}
+                              {tipoPropiedad === subItem && <Check size={14} className="text-[#24B6C1]" />}
                             </li>
                           ))}
                         </ul>
                       )}
                     </li>
                   ))}
-
-                  {/* Limpiar */}
                   <li>
                     <button
                       onClick={() => {
                         setTipoPropiedad(null);
                         setOpenDropdown(false);
                       }}
-                      className="w-full text-left px-4 py-2 text-gray-400 hover:text-red-400 transition border-t border-white/10 mt-2 pt-3"
+                      className="w-full text-center px-4 py-2 text-[10px] uppercase tracking-widest text-gray-500 hover:text-red-400 transition border-t border-white/5 mt-2 pt-3"
                     >
                       Limpiar selección
                     </button>
@@ -162,21 +148,25 @@ const SearchBar = () => {
           </AnimatePresence>
         </div>
 
-        {/* Input */}
-        <input
-          type="text"
-          placeholder="Ingresa comuna o ciudad"
-          className="px-8 py-5 border border-gray-400 bg-gray-800/50 text-white text-center rounded placeholder-white focus:outline-none focus:border-cyan-400 w-full sm:w-auto"
-        />
+        {/* Input de Búsqueda */}
+        <div className="flex-1 min-w-[240px]">
+          <input
+            type="text"
+            placeholder="Ingresa comuna o ciudad"
+            className="w-full px-6 py-4 bg-gray-600/40 text-white rounded-xl placeholder-white/50 focus:outline-none focus:ring-1 focus:ring-[#24B6C1] transition-all text-sm"
+          />
+        </div>
 
-        {/* Buscar */}
-        <button className="px-8 py-5 border border-gray-400 bg-gray-800/50 text-white rounded flex items-center gap-2 w-full sm:w-auto justify-center transition hover:border-cyan-400">
-          Buscar <Search size={20} />
+        {/* Botón Buscar */}
+        <button className="px-6 py-4 bg-gray-400/40 hover:bg-gray-400/60 text-white rounded-xl flex items-center gap-2 transition-all group">
+          <span className="text-sm font-semibold">Buscar</span>
+          <Search size={18} className="group-hover:scale-110 transition-transform" />
         </button>
 
-        {/* Mapa */}
-        <button className="px-8 py-5 bg-[#24B6C1] hover:bg-cyan-600 text-white rounded flex items-center gap-2 w-full sm:w-auto justify-center transition">
-          Mapa <MapPin size={20} />
+        {/* Botón Mapa */}
+        <button className="px-6 py-4 bg-[#24B6C1] hover:bg-cyan-600 text-white rounded-xl flex items-center gap-2 transition-all shadow-lg shadow-cyan-900/20">
+          <span className="text-sm font-semibold">Mapa</span>
+          <MapPin size={18} />
         </button>
 
       </div>
