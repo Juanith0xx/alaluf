@@ -19,6 +19,8 @@ import ClubDealsInversiones from './pages/ClubDealsInversiones';
 import ScrollToTop from './components/ScrollToTop';
 import Nosotros from './pages/Nosotros';
 
+// IMPORTACIÓN DE LA NUEVA VISTA DE BÚSQUEDA
+import SearchView from './pages/SearchView'; 
 
 function App() {
   return (
@@ -38,6 +40,9 @@ function App() {
           </>
         } />
 
+        {/* NUEVA RUTA: VISTA DE RESULTADOS DE BÚSQUEDA */}
+        <Route path="/buscar" element={<SearchView />} />
+
         {/* PAGINA DE LICITACIONES */}
         <Route path="/licitaciones" element={<Licitaciones />} />
         <Route path="/industrial" element={<Industrial />} />
@@ -47,8 +52,6 @@ function App() {
         <Route path="/tasacion-activo" element={<TasacionActivos />} />
         <Route path="/club_deals_inversiones" element={<ClubDealsInversiones/>} />
         <Route path="/nosotros" element={<Nosotros/>} />
-
-
 
       </Routes>
       <Footer />
