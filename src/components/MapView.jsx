@@ -61,7 +61,7 @@ const MapView = ({ propiedades, selectedProperty }) => {
                 
                 <FaMapMarkerAlt 
                   // Mantenemos el cambio de tamaño para destacar la selección
-                  size={isSelected ? 35 : 30} 
+                  size={isSelected ? 45 : 30} 
                   // COLOR FIJO: #24B6C1 para todos los estados
                   className="text-[#24B6C1] cursor-pointer hover:scale-125 transition-all duration-300"
                   style={{

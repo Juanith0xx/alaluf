@@ -127,7 +127,7 @@ const SearchBar = () => {
       <div className="max-w-6xl mx-auto bg-gray-200/20 backdrop-blur-md p-4 flex flex-wrap items-center gap-3 justify-center rounded-[40px] border border-white/20 shadow-2xl">
         
         {/* Selector de Objetivo (Hoja Objetivos) */}
-        <div className="flex bg-black/20 p-1 rounded-xl border border-white/5">
+        <div className="flex bg-black/60 p-1 rounded-xl border border-white/5">
           {["Comprar", "Vender", "Arrendar"].map((accion) => (
             <button
               key={accion}
@@ -193,7 +193,7 @@ const SearchBar = () => {
             onFocus={() => setShowSuggestions(true)}
             onKeyDown={(e) => e.key === "Enter" && handleSearch()}
             placeholder="Comuna, ciudad o código..."
-            className="w-full px-6 py-4 bg-gray-600/40 text-white rounded-xl placeholder-white/50 focus:outline-none focus:ring-1 focus:ring-[#24B6C1] text-sm"
+            className="w-full px-6 py-4 bg-gray-400/90 text-white rounded-xl placeholder-white/90 focus:outline-none focus:ring-1 focus:ring-[#24B6C1] text-sm"
           />
 
           <AnimatePresence>
