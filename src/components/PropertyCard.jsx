@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { FaRulerCombined, FaMapMarkerAlt, FaPhoneAlt, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
-const PropertyCard = ({ item }) => {
+// Agregamos onSelect e isActive a los props
+const PropertyCard = ({ item, onSelect, isActive }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   // DEBUG: Revisa esto en la consola de tu navegador (F12)
@@ -18,26 +19,31 @@ const PropertyCard = ({ item }) => {
   const tieneVenta = item.precios?.venta?.valor && item.precios.venta.valor !== "0";
 
   const nextImage = (e) => {
+    e.stopPropagation(); // Evitamos que el clic en la flecha active el onSelect de la card
     e.preventDefault();
     setCurrentImageIndex((prev) => (prev === imagenes.length - 1 ? 0 : prev + 1));
   };
 
   const prevImage = (e) => {
+    e.stopPropagation(); // Evitamos que el clic en la flecha active el onSelect de la card
     e.preventDefault();
     setCurrentImageIndex((prev) => (prev === 0 ? imagenes.length - 1 : prev - 1));
   };
 
   return (
-    <div className="bg-white rounded-2xl overflow-hidden shadow-xl group">
+    <div 
+      onClick={onSelect} // Disparador para centrar el mapa
+      className={`bg-white rounded-2xl overflow-hidden shadow-xl group cursor-pointer transition-all duration-300 ${
+        isActive ? 'ring-4 ring-[#24B6C1] scale-[1.02]' : 'hover:shadow-2xl'
+      }`}
+    >
       {/* Carrusel de Imágenes */}
       <div className="relative h-64 overflow-hidden bg-gray-200">
         <img 
-          // Si imagenes[0] no existe, forzamos un placeholder con el nombre de Alaluf
           src={imagenes.length > 0 ? imagenes[currentImageIndex] : "https://via.placeholder.com/600x400?text=Imagen+No+Disponible+Alaluf"} 
           className="w-full h-full object-cover transition-opacity duration-500"
           alt={`${item.titulo} - Imagen ${currentImageIndex + 1}`}
           onError={(e) => {
-            // Si la URL falla (error 403 o 404), mostramos un error visual
             e.target.src = "https://via.placeholder.com/600x400?text=Error+al+cargar+foto+de+servidor";
           }}
         />
@@ -70,7 +76,7 @@ const PropertyCard = ({ item }) => {
         </div>
       </div>
 
-      {/* El resto del contenido se mantiene igual... */}
+      {/* Contenido */}
       <div className="p-6 text-black">
         <h3 className="text-xl font-bold mb-4 leading-tight uppercase">
           {item.ubicacion?.sector || "Sector No Especificado"}
@@ -119,10 +125,16 @@ const PropertyCard = ({ item }) => {
           </div>
 
           <div className="flex gap-2 items-end">
-            <button className="p-3 bg-[#24B6C1]/10 text-[#24B6C1] rounded-xl hover:bg-[#24B6C1] hover:text-white transition">
+            <button 
+              className="p-3 bg-[#24B6C1]/10 text-[#24B6C1] rounded-xl hover:bg-[#24B6C1] hover:text-white transition"
+              onClick={(e) => e.stopPropagation()} // Evita activar el onSelect al querer llamar
+            >
               <FaPhoneAlt size={14} />
             </button>
-            <button className="px-6 py-3 bg-[#24B6C1] text-white rounded-xl font-bold text-sm">
+            <button 
+              className="px-6 py-3 bg-[#24B6C1] text-white rounded-xl font-bold text-sm"
+              onClick={(e) => e.stopPropagation()} // Evita activar el onSelect al ver ficha
+            >
               Ver ficha
             </button>
           </div>
