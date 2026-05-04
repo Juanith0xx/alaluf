@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import SearchBar from "./SearchBar"; // Importación del componente
 import Industrial from "../assets/Industrial.jpg";
 import Comercial from "../assets/Comercial.jpg";
 import Recidencial from "../assets/Residencial.jpg";
@@ -114,8 +115,14 @@ const Hero = () => {
 
   return (
     <div className="relative w-full h-screen overflow-hidden">
+      
+      {/* SearchBar integrada en la parte superior */}
+      <div className="absolute top-10 left-0 w-full z-40">
+        <SearchBar />
+      </div>
+
       {/* Imágenes */}
-      <AnimatePresence>
+      <AnimatePresence mode="wait">
         <motion.img
           key={current}
           src={slides[current].image}
@@ -141,7 +148,7 @@ const Hero = () => {
 
       {/* Texto sobre hero con animación */}
       <motion.div
-        className="absolute z-20 top-1/5 left-50 max-w-lg text-white"
+        className="absolute z-20 top-1/3 left-50 max-w-lg text-white"
         key={current}
         variants={textVariants}
         initial="hidden"
@@ -149,9 +156,9 @@ const Hero = () => {
         exit="exit"
       >
         <h1 className="text-2xl mb-4 font-[Outfit]">{slides[current].titulo}</h1>
-        <p className="mb-6 font-light font-[Outfit] text-lg">
+        <div className="mb-6 font-light font-[Outfit] text-lg">
           {slides[current].descripcion}
-        </p>
+        </div>
         <button className="px-6 py-2 border-[1px] border-white text-white rounded-lg font-semibold hover:bg-white/10 transition-colors duration-300 font-[Outfit]">
           Ver Proyectos
         </button>

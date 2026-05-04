@@ -31,8 +31,7 @@ function App() {
         {/* PAGINA PRINCIPAL */}
         <Route path="/" element={
           <>
-            <Hero />
-            <SearchBar />
+            <Hero />            
             <SpecialArea />
             <StatsSection />
             <InfoSection />
