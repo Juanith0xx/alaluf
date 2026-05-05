@@ -123,8 +123,8 @@ const SearchBar = () => {
   }, []);
 
   return (
-    <div className="relative z-30 px-4 pt-22 font-[Outfit]">
-      <div className="max-w-6xl mx-auto bg-gray-200/20 backdrop-blur-md p-4 flex flex-wrap items-center gap-3 justify-center rounded-[40px] border border-white/20 shadow-2xl">
+    <div className="relative z-30 px-4 pt-38 font-[Outfit]">
+      <div className="max-w-7xl mx-auto bg-white/70 backdrop-blur-md p-4 flex flex-wrap items-center gap-3 justify-center rounded-[40px] border border-white/20 shadow-2xl">
         
         {/* Selector de Objetivo (Hoja Objetivos) */}
         <div className="flex bg-black/60 p-1 rounded-xl border border-white/5">

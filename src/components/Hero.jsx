@@ -148,7 +148,7 @@ const Hero = () => {
 
       {/* Texto sobre hero con animación */}
       <motion.div
-        className="absolute z-20 top-1/3 left-50 max-w-lg text-white"
+        className="absolute z-20 top-[400px] left-65 max-w-lg text-white"
         key={current}
         variants={textVariants}
         initial="hidden"
@@ -165,7 +165,7 @@ const Hero = () => {
       </motion.div>
 
       {/* Indicadores laterales */}
-      <div className="absolute left-38 top-1/2 transform -translate-y-1/2 z-20 flex flex-col gap-3">
+      <div className="absolute left-48 top-[489px] transform -translate-y-1/2 z-20 flex flex-col gap-3">
         {slides.map((_, index) => (
           <button
             key={index}
