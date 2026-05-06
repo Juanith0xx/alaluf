@@ -13,20 +13,38 @@ const slides = [
       <>
         <div className="text-lg font-[Outfit] mb-2">Industrial</div>
         <div className="flex flex-col gap-1">
+           <span className="text-[#0091A4] font-bold text-3xl md:text-5xl lg:text-6xl whitespace-nowrap uppercase">
+            TU OPERACIÓN 
+          </span>
+          <span className="text-white text-3xl md:text-5xl lg:text-6xl whitespace-nowrap">
+           CRECE CUANDO
+          </span>
           <span className="text-white font-bold text-3xl md:text-5xl lg:text-6xl whitespace-nowrap">
-            ESPACIOS INDUSTRIALES,
+           ENCUENTRA
           </span>
           <span className="text-[#0091A4] font-bold text-3xl md:text-5xl lg:text-6xl whitespace-nowrap uppercase">
-            QUE IMPULSAN TU OPERACIÓN.
+            EL LUGAR CORRECTO
           </span>
         </div>
       </>
     ),
     descripcion: (
-   <p className="font-[Outfit] text-lg text-white mt-4 max-w-xl whitespace-nowrap">
-        Bodegas, centros logísticos y terrenos industriales. El área donde más operaciones hemos cerrado, con los clientes más exigentes <br></br>del mercado chileno.
+      <div className="font-[Outfit]">
+      <p className="font-[Outfit] text-lg text-white mt-4 max-w-xl whitespace-nowrap">
+        Bodegas, centros logísticos y terrenos industriales en todo Chile. 45 años eligiendo el mejor lugar para las operaciones más <br></br>
+        exigentes. Analizamos tu operación, tus volúmenes y tu proyección para recomendarte el espacio que reduce costos, mejora <br></br>
+        tiempos y hace crecer tu negocio.
       </p>
+      <div className="flex flex-row items-center gap-x-8 mt-8"></div>
+      <a 
+          href="/tu-ruta-de-busqueda" 
+          className="text-[#0091A4] font-bold text-base uppercase tracking-wider hover:text-[#24B6C1] transition-all whitespace-nowrap"
+        >
+          QUIERO ENCONTRAR
+        </a>
+      </div>  
     ),
+    
   },
   {
     image: Comercial,
@@ -35,18 +53,40 @@ const slides = [
         <div className="text-lg font-[Outfit] mb-2">Comercial</div>
         <div className="flex flex-col gap-1">
           <span className="text-white font-bold text-3xl md:text-5xl lg:text-6xl whitespace-nowrap">
-            ANALIZAMOS DÓNDE 
+            TU NEGOCIO <span className="text-white text-3xl md:text-5xl lg:text-6xl whitespace-nowrap">
+            RINDE MÁS</span></span> 
+
+          <span className="text-white font-bold text-3xl md:text-5xl lg:text-6xl whitespace-nowrap uppercase">
+            CUANDO LA UBICACIÓN 
           </span>
           <span className="text-[#0091A4] font-bold text-3xl md:text-5xl lg:text-6xl whitespace-nowrap uppercase">
-            CRECE MEJOR TU NEGOCIO.
+            TRABAJA PARA TI.
           </span>
         </div>
       </>
     ),
     descripcion: (
+      <div className="font-[Outfit]">
    <p className="font-[Outfit] text-lg text-white mt-4 max-w-xl whitespace-nowrap">
-        Más que locales, oficinas y edificios corporativos, analizamos y recomendamos las mejores decisiones comerciales para empresas. 
+        Ofrecemos oficinas, locales comerciales, retail y strip centers, cada uno con potencial para ser una ventaja competitiva. Analizamos <br></br>
+        tu negocio y cliente para que cada metro cuadrado contribuya a tu rentabilidad. 
       </p>
+      <div className="flex flex-row items-center gap-x-8 mt-8">
+          <a 
+            href="/ruta-local" 
+            className="text-[#0091A4] font-bold text-base uppercase tracking-wider hover:text-[#24B6C1] transition-all whitespace-nowrap"
+          >
+            Quiero encontrar mi local 
+          </a>
+
+          <a 
+            href="/ruta-oficina" 
+            className="text-[#0091A4] font-bold text-base uppercase tracking-wider hover:text-[#24B6C1] transition-all whitespace-nowrap"
+          >
+            Quiero encontrar mi oficina
+          </a>
+        </div>
+      </div>
     ),
   },
   {
@@ -56,19 +96,45 @@ const slides = [
         <div className="text-lg font-[Outfit] mb-2">Residencial</div>
         <div className="flex flex-col gap-1">
           <span className="text-white font-bold text-3xl md:text-5xl lg:text-6xl whitespace-nowrap">
-           VIVIR BIEN,
+           EL LUGAR QUE ELIGES
+           </span>
+            <span className="text-white text-3xl md:text-5xl lg:text-6xl whitespace-nowrap">
+           DEFINE LO QUE QUIERES
            </span>
             <span className="text-[#0091A4] font-bold text-3xl md:text-5xl lg:text-6xl whitespace-nowrap uppercase">
-           EMPIEZA POR INVERTIR BIEN.
-              </span>
+           VIVIR.
+            </span>
         </div>
       </>
     ),
     descripcion: (
+      <div className="font-[Outfit]">
    <p className="font-[Outfit] text-lg text-white mt-4 max-w-xl whitespace-nowrap">
-        Con casas y departamentos en el sector oriente, te acompañamos desde que decides buscar, hasta las llaves en la mano, con el <br></br>
-criterio de quien sabe negociar y conoce cada barrio desde hace 45 años. 
+        Casas y departamentos en el sector oriente de Santiago para comprar, arrendar o vender. Te acompañamos en todo el proceso,<br></br> 
+        con el criterio de quien conoce cada barrio desde hace 45 años y la inteligencia para que tomes siempre la mejor decisión.
       </p>
+      <div className="flex flex-row items-center gap-x-8 mt-8">
+          <a 
+            href="/ruta-local" 
+            className="text-[#0091A4] font-bold text-base uppercase tracking-wider hover:text-[#24B6C1] transition-all whitespace-nowrap"
+          >
+            QUIERO COMPRAR   
+          </a>
+
+          <a 
+            href="/ruta-oficina" 
+            className="text-[#0091A4] font-bold text-base uppercase tracking-wider hover:text-[#24B6C1] transition-all whitespace-nowrap"
+          >
+            QUIERO ARRENDAR  
+          </a>
+           <a 
+            href="/ruta-oficina" 
+            className="text-[#0091A4] font-bold text-base uppercase tracking-wider hover:text-[#24B6C1] transition-all whitespace-nowrap"
+          >
+             QUIERO VENDER
+          </a>
+        </div>
+      </div>
     ),
   },
   {
@@ -77,22 +143,34 @@ criterio de quien sabe negociar y conoce cada barrio desde hace 45 años.
       <>
         <div className="text-lg font-[Outfit] mb-2">Terreno</div>
         <div className="flex flex-col gap-1">
-          <span className="text-white font-bold text-3xl md:text-5xl lg:text-6xl whitespace-nowrap">
-            ESTUDIAMOS EL SUELO,
+          <span className="text-[#0091A4]  font-bold text-3xl md:text-5xl lg:text-6xl whitespace-nowrap">
+            ESTUDIAMOS <span className="text-white text-3xl md:text-5xl lg:text-6xl whitespace-nowrap">
+            EL SUELO,</span>
+            </span>
+          <span className="text-white font-bold text-3xl md:text-5xl lg:text-6xl whitespace-nowrap uppercase">
+            Y VEMOS EL <span className="text-[#0091A4] text-3xl md:text-5xl lg:text-6xl whitespace-nowrap">
+           POTENCIAL,</span>
           </span>
-          <span className="text-[#0091A4] font-bold text-3xl md:text-5xl lg:text-6xl whitespace-nowrap uppercase">
-            Y VEMOS EL POTENCIAL 
-          </span>
-          <span className="text-[#0091A4] font-bold text-3xl md:text-5xl lg:text-6xl whitespace-nowrap uppercase">
+          <span className="text-white text-3xl md:text-5xl lg:text-6xl whitespace-nowrap uppercase">
             QUE OTROS NO VEN.
           </span>
         </div>
       </>
     ),
     descripcion: (
+      <div className="font-[Outfit]">
    <p className="font-[Outfit] text-lg text-white mt-4 max-w-xl whitespace-nowrap">
-        Terrenos para desarrollo, industrial y proyectos, 45 años de criterio inmobiliario detrás de cada recomendación. 
+        Terrenos para desarrollo residencial, industrial y proyectos de inversión en todo Chile. Analizamos normativa, plusvalía y viabilidad real <br></br> 
+        — porque el potencial no está en la superficie. Está en estudiarlo. 
       </p>
+      <div className="flex flex-row items-center gap-x-8 mt-8"></div>
+      <a 
+          href="/tu-ruta-de-busqueda" 
+          className="text-[#0091A4] font-bold text-base uppercase tracking-wider hover:text-[#24B6C1] transition-all whitespace-nowrap"
+        >
+          QUIERO EVALUAR UN TERRENO
+        </a>
+      </div>
     ),
   },
 ];
@@ -148,7 +226,7 @@ const Hero = () => {
 
       {/* Texto sobre hero con animación */}
       <motion.div
-        className="absolute z-20 top-[400px] left-65 max-w-lg text-white"
+        className="absolute z-20 top-1/3 left-50 max-w-lg text-white"
         key={current}
         variants={textVariants}
         initial="hidden"
@@ -159,13 +237,10 @@ const Hero = () => {
         <div className="mb-6 font-light font-[Outfit] text-lg">
           {slides[current].descripcion}
         </div>
-        <button className="px-6 py-2 border-[1px] border-white text-white rounded-lg font-semibold hover:bg-white/10 transition-colors duration-300 font-[Outfit]">
-          Ver Proyectos
-        </button>
       </motion.div>
 
       {/* Indicadores laterales */}
-      <div className="absolute left-48 top-[489px] transform -translate-y-1/2 z-20 flex flex-col gap-3">
+      <div className="absolute left-38 top-1/2 transform -translate-y-1/2 z-20 flex flex-col gap-3">
         {slides.map((_, index) => (
           <button
             key={index}
