@@ -14,6 +14,11 @@ import MapView from "../components/MapView";
 // IMPORTACIÓN DEL ASSET LOCAL
 import fondoMarmol from '../assets/Marmol.jpg';
 
+// CONFIGURACIÓN DE LA API
+// Si usas Vite (lo más seguro para React 19): import.meta.env.VITE_API_URL
+// Si usas Create React App: process.env.REACT_APP_API_URL
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 const SearchView = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -138,10 +143,12 @@ const SearchView = () => {
         const comuna = searchParams.get("comuna");
 
         let url = "";
+        
+        // AQUÍ ESTÁ EL CAMBIO PRINCIPAL: Reemplazamos localhost por API_URL
         if (query) {
-          url = `http://localhost:5000/api/propiedades/${query}`;
+          url = `${API_URL}/api/propiedades/${query}`;
         } else if (tipo_prop && obj && comuna) {
-          url = `http://localhost:5000/api/propiedades/buscar?tipo_prop=${tipo_prop}&obj=${obj}&comuna=${comuna}`;
+          url = `${API_URL}/api/propiedades/buscar?tipo_prop=${tipo_prop}&obj=${obj}&comuna=${comuna}`;
         } else {
           setPropiedadesData([]);
           setLoading(false);
@@ -154,6 +161,7 @@ const SearchView = () => {
         setPropiedadesData(finalArray);
         if (finalArray.length > 0) setSelectedProperty(finalArray[0]);
       } catch (error) {
+        console.error("Error fetching properties:", error);
         setPropiedadesData([]);
       } finally {
         setLoading(false);
@@ -196,7 +204,7 @@ const SearchView = () => {
           
           <div className="lg:col-span-7 space-y-8">
             
-            {/* SEARCHBAR INTEGRADO - Mejorado con z-40 */}
+            {/* SEARCHBAR INTEGRADO */}
             <div className="relative z-40 bg-black/60 backdrop-blur-xl p-3 rounded-[35px] border border-white/10 flex flex-wrap gap-2 items-center shadow-2xl">
               
               <div className="flex bg-white/5 p-1 rounded-xl">
