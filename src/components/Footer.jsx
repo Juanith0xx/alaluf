@@ -1,39 +1,9 @@
-import { useState, useEffect } from "react";
 import bg from "../assets/Marmol.jpg";
 import logo from "../assets/Logo_A.png";
-import { FaLinkedin, FaInstagram, FaYoutube, FaChartLine } from "react-icons/fa";
+import { FaLinkedin, FaInstagram, FaYoutube } from "react-icons/fa";
 import { FaSquareFacebook } from "react-icons/fa6";
 
 const Footer = () => {
-  const [ufValue, setUfValue] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchUF = async () => {
-      try {
-        // Usamos api.gael.cloud para evitar problemas de CORS en local
-        const response = await fetch("https://api.gael.cloud/general/public/monedas/UF");
-        const data = await response.json();
-        
-        // La API gael devuelve el valor con coma, lo preparamos para el formateador
-        const valor = parseFloat(data.Valor.replace('.', '').replace(',', '.'));
-        
-        const formatter = new Intl.NumberFormat("es-CL", {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        });
-        
-        setUfValue(formatter.format(valor));
-      } catch (error) {
-        console.error("Error consultando la UF:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUF();
-  }, []);
-
   return (
     <footer
       className="w-full bg-cover bg-center text-white font-[Outfit]"
@@ -44,38 +14,25 @@ const Footer = () => {
         {/* Rejilla de 3 columnas */}
         <div className="grid md:grid-cols-3 gap-12">
 
-          {/* COLUMNA 1: LOGO, REDES Y UF */}
+          {/* COLUMNA 1: LOGO Y REDES */}
           <div className="flex flex-col items-start">
             <img src={logo} alt="Alaluf" className="h-10 mb-8" />
             
             <div className="flex items-start gap-8">
               {/* Contenedor vertical para redes sociales */}
               <div className="flex flex-col gap-5">
-                <a href="#" target="_blank" className="text-[#05FFEA] hover:text-white transition text-3xl">
+                <a href="#" target="_blank" rel="noopener noreferrer" className="text-[#05FFEA] hover:text-white transition text-3xl">
                   <FaLinkedin />
                 </a>
-                <a href="#" target="_blank" className="text-[#05FFEA] hover:text-white transition text-3xl">
+                <a href="#" target="_blank" rel="noopener noreferrer" className="text-[#05FFEA] hover:text-white transition text-3xl">
                   <FaInstagram />
                 </a>
-                <a href="#" target="_blank" className="text-[#05FFEA] hover:text-white transition text-3xl">
+                <a href="#" target="_blank" rel="noopener noreferrer" className="text-[#05FFEA] hover:text-white transition text-3xl">
                   <FaYoutube />
                 </a>
-                <a href="#" target="_blank" className="text-[#05FFEA] hover:text-white transition text-3xl">
+                <a href="#" target="_blank" rel="noopener noreferrer" className="text-[#05FFEA] hover:text-white transition text-3xl">
                   <FaSquareFacebook />
                 </a>
-              </div>
-
-              {/* INDICADOR UF AL LADO DERECHO */}
-              <div className="flex flex-col gap-2 mt-1">
-                <div className="bg-[#24B6C1]/10 border border-[#24B6C1]/30 p-4 rounded-xl backdrop-blur-sm flex flex-col items-center justify-center min-w-[110px]">
-                  <FaChartLine className="text-[#05FFEA] text-xl mb-2" />
-                  <span className="text-[9px] uppercase tracking-[0.2em] text-[#05FFEA] font-bold text-center">
-                    UF HOY
-                  </span>
-                  <span className="text-white font-bold text-sm mt-1 text-center">
-                    {loading ? "..." : (ufValue ? `$${ufValue}` : "N/A")}
-                  </span>
-                </div>
               </div>
             </div>
           </div>
