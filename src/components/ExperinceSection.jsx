@@ -169,7 +169,7 @@ const ExperienceSection = () => {
             </div>
 
            {/* DERECHA — Formulario */}
-<div className="bg-white text-gray-800 rounded-tl-[80px] rounded-b-none p-12 shadow-2xl -mt-23 -ml-34">
+<div className="bg-white text-gray-800 rounded-[80px] p-12 shadow-2xl -mt-23 -ml-34">
 
   {/* Título */}
   <h2 className="text-2xl md:text-3xl font-medium mb-10 text-start font-[Outfit]">
@@ -250,23 +250,9 @@ const ExperienceSection = () => {
     {/* Botón */}
     <button
   type="submit"
-  className="group bg-[#158F9B] hover:bg-[#127C86] text-white px-41 py-2.5 rounded-lg  text-sm font-light transition-all duration-300 flex items-center justify-center gap-2 mx-auto"
+  className="group bg-[#158F9B] hover:bg-[#127C86] text-white px-20 py-2.5 rounded-lg text-xl font-light transition-all duration-300 flex items-center justify-center gap-2 mx-auto"
 >
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1"
-  >
-    <path d="M22 2L11 13" />
-    <path d="M22 2L15 22L11 13L2 9L22 2Z" />
-  </svg>
-
-  Iniciar Conversación
+   Iniciar Conversación
 </button>
 
 

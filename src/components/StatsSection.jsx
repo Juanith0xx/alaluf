@@ -20,7 +20,7 @@ const stats = [
     ),
     subtitle: <>
     Trayectoria y<br></br>
-    visión experta
+    criterio experto
     </>
   },
   {

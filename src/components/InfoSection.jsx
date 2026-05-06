@@ -49,11 +49,11 @@ const InfoSection = () => {
               ¿Tienes alguna pregunta?
             </h2>
             <p className="text-sm md:text-xl text-gray-600 leading-relaxed font-light mb-6 font-[Outfit]">
-              <span className="font-bold">Lo primero es entenderte a ti:</span> tus objetivos, tu
-              situación y asesorarte en el camino más inteligente para
+              <span className="font-bold text-black">Lo primero es entenderte a ti:</span> tus objetivos, tu <br></br>situación y 
+              asesorarte en el camino más inteligente para<br></br> 
               llegar donde quieres.
             </p>
-            <button className="text-[#24B6C1] font-light font-[Outfit] flex items-center gap-2 hover:gap-3 transition-all">
+            <button className="text-[#24B6C1] font-light text-xl font-[Outfit] flex items-center gap-2 hover:gap-3 transition-all">
               INICIAR LA CONVERSACIÓN
             </button>
           </div>
