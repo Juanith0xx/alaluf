@@ -86,32 +86,37 @@ const SearchBar = () => {
 
   const handleSearch = () => {
     const textInput = searchQuery.trim();
-    
-    // Detección mejorada de Código o ID (ej: 26250 o ID14653)
-    const numericCode = textInput.replace(/\D/g, "");
-    
-    if (numericCode !== "" && (textInput.toLowerCase().startsWith("id") || !isNaN(textInput))) {
-      navigate(`/buscar?q=${numericCode}`);
-      return;
+
+    // Código directo: 5+ dígitos o empieza con "ID"
+    const esCodigoDirecto = /^\d{5,}$/.test(textInput) || textInput.toLowerCase().startsWith("id");
+    if (esCodigoDirecto) {
+        const numericCode = textInput.replace(/\D/g, "");
+        navigate(`/buscar/${numericCode}`);
+        return;
     }
 
-    // Mapeo según hoja 'Objetivos': Venta = 1, Arriendo = 2
+    if (!tipoPropiedad) {
+        alert("Por favor, selecciona un tipo de propiedad.");
+        return;
+    }
+    if (!selectedComuna) {
+        alert("Por favor, selecciona una comuna de la lista sugerida.");
+        return;
+    }
+
+    // Venta = 1, Arriendo = 2
     const objID = (accionActiva === "Comprar" || accionActiva === "Vender") ? 1 : 2;
-    const comunaID = selectedComuna?.id || "";
-
-    if (!tipoPropiedad || !comunaID) {
-      alert("Por favor, selecciona un tipo de propiedad y una comuna de la lista sugerida.");
-      return;
-    }
 
     const params = new URLSearchParams({
-      tipo_prop: tipoPropiedad.id,
-      obj: objID,
-      comuna: comunaID
+        tipo_prop: tipoPropiedad.id,
+        obj: objID,
+        comuna: selectedComuna.id,
+        limit: 50,
+        offset: 0
     });
 
     navigate(`/buscar?${params.toString()}`);
-  };
+};
 
   useEffect(() => {
     const handleClickOutside = (e) => {
