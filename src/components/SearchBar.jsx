@@ -86,37 +86,32 @@ const SearchBar = () => {
 
   const handleSearch = () => {
     const textInput = searchQuery.trim();
-
-    // Código directo: 5+ dígitos o empieza con "ID"
-    const esCodigoDirecto = /^\d{5,}$/.test(textInput) || textInput.toLowerCase().startsWith("id");
-    if (esCodigoDirecto) {
-        const numericCode = textInput.replace(/\D/g, "");
-        navigate(`/buscar/${numericCode}`);
-        return;
+    
+    // Detección mejorada de Código o ID (ej: 26250 o ID14653)
+    const numericCode = textInput.replace(/\D/g, "");
+    
+    if (numericCode !== "" && (textInput.toLowerCase().startsWith("id") || !isNaN(textInput))) {
+      navigate(`/buscar?q=${numericCode}`);
+      return;
     }
 
-    if (!tipoPropiedad) {
-        alert("Por favor, selecciona un tipo de propiedad.");
-        return;
-    }
-    if (!selectedComuna) {
-        alert("Por favor, selecciona una comuna de la lista sugerida.");
-        return;
-    }
-
-    // Venta = 1, Arriendo = 2
+    // Mapeo según hoja 'Objetivos': Venta = 1, Arriendo = 2
     const objID = (accionActiva === "Comprar" || accionActiva === "Vender") ? 1 : 2;
+    const comunaID = selectedComuna?.id || "";
+
+    if (!tipoPropiedad || !comunaID) {
+      alert("Por favor, selecciona un tipo de propiedad y una comuna de la lista sugerida.");
+      return;
+    }
 
     const params = new URLSearchParams({
-        tipo_prop: tipoPropiedad.id,
-        obj: objID,
-        comuna: selectedComuna.id,
-        limit: 50,
-        offset: 0
+      tipo_prop: tipoPropiedad.id,
+      obj: objID,
+      comuna: comunaID
     });
 
     navigate(`/buscar?${params.toString()}`);
-};
+  };
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -128,8 +123,8 @@ const SearchBar = () => {
   }, []);
 
   return (
-    <div className="relative z-30 px-4 pt-22 font-[Outfit]">
-      <div className="max-w-6xl mx-auto bg-gray-200/20 backdrop-blur-md p-4 flex flex-wrap items-center gap-3 justify-center rounded-[40px] border border-white/20 shadow-2xl">
+    <div className="relative z-30 px-4 pt-38 font-[Outfit]">
+      <div className="max-w-7xl mx-auto bg-white/70 backdrop-blur-md p-4 flex flex-wrap items-center gap-3 justify-center rounded-[40px] border border-white/20 shadow-2xl">
         
         {/* Selector de Objetivo (Hoja Objetivos) */}
         <div className="flex bg-black/60 p-1 rounded-xl border border-white/5">
