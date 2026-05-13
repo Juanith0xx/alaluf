@@ -14,9 +14,6 @@ import MapView from "../components/MapView";
 // IMPORTACIÓN DEL ASSET LOCAL
 import fondoMarmol from '../assets/Marmol.jpg';
 
-// CONFIGURACIÓN DE LA API
-// Si usas Vite (lo más seguro para React 19): import.meta.env.VITE_API_URL
-// Si usas Create React App: process.env.REACT_APP_API_URL
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 const SearchView = () => {
@@ -25,6 +22,10 @@ const SearchView = () => {
   const [propiedadesData, setPropiedadesData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedProperty, setSelectedProperty] = useState(null);
+
+  // 🌟 ESTADO DE PAGINACIÓN: Solo necesitamos saber el total de páginas
+  const [totalPaginas, setTotalPaginas] = useState(1);
+  const paginaActual = parseInt(searchParams.get("page")) || 1;
 
   // --- ESTADOS DEL BUSCADOR ---
   const [tipoPropiedad, setTipoPropiedad] = useState(null);
@@ -37,7 +38,7 @@ const SearchView = () => {
   const dropdownRef = useRef(null);
   const suggestionRef = useRef(null);
 
-  // DATASET COMPLETO DE COMUNAS (Actualizado)
+  // DATASET COMPLETO DE COMUNAS
   const comunasDataset = [
     { label: "Santiago", id: "13101" },
     { label: "Cerrillos", id: "13102" },
@@ -64,7 +65,7 @@ const SearchView = () => {
     { label: "Colina", id: "13301" },
   ];
 
-  // CATEGORÍAS COMPLETAS DE PROPIEDADES (Actualizado)
+  // CATEGORÍAS COMPLETAS DE PROPIEDADES
   const categoriasPropiedades = [
     { 
       nombre: "Residencial", 
@@ -117,7 +118,6 @@ const SearchView = () => {
       return;
     }
 
-    // Búsqueda por filtros (Venta/Comprar = 1, Arrendar = 2)
     const objID = (accionActiva === "Comprar" || accionActiva === "Vender") ? 1 : 2;
     const comunaID = selectedComuna?.id || "";
 
@@ -126,11 +126,30 @@ const SearchView = () => {
       return;
     }
 
+    // 🌟 Al hacer una nueva búsqueda, forzamos iniciar en la página 1
     setSearchParams({
       tipo_prop: tipoPropiedad.id,
       obj: objID,
-      comuna: comunaID
+      comuna: comunaID,
+      page: 1
     });
+  };
+
+  // 🌟 FUNCIONES DE NAVEGACIÓN DE PÁGINAS
+  const irPaginaSiguiente = () => {
+    if (paginaActual < totalPaginas) {
+      const currentParams = Object.fromEntries([...searchParams]);
+      setSearchParams({ ...currentParams, page: paginaActual + 1 });
+      window.scrollTo({ top: 0, behavior: "smooth" }); // Sube suavemente al cambiar de página
+    }
+  };
+
+  const irPaginaAnterior = () => {
+    if (paginaActual > 1) {
+      const currentParams = Object.fromEntries([...searchParams]);
+      setSearchParams({ ...currentParams, page: paginaActual - 1 });
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
   };
 
   useEffect(() => {
@@ -144,11 +163,11 @@ const SearchView = () => {
 
         let url = "";
         
-        // AQUÍ ESTÁ EL CAMBIO PRINCIPAL: Reemplazamos localhost por API_URL
         if (query) {
           url = `${API_URL}/api/propiedades/${query}`;
         } else if (tipo_prop && obj && comuna) {
-          url = `${API_URL}/api/propiedades/buscar?tipo_prop=${tipo_prop}&obj=${obj}&comuna=${comuna}`;
+          // 🌟 Añadimos el parámetro de página a la consulta al backend
+          url = `${API_URL}/api/propiedades/buscar?tipo_prop=${tipo_prop}&obj=${obj}&comuna=${comuna}&page=${paginaActual}&limit=10`;
         } else {
           setPropiedadesData([]);
           setLoading(false);
@@ -157,7 +176,24 @@ const SearchView = () => {
 
         const response = await fetch(url);
         const data = await response.json();
-        const finalArray = Array.isArray(data) ? data : (data && (data.id || data.codigo)) ? [data] : [];
+        
+        let finalArray = [];
+
+        // 🌟 LÓGICA INTELIGENTE DE LECTURA DE RESPUESTA
+        if (query) {
+          // Si es por ID, el backend manda un solo objeto de propiedad
+          finalArray = (data && (data.id || data.codigo)) ? [data] : [];
+          setTotalPaginas(1);
+        } else if (data.data && data.paginacion) {
+          // Si es búsqueda masiva, el backend manda el objeto de paginación
+          finalArray = data.data;
+          setTotalPaginas(data.paginacion.totalPaginas);
+        } else {
+          // Fallback por si acaso
+          finalArray = Array.isArray(data) ? data : [];
+          setTotalPaginas(1);
+        }
+
         setPropiedadesData(finalArray);
         if (finalArray.length > 0) setSelectedProperty(finalArray[0]);
       } catch (error) {
@@ -168,7 +204,7 @@ const SearchView = () => {
       }
     };
     fetchResultados();
-  }, [searchParams]);
+  }, [searchParams]); // Se vuelve a ejecutar cuando cambian los parámetros de URL (incluyendo la página)
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -299,6 +335,40 @@ const SearchView = () => {
                 </div>
               )}
             </div>
+
+            {/* 🌟 CONTROLES DE PAGINACIÓN */}
+            {!loading && totalPaginas > 1 && !searchParams.get("q") && (
+              <div className="flex justify-center items-center gap-6 mt-12 bg-black/40 p-4 rounded-3xl border border-white/10 backdrop-blur-md w-fit mx-auto shadow-2xl">
+                <button
+                  onClick={irPaginaAnterior}
+                  disabled={paginaActual === 1}
+                  className={`flex items-center gap-2 px-5 py-3 rounded-xl font-bold uppercase tracking-widest text-xs transition-all ${
+                    paginaActual === 1 
+                      ? 'bg-white/5 text-white/20 cursor-not-allowed' 
+                      : 'bg-[#24B6C1] text-white hover:bg-[#1e9aa3] shadow-lg shadow-[#24B6C1]/20'
+                  }`}
+                >
+                  <FaArrowLeft size={12} /> Anterior
+                </button>
+                
+                <span className="text-white/60 font-medium text-sm">
+                  Página <span className="text-white font-bold">{paginaActual}</span> de <span className="text-white font-bold">{totalPaginas}</span>
+                </span>
+                
+                <button
+                  onClick={irPaginaSiguiente}
+                  disabled={paginaActual === totalPaginas}
+                  className={`flex items-center gap-2 px-5 py-3 rounded-xl font-bold uppercase tracking-widest text-xs transition-all ${
+                    paginaActual === totalPaginas 
+                      ? 'bg-white/5 text-white/20 cursor-not-allowed' 
+                      : 'bg-[#24B6C1] text-white hover:bg-[#1e9aa3] shadow-lg shadow-[#24B6C1]/20'
+                  }`}
+                >
+                  Siguiente <span className="rotate-180 inline-block"><FaArrowLeft size={12} /></span>
+                </button>
+              </div>
+            )}
+
           </div>
 
           <div className="lg:col-span-5">
