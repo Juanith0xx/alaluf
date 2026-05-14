@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { 
   FaRulerCombined, FaMapMarkerAlt, FaPhoneAlt, 
   FaChevronLeft, FaChevronRight, FaBed, FaBath, 
@@ -6,6 +7,7 @@ import {
 } from "react-icons/fa";
 
 const PropertyCard = ({ item, onSelect, isActive }) => {
+  const navigate = useNavigate();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   if (!item) return null;
@@ -26,18 +28,15 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
     setCurrentImageIndex((prev) => (prev === 0 ? imagenes.length - 1 : prev - 1));
   };
 
-  // 💡 FUNCIÓN AUXILIAR: Busca en los campos específicos del backend
   const obtenerCampoExtra = (termino) => {
     if (!item.caracteristicasExtra) return null;
     const campo = item.caracteristicasExtra.find(c => c.label.toLowerCase().includes(termino.toLowerCase()));
     return campo && campo.value !== null ? campo.value : null;
   };
 
-  // 🚀 LÓGICA DINÁMICA POR TIPO DE PROPIEDAD
   const renderizarDetalles = () => {
     const tipo = (item.titulo || "").toLowerCase();
     
-    // Variables comunes con fallbacks
     const dorms = item.detalles?.dormitorios || 0;
     const banos = item.detalles?.banos || 0;
     const estac = item.detalles?.estacionamientos || 0;
@@ -46,7 +45,6 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
     const m2Utiles = obtenerCampoExtra("útiles") || item.detalles?.superficie || "0";
     const m2Totales = obtenerCampoExtra("totales") || item.detalles?.superficie || "0";
 
-    // Un pequeño componente interno para no repetir código visual
     const InfoItem = ({ icon: Icon, text }) => (
       <div className="flex items-center gap-1.5 bg-gray-50 px-2 py-1 rounded-md border border-gray-100">
         <Icon className="text-[#24B6C1] text-xs" />
@@ -54,7 +52,6 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
       </div>
     );
 
-    // 1. CASAS
     if (tipo.includes("casa") && !tipo.includes("comercial")) {
       return (
         <div className="flex flex-wrap gap-2 mt-3">
@@ -66,7 +63,6 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
       );
     }
     
-    // 2. DEPARTAMENTOS
     if (tipo.includes("departamento")) {
       return (
         <div className="flex flex-wrap gap-2 mt-3">
@@ -78,7 +74,6 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
       );
     }
 
-    // 3. OFICINAS
     if (tipo.includes("oficina")) {
       const tipoEdificio = obtenerCampoExtra("tipo edificio");
       return (
@@ -90,7 +85,6 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
       );
     }
 
-    // 4. LOCALES
     if (tipo.includes("local")) {
       return (
         <div className="flex flex-wrap gap-2 mt-3">
@@ -100,7 +94,6 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
       );
     }
 
-    // 5. CASAS COMERCIALES
     if (tipo.includes("comercial")) {
       return (
         <div className="flex flex-wrap gap-2 mt-3">
@@ -111,7 +104,6 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
       );
     }
 
-    // 6. TERRENOS PARA PROYECTOS
     if (tipo.includes("terreno") && tipo.includes("proyecto")) {
       const uso = obtenerCampoExtra("uso") || obtenerCampoExtra("destino");
       return (
@@ -122,7 +114,6 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
       );
     }
 
-    // 7. TERRENOS INDUSTRIALES
     if (tipo.includes("terreno") && tipo.includes("industrial")) {
       return (
         <div className="flex flex-wrap gap-2 mt-3">
@@ -131,7 +122,6 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
       );
     }
 
-    // 8. GALPONES
     if (tipo.includes("galpón") || tipo.includes("galpon")) {
       return (
         <div className="flex flex-wrap gap-2 mt-3">
@@ -141,7 +131,6 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
       );
     }
 
-    // 9. PARCELAS Y FUNDOS
     if (tipo.includes("parcela") || tipo.includes("fundo")) {
       const supTerreno = obtenerCampoExtra("superficie") || m2Terreno;
       return (
@@ -151,7 +140,6 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
       );
     }
 
-    // FALLBACK: Si es otro tipo raro, muestra lo básico
     return (
       <div className="flex flex-wrap gap-2 mt-3">
         <InfoItem icon={FaRulerCombined} text={`${item.detalles?.superficie || "0"} m²`} />
@@ -166,7 +154,6 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
         isActive ? 'ring-4 ring-[#24B6C1] scale-[1.02]' : 'hover:shadow-2xl'
       }`}
     >
-      {/* Carrusel de Imágenes */}
       <div className="relative h-64 overflow-hidden bg-gray-200">
         <img 
           src={imagenes.length > 0 ? imagenes[currentImageIndex] : "https://via.placeholder.com/600x400?text=Imagen+No+Disponible+Alaluf"} 
@@ -198,7 +185,6 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
           </>
         )}
 
-        {/* Badge Tipo Propiedad */}
         <div className="absolute top-4 left-4 flex gap-2">
           <span className="bg-white/90 text-black text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-tighter shadow-sm">
             {item.titulo || "Propiedad"}
@@ -206,7 +192,6 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
         </div>
       </div>
 
-      {/* Contenido */}
       <div className="p-6 text-black">
         <h3 className="text-xl font-bold mb-3 leading-tight uppercase line-clamp-1 text-ellipsis">
           {item.ubicacion?.sector || "Sector No Especificado"}
@@ -218,7 +203,6 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
             <span>{item.ubicacion?.comuna || "Sin Comuna"}, {item.ubicacion?.region || "Chile"}</span>
           </div>
           
-          {/* AQUÍ SE INYECTA LA LÓGICA DINÁMICA */}
           {renderizarDetalles()}
 
           <div className="text-[10px] text-gray-400 mt-3 font-medium tracking-wide">
@@ -260,7 +244,10 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
             </button>
             <button 
               className="px-5 py-3 bg-[#24B6C1] text-white rounded-xl font-bold text-xs uppercase tracking-wider shadow-md hover:bg-cyan-600 transition"
-              onClick={(e) => e.stopPropagation()} 
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate(`/propiedad/${item.codigo || item.id}`);
+              }} 
             >
               Ficha
             </button>

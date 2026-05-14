@@ -2,7 +2,6 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import './App.css';
 import Hero from './components/Hero';
-import SearchBar from './components/SearchBar';
 import SpecialArea from './components/SpecialArea';
 import StatsSection from './components/StatsSection';
 import InfoSection from './components/InfoSection';
@@ -19,8 +18,9 @@ import ClubDealsInversiones from './pages/ClubDealsInversiones';
 import ScrollToTop from './components/ScrollToTop';
 import Nosotros from './pages/Nosotros';
 
-// IMPORTACIÓN DE LA NUEVA VISTA DE BÚSQUEDA
+// IMPORTACIONES DE VISTAS DE BÚSQUEDA Y DETALLE
 import SearchView from './pages/SearchView'; 
+import PropertyPage from './pages/PropertyPage'; // 🌟 NUEVA IMPORTACIÓN
 
 function App() {
   return (
@@ -39,10 +39,13 @@ function App() {
           </>
         } />
 
-        {/* NUEVA RUTA: VISTA DE RESULTADOS DE BÚSQUEDA */}
+        {/* VISTA DE RESULTADOS DE BÚSQUEDA */}
         <Route path="/buscar" element={<SearchView />} />
 
-        {/* PAGINA DE LICITACIONES */}
+        {/* 🌟 NUEVA RUTA: FICHA DE DETALLE DE PROPIEDAD */}
+        <Route path="/propiedad/:id" element={<PropertyPage />} />
+
+        {/* RESTO DE PAGINAS */}
         <Route path="/licitaciones" element={<Licitaciones />} />
         <Route path="/industrial" element={<Industrial />} />
         <Route path="/comercial" element={<Comercial />} />
