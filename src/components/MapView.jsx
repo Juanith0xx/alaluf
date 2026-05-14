@@ -1,39 +1,63 @@
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import mapboxgl from 'mapbox-gl'; 
-import { Map, Marker, NavigationControl, FullscreenControl } from 'react-map-gl';
+import { Map, Marker, NavigationControl } from 'react-map-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { FaMapMarkerAlt } from 'react-icons/fa';
 
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN;
-const MapView = ({ propiedades, selectedProperty }) => {
-  const mapRef = useRef();
-  const [viewState, setViewState] = useState({
-    latitude: -33.4489,
-    longitude: -70.6693,
-    zoom: 11
-  });
 
+const MapView = ({ propiedades, selectedProperty, setSelectedProperty }) => {
+  const mapRef = useRef(null);
+
+  // 1. Encuadre automático (fitBounds) al hacer una búsqueda masiva
   useEffect(() => {
-    console.log("Propiedades en el Mapa:", propiedades.map(p => ({ id: p.id, coords: p.coords })));
+    if (propiedades.length > 0 && mapRef.current) {
+      const bounds = new mapboxgl.LngLatBounds();
+      let hasCoords = false;
+
+      propiedades.forEach((prop) => {
+        if (prop.coords?.lng && prop.coords?.lat) {
+          bounds.extend([parseFloat(prop.coords.lng), parseFloat(prop.coords.lat)]);
+          hasCoords = true;
+        }
+      });
+
+      if (hasCoords) {
+        mapRef.current.fitBounds(bounds, { 
+          padding: 80, 
+          duration: 1500, 
+          maxZoom: 15 
+        });
+      }
+    }
   }, [propiedades]);
 
+  // 2. 🌟 EL MOTOR DE VUELO: Esto centra el mapa al hacer clic en una Card
   useEffect(() => {
-    if (selectedProperty && selectedProperty.coords?.lat && selectedProperty.coords?.lng) {
-      mapRef.current?.flyTo({
-        center: [selectedProperty.coords.lng, selectedProperty.coords.lat],
-        duration: 2000,
-        zoom: 15,
+    // Si hay una propiedad seleccionada, tiene coordenadas, y el mapa ya cargó...
+    if (selectedProperty?.coords?.lat && selectedProperty?.coords?.lng && mapRef.current) {
+      
+      mapRef.current.flyTo({
+        center: [parseFloat(selectedProperty.coords.lng), parseFloat(selectedProperty.coords.lat)],
+        duration: 1500, // 1.5 segundos de animación de vuelo
+        zoom: 16,       // Nivel de zoom de calle
         essential: true
       });
+      
+    } else if (selectedProperty && (!selectedProperty.coords?.lat || !selectedProperty.coords?.lng)) {
+      console.warn(`La propiedad Código ${selectedProperty.codigo} no tiene coordenadas en la base de datos.`);
     }
-  }, [selectedProperty]);
+  }, [selectedProperty]); // Este useEffect se dispara CADA VEZ que tocas una card
 
   return (
     <div className="w-full h-full rounded-[40px] overflow-hidden border border-white/10 shadow-2xl bg-[#1a1a1a]">
       <Map
-        {...viewState}
         ref={mapRef}
-        onMove={evt => setViewState(evt.viewState)}
+        initialViewState={{
+          latitude: -33.4489,
+          longitude: -70.6693,
+          zoom: 11
+        }}
         style={{ width: '100%', height: '100%' }}
         mapStyle="mapbox://styles/mapbox/streets-v12"
         mapboxAccessToken={MAPBOX_TOKEN}
@@ -43,9 +67,10 @@ const MapView = ({ propiedades, selectedProperty }) => {
         <NavigationControl position="top-left" />
 
         {propiedades.map((prop) => {
+          // Si la propiedad no tiene coordenadas, no dibujamos el pin
           if (!prop.coords?.lat || !prop.coords?.lng) return null;
 
-          const isSelected = selectedProperty?.id === prop.id;
+          const isSelected = selectedProperty?.id === prop.id || selectedProperty?.codigo === prop.codigo;
 
           return (
             <Marker 
@@ -53,19 +78,23 @@ const MapView = ({ propiedades, selectedProperty }) => {
               latitude={parseFloat(prop.coords.lat)} 
               longitude={parseFloat(prop.coords.lng)} 
               anchor="bottom"
+              style={{ zIndex: isSelected ? 50 : 1 }} // El pin seleccionado se pone por encima de los demás
             >
-              <div className="group relative flex flex-col items-center">
-                <div className="absolute bottom-10 bg-white text-black text-[10px] font-bold px-3 py-1 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-xl z-50">
+              <div 
+                className="group relative flex flex-col items-center cursor-pointer"
+                onClick={() => {
+                  // Si tienes la función setSelectedProperty, permitimos seleccionar desde el mapa también
+                  if (setSelectedProperty) setSelectedProperty(prop);
+                }} 
+              >
+                <div className={`absolute bottom-10 bg-white text-black text-[10px] font-bold px-3 py-1 rounded-lg transition-opacity whitespace-nowrap shadow-xl ${isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
                   {prop.precios?.arriendo?.valor || prop.precios?.venta?.valor} {prop.precios?.arriendo?.moneda || prop.precios?.venta?.moneda}
                 </div>
                 
                 <FaMapMarkerAlt 
-                  // Mantenemos el cambio de tamaño para destacar la selección
-                  size={isSelected ? 45 : 30} 
-                  // COLOR FIJO: #24B6C1 para todos los estados
-                  className="text-[#24B6C1] cursor-pointer hover:scale-125 transition-all duration-300"
+                  size={isSelected ? 50 : 35} 
+                  className="text-[#24B6C1] transition-all duration-300"
                   style={{
-                    // Ajustamos el resplandor (glow) para diferenciar el seleccionado
                     filter: isSelected 
                       ? "drop-shadow(0 0 15px rgba(36, 182, 193, 0.9))" 
                       : "drop-shadow(0 0 8px rgba(36, 182, 193, 0.4))"

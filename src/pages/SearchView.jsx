@@ -23,7 +23,7 @@ const SearchView = () => {
   const [loading, setLoading] = useState(true);
   const [selectedProperty, setSelectedProperty] = useState(null);
 
-  // 🌟 ESTADO DE PAGINACIÓN: Solo necesitamos saber el total de páginas
+  // 🌟 ESTADO DE PAGINACIÓN
   const [totalPaginas, setTotalPaginas] = useState(1);
   const paginaActual = parseInt(searchParams.get("page")) || 1;
 
@@ -126,7 +126,7 @@ const SearchView = () => {
       return;
     }
 
-    // 🌟 Al hacer una nueva búsqueda, forzamos iniciar en la página 1
+    // Al hacer una nueva búsqueda, forzamos iniciar en la página 1
     setSearchParams({
       tipo_prop: tipoPropiedad.id,
       obj: objID,
@@ -135,12 +135,12 @@ const SearchView = () => {
     });
   };
 
-  // 🌟 FUNCIONES DE NAVEGACIÓN DE PÁGINAS
+  // FUNCIONES DE NAVEGACIÓN DE PÁGINAS
   const irPaginaSiguiente = () => {
     if (paginaActual < totalPaginas) {
       const currentParams = Object.fromEntries([...searchParams]);
       setSearchParams({ ...currentParams, page: paginaActual + 1 });
-      window.scrollTo({ top: 0, behavior: "smooth" }); // Sube suavemente al cambiar de página
+      window.scrollTo({ top: 0, behavior: "smooth" }); 
     }
   };
 
@@ -166,7 +166,6 @@ const SearchView = () => {
         if (query) {
           url = `${API_URL}/api/propiedades/${query}`;
         } else if (tipo_prop && obj && comuna) {
-          // 🌟 Añadimos el parámetro de página a la consulta al backend
           url = `${API_URL}/api/propiedades/buscar?tipo_prop=${tipo_prop}&obj=${obj}&comuna=${comuna}&page=${paginaActual}&limit=10`;
         } else {
           setPropiedadesData([]);
@@ -179,17 +178,13 @@ const SearchView = () => {
         
         let finalArray = [];
 
-        // 🌟 LÓGICA INTELIGENTE DE LECTURA DE RESPUESTA
         if (query) {
-          // Si es por ID, el backend manda un solo objeto de propiedad
           finalArray = (data && (data.id || data.codigo)) ? [data] : [];
           setTotalPaginas(1);
         } else if (data.data && data.paginacion) {
-          // Si es búsqueda masiva, el backend manda el objeto de paginación
           finalArray = data.data;
           setTotalPaginas(data.paginacion.totalPaginas);
         } else {
-          // Fallback por si acaso
           finalArray = Array.isArray(data) ? data : [];
           setTotalPaginas(1);
         }
@@ -204,7 +199,7 @@ const SearchView = () => {
       }
     };
     fetchResultados();
-  }, [searchParams]); // Se vuelve a ejecutar cuando cambian los parámetros de URL (incluyendo la página)
+  }, [searchParams]);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -323,12 +318,23 @@ const SearchView = () => {
               {loading ? (
                 <div className="col-span-2 py-40 text-center"><div className="w-12 h-12 border-4 border-[#24B6C1] border-t-transparent rounded-full animate-spin inline-block"></div></div>
               ) : propiedadesData.length > 0 ? (
-                propiedadesData.map((prop) => (
-                  <PropertyCard key={prop.id || prop.codigo} item={prop} 
-                    onSelect={() => setSelectedProperty(prop)} 
-                    isActive={selectedProperty?.id === prop.id} 
-                  />
-                ))
+                propiedadesData.map((prop) => {
+                  // 🔧 FIX 1: Comparación hiper-robusta (String == Number seguro)
+                  const esActiva = selectedProperty && (
+                    selectedProperty.id == prop.id || 
+                    selectedProperty.codigo == prop.codigo ||
+                    selectedProperty.id == prop.codigo // A veces la API cruza estos valores
+                  );
+
+                  return (
+                    <PropertyCard 
+                      key={prop.id || prop.codigo} 
+                      item={prop} 
+                      onSelect={() => setSelectedProperty(prop)} 
+                      isActive={esActiva} 
+                    />
+                  );
+                })
               ) : (
                 <div className="col-span-2 py-40 text-center bg-black/40 rounded-[40px] border border-dashed border-white/10">
                   <p className="text-gray-500 font-bold uppercase tracking-widest">Sin resultados en esta zona</p>
@@ -336,7 +342,7 @@ const SearchView = () => {
               )}
             </div>
 
-            {/* 🌟 CONTROLES DE PAGINACIÓN */}
+            {/* CONTROLES DE PAGINACIÓN */}
             {!loading && totalPaginas > 1 && !searchParams.get("q") && (
               <div className="flex justify-center items-center gap-6 mt-12 bg-black/40 p-4 rounded-3xl border border-white/10 backdrop-blur-md w-fit mx-auto shadow-2xl">
                 <button
@@ -373,17 +379,84 @@ const SearchView = () => {
 
           <div className="lg:col-span-5">
             <div className="sticky top-28 space-y-8">
+              
+              {/* MAPA */}
               <div className="h-[480px] relative overflow-hidden shadow-2xl rounded-[40px] border border-white/20 bg-black">
-                <MapView propiedades={propiedadesData} selectedProperty={selectedProperty} />
+                {/* 🔧 FIX 2: Pasamos explícitamente setSelectedProperty al mapa */}
+                <MapView 
+                  propiedades={propiedadesData} 
+                  selectedProperty={selectedProperty}
+                  setSelectedProperty={setSelectedProperty} 
+                />
               </div>
-              <div className="bg-white p-10 rounded-[40px] text-black shadow-2xl">
-                <h3 className="text-2xl font-black mb-1 tracking-tighter uppercase italic">Asesoría Alaluf</h3>
-                <p className="text-gray-500 text-sm mb-6">Contáctanos para gestionar tu propiedad.</p>
-                <form className="space-y-3">
-                  <input type="text" placeholder="Nombre completo" className="w-full p-4 bg-gray-50 rounded-2xl border border-gray-100" />
-                  <button className="w-full py-4 bg-black text-white font-black rounded-2xl hover:bg-[#24B6C1] transition-all uppercase text-xs tracking-widest">Enviar Requerimiento</button>
+
+              {/* FORMULARIO DE CONTACTO */}
+              <div className="bg-white text-gray-800 rounded-[40px] p-8 lg:p-10 shadow-2xl">
+                <form className="space-y-6 font-[Outfit]">
+                  <div className="grid md:grid-cols-2 gap-4">
+                    
+                    <div className="space-y-2 md:col-span-2 lg:col-span-1">
+                      <label className="text-sm font-semibold">¿Qué estás buscando?</label>
+                      <select className="w-full bg-white border border-gray-200 px-4 py-3 text-gray-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#24B6C1]">
+                        <option>Selecciona</option>
+                        <option value="propiedad">Comprar una propiedad</option>
+                        <option value="arrendar">Arrendar una propiedad</option>
+                        <option value="vender">Vender o arrendar lo que tengo</option>
+                        <option value="asesoria">Asesoría de inversión</option>
+                        <option value="licitacion">Licitación o terreno</option>
+                        <option value="admin">Administración de arriendos</option>
+                        <option value="duda">No sé por dónde empezar</option>
+                      </select>
+                    </div>
+
+                    <div className="space-y-2 md:col-span-2 lg:col-span-1">
+                      <label className="text-sm font-semibold">Nombre completo *</label>
+                      <input
+                        type="text"
+                        placeholder="Tu nombre"
+                        className="w-full bg-white border border-gray-200 px-4 py-3 placeholder-gray-400 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#24B6C1]"
+                      />
+                    </div>
+
+                    <div className="space-y-2 md:col-span-2 lg:col-span-1">
+                      <label className="text-sm font-semibold">Correo electrónico *</label>
+                      <input
+                        type="email"
+                        placeholder="tu@email.com"
+                        className="w-full bg-white border border-gray-200 px-4 py-3 placeholder-gray-400 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#24B6C1]"
+                      />
+                    </div>
+
+                    <div className="space-y-2 md:col-span-2 lg:col-span-1">
+                      <label className="text-sm font-semibold">Teléfono</label>
+                      <input
+                        type="text"
+                        placeholder="+56 9 1234 5678"
+                        className="w-full bg-white border border-gray-200 px-4 py-3 placeholder-gray-400 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#24B6C1]"
+                      />
+                    </div>
+
+                    <div className="md:col-span-2 space-y-2">
+                      <label className="text-sm font-semibold">Hablemos de lo que necesitas.</label>
+                      <textarea
+                        rows="4"
+                        placeholder="Cuéntanos qué tienes en mente — una propiedad, una inversión o simplemente una duda que quieres resolver."
+                        className="w-full bg-white border border-gray-200 px-4 py-4 placeholder-gray-400 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#24B6C1] resize-none"
+                      />
+                    </div>
+
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="w-full group bg-[#158F9B] hover:bg-[#127C86] text-white px-8 py-4 rounded-xl text-lg font-bold transition-all duration-300 flex items-center justify-center gap-2 mt-4"
+                  >
+                     Continuar
+                  </button>
+
                 </form>
               </div>
+
             </div>
           </div>
 
