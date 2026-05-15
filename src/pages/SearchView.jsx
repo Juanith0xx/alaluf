@@ -23,6 +23,9 @@ const SearchView = () => {
   const [loading, setLoading] = useState(true);
   const [selectedProperty, setSelectedProperty] = useState(null);
 
+  // 🌟 MEJORA: Estado para el conteo total
+  const [totalPropiedades, setTotalPropiedades] = useState(0);
+
   // 🌟 ESTADO DE PAGINACIÓN
   const [totalPaginas, setTotalPaginas] = useState(1);
   const paginaActual = parseInt(searchParams.get("page")) || 1;
@@ -67,41 +70,21 @@ const SearchView = () => {
 
   // CATEGORÍAS COMPLETAS DE PROPIEDADES
   const categoriasPropiedades = [
-    { 
-      nombre: "Residencial", 
-      sub: [
-        { label: "Casas", id: 1 }, 
-        { label: "Departamentos", id: 2 } 
-      ] 
-    },
-    { 
-      nombre: "Comercial / Oficinas", 
-      sub: [
-        { label: "Oficinas", id: 3 }, 
-        { label: "Locales", id: 4 },
-        { label: "Casa Comercial", id: 5 },
-        { label: "Hotelería", id: 13 }
-      ] 
-    },
-    { 
-      nombre: "Industrial / Terrenos", 
-      sub: [
-        { label: "Galpones", id: 8 }, 
-        { label: "Bodega Industrial", id: 17 },
-        { label: "Terreno Proyectos", id: 6 }, 
-        { label: "Terreno Industrial", id: 7 } 
-      ] 
-    },
-    { 
-      nombre: "Otros", 
-      sub: [
-        { label: "Parcela / Sitio", id: 10 }, 
-        { label: "Parcela", id: 11 },
-        { label: "Edificios Corporativos", id: 12 },
-        { label: "Campos", id: 15 }
-      ] 
-    },
+    { nombre: "Residencial", sub: [{ label: "Casas", id: 1 }, { label: "Departamentos", id: 2 }] },
+    { nombre: "Comercial / Oficinas", sub: [{ label: "Oficinas", id: 3 }, { label: "Locales", id: 4 }, { label: "Casa Comercial", id: 5 }, { label: "Hotelería", id: 13 }] },
+    { nombre: "Industrial / Terrenos", sub: [{ label: "Galpones", id: 8 }, { label: "Bodega Industrial", id: 17 }, { label: "Terreno Proyectos", id: 6 }, { label: "Terreno Industrial", id: 7 }] },
+    { nombre: "Otros", sub: [{ label: "Parcela / Sitio", id: 10 }, { label: "Parcela", id: 11 }, { label: "Edificios Corporativos", id: 12 }, { label: "Campos", id: 15 }] },
   ];
+
+  // 🌟 FUNCIÓN AUXILIAR: Obtiene el nombre legible (Casas, Oficinas) a partir del ID
+  const obtenerLabelPorId = (id) => {
+    if (!id) return "Propiedades";
+    for (let cat of categoriasPropiedades) {
+      const subEncontrada = cat.sub.find(s => s.id == id);
+      if (subEncontrada) return subEncontrada.label;
+    }
+    return "Propiedades";
+  };
 
   const filteredComunas = searchQueryInput.length > 1 
     ? comunasDataset.filter(c => c.label.toLowerCase().includes(searchQueryInput.toLowerCase()))
@@ -111,7 +94,6 @@ const SearchView = () => {
     const textInput = searchQueryInput.trim();
     const numericOnly = textInput.replace(/\D/g, "");
     
-    // Búsqueda por ID o Código
     if (numericOnly !== "" && (textInput.toLowerCase().startsWith("id") || !isNaN(textInput))) {
       setSearchParams({ q: numericOnly });
       setShowSuggestions(false);
@@ -126,16 +108,9 @@ const SearchView = () => {
       return;
     }
 
-    // Al hacer una nueva búsqueda, forzamos iniciar en la página 1
-    setSearchParams({
-      tipo_prop: tipoPropiedad.id,
-      obj: objID,
-      comuna: comunaID,
-      page: 1
-    });
+    setSearchParams({ tipo_prop: tipoPropiedad.id, obj: objID, comuna: comunaID, page: 1 });
   };
 
-  // FUNCIONES DE NAVEGACIÓN DE PÁGINAS
   const irPaginaSiguiente = () => {
     if (paginaActual < totalPaginas) {
       const currentParams = Object.fromEntries([...searchParams]);
@@ -161,14 +136,19 @@ const SearchView = () => {
         const obj = searchParams.get("obj");
         const comuna = searchParams.get("comuna");
 
+        // 🌟 SINCRONIZACIÓN: Actualizamos el estado tipoPropiedad basándonos en la URL
+        if (tipo_prop && (!tipoPropiedad || tipoPropiedad.id != tipo_prop)) {
+          setTipoPropiedad({ label: obtenerLabelPorId(tipo_prop), id: tipo_prop });
+        }
+
         let url = "";
-        
         if (query) {
           url = `${API_URL}/api/propiedades/${query}`;
         } else if (tipo_prop && obj && comuna) {
           url = `${API_URL}/api/propiedades/buscar?tipo_prop=${tipo_prop}&obj=${obj}&comuna=${comuna}&page=${paginaActual}&limit=10`;
         } else {
           setPropiedadesData([]);
+          setTotalPropiedades(0);
           setLoading(false);
           return;
         }
@@ -179,14 +159,18 @@ const SearchView = () => {
         let finalArray = [];
 
         if (query) {
-          finalArray = (data && (data.id || data.codigo)) ? [data] : [];
+          const exists = (data && (data.id || data.codigo));
+          finalArray = exists ? [data] : [];
           setTotalPaginas(1);
+          setTotalPropiedades(exists ? 1 : 0);
         } else if (data.data && data.paginacion) {
           finalArray = data.data;
           setTotalPaginas(data.paginacion.totalPaginas);
+          setTotalPropiedades(data.paginacion.totalPropiedades || 0);
         } else {
           finalArray = Array.isArray(data) ? data : [];
           setTotalPaginas(1);
+          setTotalPropiedades(finalArray.length);
         }
 
         setPropiedadesData(finalArray);
@@ -194,12 +178,13 @@ const SearchView = () => {
       } catch (error) {
         console.error("Error fetching properties:", error);
         setPropiedadesData([]);
+        setTotalPropiedades(0);
       } finally {
         setLoading(false);
       }
     };
     fetchResultados();
-  }, [searchParams]);
+  }, [searchParams, paginaActual]);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -226,7 +211,11 @@ const SearchView = () => {
           <button onClick={() => navigate('/')} className="p-4 border border-white/10 rounded-2xl hover:bg-[#24B6C1] transition-all">
             <FaArrowLeft />
           </button>
-          <h1 className="text-4xl font-black tracking-tighter uppercase italic">Resultados Alaluf</h1>
+          
+          {/* 🌟 TÍTULO DINÁMICO: Total X [Categoría] encontradas */}
+          <h1 className=" pt-2 !text-2xl font-bold !font-[Outfit] tracking-tighter uppercase italic">
+            Total {obtenerLabelPorId(searchParams.get("tipo_prop"))} encontradas <span className="text-[#24B6C1]"> {totalPropiedades}</span> 
+          </h1>
         </div>
       </div>
 
@@ -319,11 +308,9 @@ const SearchView = () => {
                 <div className="col-span-2 py-40 text-center"><div className="w-12 h-12 border-4 border-[#24B6C1] border-t-transparent rounded-full animate-spin inline-block"></div></div>
               ) : propiedadesData.length > 0 ? (
                 propiedadesData.map((prop) => {
-                  // 🔧 FIX 1: Comparación hiper-robusta (String == Number seguro)
                   const esActiva = selectedProperty && (
                     selectedProperty.id == prop.id || 
-                    selectedProperty.codigo == prop.codigo ||
-                    selectedProperty.id == prop.codigo // A veces la API cruza estos valores
+                    selectedProperty.codigo == prop.codigo
                   );
 
                   return (
@@ -379,10 +366,7 @@ const SearchView = () => {
 
           <div className="lg:col-span-5">
             <div className="sticky top-28 space-y-8">
-              
-              {/* MAPA */}
               <div className="h-[480px] relative overflow-hidden shadow-2xl rounded-[40px] border border-white/20 bg-black">
-                {/* 🔧 FIX 2: Pasamos explícitamente setSelectedProperty al mapa */}
                 <MapView 
                   propiedades={propiedadesData} 
                   selectedProperty={selectedProperty}
@@ -394,7 +378,6 @@ const SearchView = () => {
               <div className="bg-white text-gray-800 rounded-[40px] p-8 lg:p-10 shadow-2xl">
                 <form className="space-y-6 font-[Outfit]">
                   <div className="grid md:grid-cols-2 gap-4">
-                    
                     <div className="space-y-2 md:col-span-2 lg:col-span-1">
                       <label className="text-sm font-semibold">¿Qué estás buscando?</label>
                       <select className="w-full bg-white border border-gray-200 px-4 py-3 text-gray-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#24B6C1]">
@@ -411,52 +394,30 @@ const SearchView = () => {
 
                     <div className="space-y-2 md:col-span-2 lg:col-span-1">
                       <label className="text-sm font-semibold">Nombre completo *</label>
-                      <input
-                        type="text"
-                        placeholder="Tu nombre"
-                        className="w-full bg-white border border-gray-200 px-4 py-3 placeholder-gray-400 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#24B6C1]"
-                      />
+                      <input type="text" placeholder="Tu nombre" className="w-full bg-white border border-gray-200 px-4 py-3 placeholder-gray-400 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#24B6C1]" />
                     </div>
 
                     <div className="space-y-2 md:col-span-2 lg:col-span-1">
                       <label className="text-sm font-semibold">Correo electrónico *</label>
-                      <input
-                        type="email"
-                        placeholder="tu@email.com"
-                        className="w-full bg-white border border-gray-200 px-4 py-3 placeholder-gray-400 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#24B6C1]"
-                      />
+                      <input type="email" placeholder="tu@email.com" className="w-full bg-white border border-gray-200 px-4 py-3 placeholder-gray-400 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#24B6C1]" />
                     </div>
 
                     <div className="space-y-2 md:col-span-2 lg:col-span-1">
                       <label className="text-sm font-semibold">Teléfono</label>
-                      <input
-                        type="text"
-                        placeholder="+56 9 1234 5678"
-                        className="w-full bg-white border border-gray-200 px-4 py-3 placeholder-gray-400 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#24B6C1]"
-                      />
+                      <input type="text" placeholder="+56 9 1234 5678" className="w-full bg-white border border-gray-200 px-4 py-3 placeholder-gray-400 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#24B6C1]" />
                     </div>
 
                     <div className="md:col-span-2 space-y-2">
                       <label className="text-sm font-semibold">Hablemos de lo que necesitas.</label>
-                      <textarea
-                        rows="4"
-                        placeholder="Cuéntanos qué tienes en mente — una propiedad, una inversión o simplemente una duda que quieres resolver."
-                        className="w-full bg-white border border-gray-200 px-4 py-4 placeholder-gray-400 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#24B6C1] resize-none"
-                      />
+                      <textarea rows="4" placeholder="Cuéntanos qué tienes en mente — una propiedad, una inversión o simplemente una duda que quieres resolver." className="w-full bg-white border border-gray-200 px-4 py-4 placeholder-gray-400 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#24B6C1] resize-none" />
                     </div>
-
                   </div>
 
-                  <button
-                    type="submit"
-                    className="w-full group bg-[#158F9B] hover:bg-[#127C86] text-white px-8 py-4 rounded-xl text-lg font-bold transition-all duration-300 flex items-center justify-center gap-2 mt-4"
-                  >
+                  <button type="submit" className="w-full group bg-[#158F9B] hover:bg-[#127C86] text-white px-8 py-4 rounded-xl text-lg font-bold transition-all duration-300 flex items-center justify-center gap-2 mt-4">
                      Continuar
                   </button>
-
                 </form>
               </div>
-
             </div>
           </div>
 
