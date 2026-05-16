@@ -1,13 +1,17 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Search } from "lucide-react";
+import { Menu, X, Search, ChevronDown } from "lucide-react"; // Importamos ChevronDown para indicar desplegable
 import logo from "../assets/Logo_A.png";
-import { Link, useNavigate } from 'react-router-dom'; // Importamos useNavigate
+import { Link, useNavigate } from 'react-router-dom';
 
 /* =========================
    DESKTOP NAVBAR
 ========================= */
-const NavbarDesktop = ({ openDropdown, setOpenDropdown, searchCode, setSearchCode, onSearch }) => (
+const NavbarDesktop = ({ 
+  openDropdown, setOpenDropdown, 
+  openToolsDropdown, setOpenToolsDropdown, // 🌟 Nuevos estados para herramientas
+  searchCode, setSearchCode, onSearch 
+}) => (
   <nav className="fixed w-full z-50 bg-black/50 text-white font-[Outfit] pt-8 hidden lg:block">
     <div className="max-w-7xl mx-auto px-6 py-4 flex items-center">
 
@@ -72,6 +76,36 @@ const NavbarDesktop = ({ openDropdown, setOpenDropdown, searchCode, setSearchCod
 
             <Link to="/nosotros" className="hover:text-teal-400 transition duration-300 font-medium">Nosotros</Link>
             <a href="https://alaluf.cl/pressroom2.php" className="hover:text-teal-400 transition duration-300 font-medium">Newsletter</a>
+            
+            {/* 🌟 NUEVA SECCIÓN: Herramientas Dropdown (Desktop) */}
+            <div
+              className="relative"
+              onMouseEnter={() => setOpenToolsDropdown(true)}
+              onMouseLeave={() => setOpenToolsDropdown(false)}
+            >
+              <span className="cursor-pointer hover:text-teal-400 transition duration-300 font-medium flex items-center gap-1">
+                Herramientas <ChevronDown size={14} className="opacity-70" />
+              </span>
+
+              <AnimatePresence>
+                {openToolsDropdown && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 15 }}
+                    transition={{ duration: 0.25 }}
+                    className="absolute top-12 -left-6 bg-black/50 backdrop-blur-2xl p-6 shadow-2xl w-60 border border-white/10"
+                  >
+                    <ul className="space-y-4 text-base font-medium">
+                      <li className="relative cursor-pointer transition hover:text-teal-400 before:content-['>'] before:absolute before:-left-4 before:opacity-0 hover:before:opacity-100">
+                        <Link to="/simulador-hipotecario" className="block w-full">Simulador Hipotecario</Link>
+                      </li>
+                    </ul>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
             <a href="#" className="hover:text-teal-400 transition duration-300 font-medium">Contacto</a>
           </div>
 
@@ -107,7 +141,11 @@ const NavbarDesktop = ({ openDropdown, setOpenDropdown, searchCode, setSearchCod
 /* =========================
    MOBILE NAVBAR
 ========================= */
-const NavbarMobile = ({ openMenu, setOpenMenu, searchCode, setSearchCode, onSearch }) => (
+const NavbarMobile = ({ 
+  openMenu, setOpenMenu, 
+  openMobileTools, setOpenMobileTools, // 🌟 Estado herramientas mobile
+  searchCode, setSearchCode, onSearch 
+}) => (
   <nav className="fixed w-full z-50 bg-black/60 text-white font-[Outfit] pt-6 lg:hidden">
     <div className="flex items-center justify-between px-6 py-4">
       <Link to="/" className="flex items-center">
@@ -133,9 +171,39 @@ const NavbarMobile = ({ openMenu, setOpenMenu, searchCode, setSearchCode, onSear
         >
           <div className="flex flex-col gap-5 text-base mt-4">
             <span className="cursor-pointer hover:text-teal-400 transition">Servicios</span>
-            <Link to="/nosotros" className="hover:text-teal-400 transition">Nosotros</Link>
-            <a href="#" className="hover:text-teal-400 transition">Newsletter</a>
-            <a href="#" className="hover:text-teal-400 transition font-semibold">Mi Alaluf</a>
+            <Link to="/nosotros" onClick={() => setOpenMenu(false)} className="hover:text-teal-400 transition">Nosotros</Link>
+            <a href="https://alaluf.cl/pressroom2.php" className="hover:text-teal-400 transition">Newsletter</a>
+            
+            {/* 🌟 NUEVA SECCIÓN: Herramientas Desplegable (Mobile Accordion) */}
+            <div className="flex flex-col">
+              <span 
+                onClick={() => setOpenMobileTools(!openMobileTools)} 
+                className="cursor-pointer hover:text-teal-400 transition flex items-center justify-between"
+              >
+                Herramientas <ChevronDown size={16} className={`transition-transform duration-200 ${openMobileTools ? "rotate-180 text-teal-400" : "opacity-70"}`} />
+              </span>
+              <AnimatePresence>
+                {openMobileTools && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="pl-4 mt-3 space-y-3 border-l border-white/10 text-sm font-medium overflow-hidden"
+                  >
+                    <Link 
+                      to="/simulador-hipotecario" 
+                      onClick={() => { setOpenMenu(false); setOpenMobileTools(false); }}
+                      className="block hover:text-teal-400 transition py-1"
+                    >
+                      Simulador Hipotecario
+                    </Link>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            <a href="#" className="hover:text-teal-400 transition">Contacto</a>
+            <a href="https://alaluf.cl/mialaluf/" className="hover:text-teal-400 transition font-semibold">Mi Alaluf</a>
 
             {/* Mobile Search Funcional */}
             <div className="flex items-center bg-white/10 px-4 py-2 rounded-xl mt-4">
@@ -149,7 +217,7 @@ const NavbarMobile = ({ openMenu, setOpenMenu, searchCode, setSearchCode, onSear
               />
               <Search 
                 size={18} 
-                className="ml-2 opacity-70" 
+                className="ml-2 opacity-70 cursor-pointer" 
                 onClick={onSearch}
               />
             </div>
@@ -167,14 +235,16 @@ const NavbarMobile = ({ openMenu, setOpenMenu, searchCode, setSearchCode, onSear
 const Navbar = () => {
   const [openMenu, setOpenMenu] = useState(false);
   const [openDropdown, setOpenDropdown] = useState(false);
-  const [searchCode, setSearchCode] = useState(""); // Estado para el código
+  const [openToolsDropdown, setOpenToolsDropdown] = useState(false); // 🌟 Estado Desktop
+  const [openMobileTools, setOpenMobileTools] = useState(false); // 🌟 Estado Mobile
+  const [searchCode, setSearchCode] = useState(""); 
   const navigate = useNavigate();
 
   const handleSearch = () => {
     if (searchCode.trim()) {
       navigate(`/buscar?q=${searchCode.trim()}`);
-      setSearchCode(""); // Limpiamos el input
-      setOpenMenu(false); // Cerramos el menú móvil si está abierto
+      setSearchCode(""); 
+      setOpenMenu(false); 
     }
   };
 
@@ -183,6 +253,8 @@ const Navbar = () => {
       <NavbarDesktop
         openDropdown={openDropdown}
         setOpenDropdown={setOpenDropdown}
+        openToolsDropdown={openToolsDropdown}
+        setOpenToolsDropdown={setOpenToolsDropdown}
         searchCode={searchCode}
         setSearchCode={setSearchCode}
         onSearch={handleSearch}
@@ -190,6 +262,8 @@ const Navbar = () => {
       <NavbarMobile
         openMenu={openMenu}
         setOpenMenu={setOpenMenu}
+        openMobileTools={openMobileTools}
+        setOpenMobileTools={setOpenMobileTools}
         searchCode={searchCode}
         setSearchCode={setSearchCode}
         onSearch={handleSearch}

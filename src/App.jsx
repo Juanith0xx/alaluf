@@ -20,7 +20,10 @@ import Nosotros from './pages/Nosotros';
 
 // IMPORTACIONES DE VISTAS DE BÚSQUEDA Y DETALLE
 import SearchView from './pages/SearchView'; 
-import PropertyPage from './pages/PropertyPage'; // 🌟 NUEVA IMPORTACIÓN
+import PropertyPage from './pages/PropertyPage'; 
+
+// 🌟 NUEVA IMPORTACIÓN: SIMULADOR HIPOTECARIO
+import MortgageCalculator from './pages/MortgageCalculator';
 
 function App() {
   return (
@@ -42,8 +45,11 @@ function App() {
         {/* VISTA DE RESULTADOS DE BÚSQUEDA */}
         <Route path="/buscar" element={<SearchView />} />
 
-        {/* 🌟 NUEVA RUTA: FICHA DE DETALLE DE PROPIEDAD */}
+        {/* FICHA DE DETALLE DE PROPIEDAD */}
         <Route path="/propiedad/:id" element={<PropertyPage />} />
+
+        {/* 🌟 NUEVA RUTA: SIMULADOR HIPOTECARIO ALALUF */}
+        <Route path="/simulador-hipotecario" element={<MortgageCalculator />} />
 
         {/* RESTO DE PAGINAS */}
         <Route path="/licitaciones" element={<Licitaciones />} />
