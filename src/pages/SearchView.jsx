@@ -23,10 +23,10 @@ const SearchView = () => {
   const [loading, setLoading] = useState(true);
   const [selectedProperty, setSelectedProperty] = useState(null);
 
-  // 🌟 MEJORA: Estado para el conteo total
+  // Estado para el conteo total
   const [totalPropiedades, setTotalPropiedades] = useState(0);
 
-  // 🌟 ESTADO DE PAGINACIÓN
+  // ESTADO DE PAGINACIÓN
   const [totalPaginas, setTotalPaginas] = useState(1);
   const paginaActual = parseInt(searchParams.get("page")) || 1;
 
@@ -36,7 +36,11 @@ const SearchView = () => {
   const [selectedComuna, setSelectedComuna] = useState(null);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [openDropdown, setOpenDropdown] = useState(false);
-  const [accionActiva, setAccionActiva] = useState("Arrendar");
+  
+  // 🌟 MEJORA: Sincroniza automáticamente el botón "Comprar" o "Arrendar" según la URL
+  const [accionActiva, setAccionActiva] = useState(() => {
+    return searchParams.get("obj") === "2" ? "Arrendar" : "Comprar";
+  });
   
   const dropdownRef = useRef(null);
   const suggestionRef = useRef(null);
@@ -76,7 +80,7 @@ const SearchView = () => {
     { nombre: "Otros", sub: [{ label: "Parcela / Sitio", id: 10 }, { label: "Parcela", id: 11 }, { label: "Edificios Corporativos", id: 12 }, { label: "Campos", id: 15 }] },
   ];
 
-  // 🌟 FUNCIÓN AUXILIAR: Obtiene el nombre legible (Casas, Oficinas) a partir del ID
+  // FUNCIÓN AUXILIAR: Obtiene el nombre legible
   const obtenerLabelPorId = (id) => {
     if (!id) return "Propiedades";
     for (let cat of categoriasPropiedades) {
@@ -102,13 +106,16 @@ const SearchView = () => {
 
     const objID = (accionActiva === "Comprar" || accionActiva === "Vender") ? 1 : 2;
     const comunaID = selectedComuna?.id || "";
+    const tipoID = tipoPropiedad?.id || "";
 
-    if (!tipoPropiedad || !comunaID) {
-      alert("Por favor selecciona Tipo de Propiedad y una Comuna de la lista sugerida.");
-      return;
-    }
-
-    setSearchParams({ tipo_prop: tipoPropiedad.id, obj: objID, comuna: comunaID, page: 1 });
+    // 🌟 MEJORA: Ya no bloqueamos la búsqueda con un Alert si falta la comuna.
+    // Permitimos búsquedas amplias de forma natural.
+    setSearchParams({ 
+      ...(tipoID && { tipo_prop: tipoID }), 
+      obj: objID, 
+      ...(comunaID && { comuna: comunaID }), 
+      page: 1 
+    });
   };
 
   const irPaginaSiguiente = () => {
@@ -136,21 +143,24 @@ const SearchView = () => {
         const obj = searchParams.get("obj");
         const comuna = searchParams.get("comuna");
 
-        // 🌟 SINCRONIZACIÓN: Actualizamos el estado tipoPropiedad basándonos en la URL
+        // SINCRONIZACIÓN: Actualizamos el estado tipoPropiedad basándonos en la URL
         if (tipo_prop && (!tipoPropiedad || tipoPropiedad.id != tipo_prop)) {
           setTipoPropiedad({ label: obtenerLabelPorId(tipo_prop), id: tipo_prop });
         }
 
         let url = "";
+        
         if (query) {
           url = `${API_URL}/api/propiedades/${query}`;
-        } else if (tipo_prop && obj && comuna) {
-          url = `${API_URL}/api/propiedades/buscar?tipo_prop=${tipo_prop}&obj=${obj}&comuna=${comuna}&page=${paginaActual}&limit=10`;
         } else {
-          setPropiedadesData([]);
-          setTotalPropiedades(0);
-          setLoading(false);
-          return;
+          // 🌟 FIX CRÍTICO DEL BACKEND: 
+          // Si enviamos "null" literal en la URL, el backend falla y devuelve 0 resultados.
+          // Usamos `|| ""` para enviar un campo vacío, lo que hace que tu backend ignore el filtro y traiga TODO (Casas, Deptos, etc).
+          const safeTipoProp = tipo_prop || ""; 
+          const safeObj = obj || "1"; // Por defecto buscar ventas
+          const safeComuna = comuna || ""; 
+          
+          url = `${API_URL}/api/propiedades/buscar?tipo_prop=${safeTipoProp}&obj=${safeObj}&comuna=${safeComuna}&page=${paginaActual}&limit=10`;
         }
 
         const response = await fetch(url);
@@ -212,7 +222,7 @@ const SearchView = () => {
             <FaArrowLeft />
           </button>
           
-          {/* 🌟 TÍTULO DINÁMICO: Total X [Categoría] encontradas */}
+          {/* TÍTULO DINÁMICO */}
           <h1 className=" pt-2 !text-2xl font-bold !font-[Outfit] tracking-tighter uppercase italic">
             Total {obtenerLabelPorId(searchParams.get("tipo_prop"))} encontradas <span className="text-[#24B6C1]"> {totalPropiedades}</span> 
           </h1>

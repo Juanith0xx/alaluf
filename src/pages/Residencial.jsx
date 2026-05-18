@@ -1,10 +1,18 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 // Importación de imágenes
 import heroResidencial from '../assets/residencia.jpeg'; 
 import fondoMarmol from '../assets/Marmol.jpg'; 
 
 const Residencial = () => {
+  const navigate = useNavigate();
+
+  // 🌟 ESTADOS PARA LOS SELECTORES DE LAS TARJETAS
+  // ID 1 = Casas, ID 2 = Departamentos
+  const [tipoComprar, setTipoComprar] = useState(1); // Por defecto busca Casas para comprar
+  const [tipoArrendar, setTipoArrendar] = useState(2); // Por defecto busca Deptos para arrendar
+
   const subservicios = [
     {
       title: "COMPRAR",
@@ -25,6 +33,17 @@ const Residencial = () => {
       buttonColor: "bg-[#0091A4]",
     },
   ];
+
+  // 🌟 MANEJADOR DE CLICS CON LA SELECCIÓN PRECISA PARA PROTEGER LA API PHP
+  const handleSubservicioClick = (action) => {
+    if (action === "COMPRAR") {
+      navigate(`/buscar?obj=1&tipo_prop=${tipoComprar}`);
+    } else if (action === "ARRENDAR") {
+      navigate(`/buscar?obj=2&tipo_prop=${tipoArrendar}`);
+    } else if (action === "VENDER") {
+      navigate("/#contacto");
+    }
+  };
 
   return (
     <main 
@@ -76,7 +95,7 @@ const Residencial = () => {
         </div>
       </section>
 
-      {/* SECCIÓN 3 SUBSERVICIOS - ESTILO LICITACIONES */}
+      {/* SECCIÓN 3 SUBSERVICIOS */}
       <section className="py-16 md:py-20 px-6 md:px-12">
         <div className="mx-auto w-full max-w-[1400px]">
           <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold text-center text-white uppercase tracking-wider mb-16 md:mb-24 drop-shadow-md">
@@ -89,21 +108,56 @@ const Residencial = () => {
                 key={index} 
                 className="bg-white text-gray-800 rounded-xl p-8 md:p-10 shadow-2xl flex flex-col border border-gray-100 transition-transform hover:scale-[1.01] w-full" 
               >
-                {/* Cabecera TIPO BOTÓN (Copiado de Licitaciones) */}
                 <div className="bg-[#3e3e3e] text-center text-white rounded-full py-3 px-6 -mx-4 -mt-4 mb-8 font-semibold tracking-wide uppercase shadow-md text-lg">
                   {subservicio.title}
                 </div>
                 
-                {/* Cuerpo de la tarjeta */}
                 <div className="flex flex-col flex-grow">
-                  <p className="text-base md:text-lg lg:text-xl leading-relaxed text-left flex-grow mb-10 text-gray-600 font-medium">
+                  <p className="text-base md:text-lg lg:text-xl leading-relaxed text-left flex-grow mb-8 text-gray-600 font-medium">
                     {subservicio.description}
                   </p>
                   
-                  {/* Botón Cyan */}
+                  {/* 🌟 SELECTOR INTEGRADO (Solo para Comprar y Arrendar) */}
+                  {subservicio.title === "COMPRAR" && (
+                    <div className="flex bg-gray-100/80 p-1.5 rounded-xl mb-6 shadow-inner border border-gray-200">
+                      <button
+                        onClick={() => setTipoComprar(1)}
+                        className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all ${tipoComprar === 1 ? "bg-white text-[#0091A4] shadow-md" : "text-gray-500 hover:text-gray-700"}`}
+                      >
+                        Casas
+                      </button>
+                      <button
+                        onClick={() => setTipoComprar(2)}
+                        className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all ${tipoComprar === 2 ? "bg-white text-[#0091A4] shadow-md" : "text-gray-500 hover:text-gray-700"}`}
+                      >
+                        Departamentos
+                      </button>
+                    </div>
+                  )}
+
+                  {subservicio.title === "ARRENDAR" && (
+                    <div className="flex bg-gray-100/80 p-1.5 rounded-xl mb-6 shadow-inner border border-gray-200">
+                      <button
+                        onClick={() => setTipoArrendar(1)}
+                        className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all ${tipoArrendar === 1 ? "bg-white text-[#0091A4] shadow-md" : "text-gray-500 hover:text-gray-700"}`}
+                      >
+                        Casas
+                      </button>
+                      <button
+                        onClick={() => setTipoArrendar(2)}
+                        className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all ${tipoArrendar === 2 ? "bg-white text-[#0091A4] shadow-md" : "text-gray-500 hover:text-gray-700"}`}
+                      >
+                        Departamentos
+                      </button>
+                    </div>
+                  )}
+                  {/* Espaciador para la tarjeta de Vender para que mantenga la misma altura */}
+                  {subservicio.title === "VENDER" && <div className="h-[52px] mb-6"></div>}
+                  
                   <div className="text-left mt-auto">
                     <button 
-                      className={`${subservicio.buttonColor} text-white hover:brightness-110 font-bold text-lg px-10 py-4 rounded-xl shadow-lg transition duration-300 active:scale-95`}
+                      onClick={() => handleSubservicioClick(subservicio.title)}
+                      className={`${subservicio.buttonColor} text-white hover:brightness-110 font-bold text-lg px-10 py-4 rounded-xl shadow-lg transition duration-300 active:scale-95 w-full md:w-auto`}
                     >
                       {subservicio.buttonText}
                     </button>
