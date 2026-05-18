@@ -1,9 +1,45 @@
+import React, { useState, useEffect } from "react";
 import bg from "../assets/Marmol.jpg";
 import logo from "../assets/Logo_A.png";
-import { FaLinkedin, FaInstagram, FaYoutube } from "react-icons/fa";
+import { 
+  FaLinkedin, FaInstagram, FaYoutube, FaChartLine, 
+  FaPhoneAlt, FaEnvelope, FaMapMarkerAlt 
+} from "react-icons/fa"; // 🌟 Importamos los iconos correctos para contacto
 import { FaSquareFacebook } from "react-icons/fa6";
 
 const Footer = () => {
+  const [ufValue, setUfValue] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUF = async () => {
+      try {
+        // 🌟 URL absoluta apuntando a tu Express Server (evita que responda el index.html del frontend)
+        // Nota: Si estás en producción, puedes cambiarlo por tu dominio o usar import.meta.env.VITE_API_URL
+        const response = await fetch("http://localhost:5000/api/indicadores/uf");
+        const data = await response.json();
+        
+        if (data.success && data.valor) {
+          const formatter = new Intl.NumberFormat("es-CL", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          });
+          
+          setUfValue(formatter.format(data.valor));
+        } else {
+          setUfValue("N/A");
+        }
+      } catch (error) {
+        console.error("Error consultando la UF interna:", error);
+        setUfValue("N/A");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUF();
+  }, []);
+
   return (
     <footer
       className="w-full bg-cover bg-center text-white font-[Outfit]"
@@ -14,7 +50,7 @@ const Footer = () => {
         {/* Rejilla de 3 columnas */}
         <div className="grid md:grid-cols-3 gap-12">
 
-          {/* COLUMNA 1: LOGO Y REDES */}
+          {/* COLUMNA 1: LOGO, REDES Y UF */}
           <div className="flex flex-col items-start">
             <img src={logo} alt="Alaluf" className="h-10 mb-8" />
             
@@ -34,6 +70,20 @@ const Footer = () => {
                   <FaSquareFacebook />
                 </a>
               </div>
+
+              {/* INDICADOR UF */}
+              <div className="flex flex-col gap-2 mt-1">
+                <div className="bg-[#24B6C1]/10 border border-[#24B6C1]/30 p-4 rounded-xl backdrop-blur-sm flex flex-col items-center justify-center min-w-[110px]">
+                  <FaChartLine className="text-[#05FFEA] text-xl mb-2" />
+                  <span className="text-[9px] uppercase tracking-[0.2em] text-[#05FFEA] font-bold text-center">
+                    UF HOY
+                  </span>
+                  <span className="text-white font-bold text-sm mt-1 text-center">
+                    {loading ? "..." : (ufValue !== "N/A" ? `$${ufValue}` : "N/A")}
+                  </span>
+                </div>
+              </div>
+
             </div>
           </div>
 
@@ -54,17 +104,17 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* COLUMNA 3: CONTACTO */}
+          {/* COLUMNA 3: CONTACTO (Modificado con react-icons limpios) */}
           <div>
             <h4 className="font-semibold mb-6 uppercase tracking-wider text-sm text-white">
               Contacto
             </h4>
             <div className="space-y-6 text-sm text-white/70">
+              
+              {/* Teléfono */}
               <div className="flex items-start gap-4">
-                <div className="border border-[#24B6C1] p-2 rounded-lg">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#24B6C1" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
-                    <path d="M22 16.92V21a1 1 0 0 1-1.09 1A19.72 19.72 0 0 1 3 5.09 1 1 0 0 1 4 4h4.09a1 1 0 0 1 1 .75l.7 3.11a1 1 0 0 1-.27.95L8.09 10.91a16 16 0 0 0 6 6l2.1-1.43a1 1 0 0 1 .95-.27l3.11.7a1 1 0 0 1 .75 1z"/>
-                  </svg>
+                <div className="border border-[#24B6C1] p-2 rounded-lg text-[#24B6C1]">
+                  <FaPhoneAlt className="w-4 h-4" />
                 </div>
                 <div>
                   <p className="text-white/50 text-[10px] uppercase">Teléfono</p>
@@ -73,12 +123,10 @@ const Footer = () => {
                 </div>
               </div>
 
+              {/* Email */}
               <div className="flex items-start gap-4">
-                <div className="border border-[#24B6C1] p-2 rounded-lg">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#24B6C1" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
-                    <rect x="3" y="5" width="18" height="14" rx="2" />
-                    <path d="M3 7l9 6 9-6" />
-                  </svg>
+                <div className="border border-[#24B6C1] p-2 rounded-lg text-[#24B6C1]">
+                  <FaEnvelope className="w-4 h-4" />
                 </div>
                 <div>
                   <p className="text-white/50 text-[10px] uppercase">E-mail</p>
@@ -86,24 +134,23 @@ const Footer = () => {
                 </div>
               </div>
 
+              {/* Oficina */}
               <div className="flex items-start gap-4">
-                <div className="border border-[#24B6C1] p-2 rounded-lg">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#24B6C1" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
-                    <path d="M21 10c0 6-9 12-9 12S3 16 3 10a9 9 0 0 1 18 0z" />
-                    <circle cx="12" cy="10" r="3" />
-                  </svg>
+                <div className="border border-[#24B6C1] p-2 rounded-lg text-[#24B6C1]">
+                  <FaMapMarkerAlt className="w-4 h-4" />
                 </div>
                 <div>
                   <p className="text-white/50 text-[10px] uppercase">Oficina</p>
                   <p className="text-white/90">Av. Apoquindo 4775,<br />Las Condes, Santiago</p>
                 </div>
               </div>
+
             </div>
           </div>
 
         </div>
 
-        {/* Línea inferior: Copyright */}
+        {/* Copyright */}
         <div className="border-t border-white/10 mt-16 pt-8 text-center">
           <p className="text-xs text-white/40 tracking-wide">
             © {new Date().getFullYear()} Alaluf. Todos los derechos reservados.
