@@ -4,7 +4,7 @@ import logo from "../assets/Logo_A.png";
 import { 
   FaLinkedin, FaInstagram, FaYoutube, FaChartLine, 
   FaPhoneAlt, FaEnvelope, FaMapMarkerAlt 
-} from "react-icons/fa"; // 🌟 Importamos los iconos correctos para contacto
+} from "react-icons/fa";
 import { FaSquareFacebook } from "react-icons/fa6";
 
 const Footer = () => {
@@ -14,9 +14,10 @@ const Footer = () => {
   useEffect(() => {
     const fetchUF = async () => {
       try {
-        // 🌟 URL absoluta apuntando a tu Express Server (evita que responda el index.html del frontend)
-        // Nota: Si estás en producción, puedes cambiarlo por tu dominio o usar import.meta.env.VITE_API_URL
-        const response = await fetch("http://localhost:5000/api/indicadores/uf");
+        // 🌟 Lee la variable de entorno de Vite en producción. Si estás en local, cae a localhost:5000
+        const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+        
+        const response = await fetch(`${API_URL}/api/indicadores/uf`);
         const data = await response.json();
         
         if (data.success && data.valor) {
@@ -104,7 +105,7 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* COLUMNA 3: CONTACTO (Modificado con react-icons limpios) */}
+          {/* COLUMNA 3: CONTACTO */}
           <div>
             <h4 className="font-semibold mb-6 uppercase tracking-wider text-sm text-white">
               Contacto
