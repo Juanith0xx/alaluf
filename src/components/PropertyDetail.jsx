@@ -19,10 +19,10 @@ const PropertyDetail = ({ property }) => {
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [activeFilter, setActiveFilter] = useState(null);
 
-  // 🌟 ESTADOS PARA EL AGENDAMIENTO DE VISITAS
+  // ESTADOS PARA EL AGENDAMIENTO DE VISITAS
   const [diaSeleccionado, setDiaSeleccionado] = useState(null);
-  const [bloqueHorario, setBloqueHorario] = useState(null); // 'manana' o 'tarde'
-  const [horaSeleccionada, setHoraSeleccionada] = useState(null); // 🌟 NUEVO ESTADO: Guarda la hora exacta elegida
+  const [bloqueHorario, setBloqueHorario] = useState(null); 
+  const [horaSeleccionada, setHoraSeleccionada] = useState(null); 
 
   if (!property) return null;
 
@@ -30,7 +30,7 @@ const PropertyDetail = ({ property }) => {
   const precioPrincipal = property.precios?.venta?.valor || property.precios?.arriendo?.valor;
   const moneda = property.precios?.venta?.moneda || property.precios?.arriendo?.moneda;
 
-  // 🌟 DEFINICIÓN DE RANGOS HORARIOS DISPONIBLES (Intervalos de 30 minutos)
+  // DEFINICIÓN DE RANGOS HORARIOS DISPONIBLES (Intervalos de 30 minutos)
   const rangoManana = ["09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00"];
   const rangoTarde = ["14:30", "15:00", "15:30", "16:00", "16:30", "17:00", "17:30", "18:00"];
 
@@ -78,7 +78,7 @@ const PropertyDetail = ({ property }) => {
       const fecha = new Date();
       fecha.setDate(fecha.getDate() + i);
 
-      if (fecha.getDay() === 0) continue; // Saltar domingos
+      if (fecha.getDay() === 0) continue; 
 
       dias.push({
         id: fecha.toISOString().split("T")[0],
@@ -96,37 +96,30 @@ const PropertyDetail = ({ property }) => {
     setDiaSeleccionado(diasDisponibles[0]);
   }
 
-  // Confirmar el agendamiento de la visita
-  const handleConfirmarVisita = () => {
-    if (!diaSeleccionado || !bloqueHorario || !horaSeleccionada) {
-      alert("Por favor, selecciona un día, un bloque y la hora exacta de tu visita.");
-      return;
-    }
-    
-    alert(`¡Solicitud de visita enviada!\nPropiedad: ${property.codigo}\nFecha: ${diaSeleccionado.fechaCompleta}\nHora: ${horaSeleccionada} hrs\nUn asesor Alaluf se contactará contigo para confirmar.`);
-  };
-
   return (
     <div 
       className="min-h-screen bg-cover bg-center bg-fixed font-[Outfit] pb-20 text-gray-900"
       style={{ backgroundImage: `url(${fondoMarmol})` }}
     >
       
-      <div className="max-w-[1400px] mx-auto px-6 pt-32 pb-10 grid lg:grid-cols-12 gap-12">
+      {/* SECCIÓN CONTENEDORA GLOBAL CON FILAS ADAPTATIVAS */}
+      <div className="max-w-[1400px] mx-auto px-4 md:px-6 pt-24 sm:pt-28 lg:pt-32 pb-10 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12">
         
-        {/* COLUMNA IZQUIERDA: CONTENIDO PRINCIPAL */}
-        <div className="lg:col-span-8 space-y-6">
+        {/* COLUMNA IZQUIERDA: CONTENIDO PRINCIPAL (Ocupa full ancho en móvil/tablet, 8 de 12 en escritorio) */}
+        <div className="col-span-1 lg:col-span-8 space-y-6">
           
-          {/* 1. GALERÍA ASIMÉTRICA DE FOTOS */}
-          <section className="grid grid-cols-1 md:grid-cols-4 gap-3 rounded-[40px] overflow-hidden shadow-2xl bg-black/5 md:h-[480px]">
+          {/* 1. GALERÍA ASIMÉTRICA DE FOTOS RESPONSIVA */}
+          <section className="grid grid-cols-1 md:grid-cols-4 gap-2 md:gap-3 rounded-[24px] md:rounded-[40px] overflow-hidden shadow-2xl bg-black/5 h-64 sm:h-80 md:h-[400px] lg:h-[480px]">
+            {/* Foto Grande Principal */}
             <div 
-              className="col-span-1 md:col-span-2 md:row-span-2 relative overflow-hidden group cursor-pointer h-64 md:h-full"
+              className="col-span-1 md:col-span-2 md:row-span-2 relative overflow-hidden group cursor-pointer h-full"
               onClick={() => openLightbox(0)}
             >
               <img src={imagenes[0] || "/placeholder.jpg"} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" alt="Vista principal" />
               <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition duration-300" />
             </div>
 
+            {/* Fotos Secundarias Cuadrícula Derecha (Ocultas en celular para no saturar, visibles desde md) */}
             {[1, 2, 3].map((idx) => (
               <div key={idx} className="hidden md:block md:col-span-1 relative overflow-hidden group cursor-pointer h-full" onClick={() => openLightbox(idx)}>
                 <img src={imagenes[idx] || imagenes[0]} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" alt={`Vista interior ${idx}`} />
@@ -134,7 +127,11 @@ const PropertyDetail = ({ property }) => {
               </div>
             ))}
 
-            <div className="hidden md:block md:col-span-1 relative overflow-hidden group cursor-pointer h-full" onClick={() => openLightbox(4)}>
+            {/* Foto 5 (Último cuadrante con botón) */}
+            <div 
+              className="hidden md:block md:col-span-1 relative overflow-hidden group cursor-pointer h-full"
+              onClick={() => openLightbox(4)}
+            >
               <img src={imagenes[4] || imagenes[0]} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" alt="Vista complementaria" />
               <div className="absolute inset-0 bg-black/30 backdrop-blur-[1px] flex items-end justify-end p-4">
                 <span className="bg-white hover:bg-[#24B6C1] hover:text-white text-[#24B6C1] px-4 py-2 rounded-full text-xs font-bold shadow-lg border border-[#24B6C1]/20 transition-all duration-300 transform group-hover:scale-105">
@@ -144,110 +141,112 @@ const PropertyDetail = ({ property }) => {
             </div>
           </section>
 
-          {/* 2. BARRA DE CONTROL INTEGRADA */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-black/30 px-6 py-4 rounded-[24px] backdrop-blur-md border border-white/10 text-white shadow-lg">
-            <div className="flex flex-wrap items-center gap-4">
-              <button onClick={() => navigate(-1)} className="flex items-center gap-2 hover:text-[#24B6C1] transition font-semibold bg-white/10 px-4 py-2 rounded-full border border-white/5 text-sm">
+          {/* 2. BARRA DE CONTROL INTEGRADA RESPONSIVA */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-black/30 px-4 md:px-6 py-4 rounded-[20px] md:rounded-[24px] backdrop-blur-md border border-white/10 text-white shadow-lg">
+            {/* Lado Izquierdo: Volver y Código */}
+            <div className="flex flex-row items-center justify-between sm:justify-start gap-4 w-full sm:w-auto">
+              <button onClick={() => navigate(-1)} className="flex items-center gap-2 hover:text-[#24B6C1] transition font-semibold bg-white/10 px-4 py-2 rounded-full border border-white/5 text-xs md:text-sm">
                 <FaArrowLeft size={12} /> Volver al listado
               </button>
               <span className="text-white/20 hidden sm:inline">|</span>
-              <div className="text-[11px] font-bold tracking-widest uppercase opacity-90 bg-white/5 px-4 py-2 rounded-full border border-white/5">
+              <div className="text-[10px] md:text-[11px] font-bold tracking-widest uppercase opacity-90 bg-white/5 px-4 py-2 rounded-full border border-white/5">
                 Código Alaluf: {property.codigo}
               </div>
             </div>
 
-            <div className="flex items-center gap-2.5">
-              <span className="text-xs uppercase font-bold tracking-wider text-gray-300 mr-1 hidden md:inline">Compartir:</span>
+            {/* Lado Derecho: Redes Sociales */}
+            <div className="flex items-center justify-center sm:justify-end gap-2 w-full sm:w-auto border-t border-white/10 sm:border-0 pt-3 sm:pt-0">
+              <span className="text-[11px] uppercase font-bold tracking-wider text-gray-300 mr-1 hidden md:inline">Compartir:</span>
               <a href={`https://api.whatsapp.com/send?text=Mira%20esta%20propiedad%20en%20Alaluf:%20${currentUrl}`} target="_blank" rel="noreferrer" className="p-2.5 bg-white/10 hover:bg-[#25D366] rounded-full transition-colors text-white">
-                <FaWhatsapp size={14} />
+                <FaWhatsapp size={13} />
               </a>
               <a href={`https://www.facebook.com/sharer/sharer.php?u=${currentUrl}`} target="_blank" rel="noreferrer" className="p-2.5 bg-white/10 hover:bg-[#1877F2] rounded-full transition-colors text-white">
-                <FaFacebookF size={14} />
+                <FaFacebookF size={13} />
               </a>
               <a href={`mailto:?subject=Propiedad%20Alaluf%20-%20${property.titulo}&body=Mira%20esta%20oportunidad%20en%20Alaluf:%20${currentUrl}`} className="p-2.5 bg-white/10 hover:bg-[#24B6C1] rounded-full transition-colors text-white">
-                <FaEnvelope size={14} />
+                <FaEnvelope size={13} />
               </a>
               <button onClick={copiarEnlace} className="p-2.5 bg-white/10 hover:bg-[#E1306C] rounded-full transition-colors text-white">
-                <FaInstagram size={14} />
+                <FaInstagram size={13} />
               </button>
               <button onClick={copiarEnlace} className="p-2.5 bg-white/10 hover:bg-black rounded-full transition-colors text-white border border-white/5">
-                <FaTiktok size={14} />
+                <FaTiktok size={13} />
               </button>
             </div>
           </div>
 
           {/* 3. BLOQUE BLANCO DE DETALLES INMUEBLE */}
-          <div className="bg-white/95 backdrop-blur-sm rounded-[40px] p-8 md:p-10 shadow-xl border border-gray-100 space-y-10">
+          <div className="bg-white/95 backdrop-blur-sm rounded-[24px] md:rounded-[40px] p-5 md:p-8 lg:p-10 shadow-xl border border-gray-100 space-y-8 md:space-y-10">
             
             {/* Info Principal */}
             <section className="space-y-4">
-              <div className="flex flex-wrap gap-3">
-                <span className="bg-[#24B6C1] text-white px-4 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest">
+              <div className="flex flex-wrap gap-2">
+                <span className="bg-[#24B6C1] text-white px-3 py-1 rounded-full text-[9px] md:text-[10px] font-bold uppercase tracking-widest">
                   {property.titulo}
                 </span>
-                <span className="bg-gray-100 text-gray-600 px-4 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest">
+                <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-[9px] md:text-[10px] font-bold uppercase tracking-widest">
                   {property.operacion}
                 </span>
               </div>
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tighter leading-none">
+              <h1 className="text-2xl md:text-4xl lg:text-5xl font-bold tracking-tighter leading-tight md:leading-none">
                 {property.ubicacion?.sector || "Ubicación Privilegiada"}
               </h1>
-              <div className="flex items-center gap-2 text-gray-500 text-base md:text-lg">
-                <FaMapMarkerAlt className="text-[#24B6C1]" />
-                <span>{property.ubicacion?.direccion}, {property.ubicacion?.comuna}</span>
+              <div className="flex items-center gap-2 text-gray-500 text-sm md:text-lg">
+                <FaMapMarkerAlt className="text-[#24B6C1] shrink-0" />
+                <span className="line-clamp-2">{property.ubicacion?.direccion}, {property.ubicacion?.comuna}</span>
               </div>
-              <div className="pt-4 flex flex-wrap items-baseline gap-4">
-                <span className="text-4xl md:text-5xl font-black text-[#24B6C1]">{precioPrincipal} {moneda}</span>
-                <span className="text-gray-400 text-sm font-medium">Gastos comunes: {getExtra("Gastos Comunes")}</span>
+              <div className="pt-2 flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-4">
+                <span className="text-3xl md:text-5xl font-black text-[#24B6C1]">{precioPrincipal} {moneda}</span>
+                <span className="text-gray-400 text-xs md:text-sm font-medium">Gastos comunes: {getExtra("Gastos Comunes")}</span>
               </div>
             </section>
 
-            {/* Características Técnicas */}
-            <section className="grid grid-cols-2 md:grid-cols-4 gap-6 py-8 border-y border-gray-100">
+            {/* Características Técnicas (Grid fluido) */}
+            <section className="grid grid-cols-2 sm:grid-cols-4 gap-4 py-6 md:py-8 border-y border-gray-100">
               <div className="space-y-1">
-                <span className="text-gray-400 text-[10px] uppercase font-bold tracking-widest">Superficie</span>
-                <div className="flex items-center gap-2 font-bold text-lg italic">
+                <span className="text-gray-400 text-[9px] md:text-[10px] uppercase font-bold tracking-widest block">Superficie</span>
+                <div className="flex items-center gap-2 font-bold text-base md:text-lg italic">
                   <FaRulerCombined className="text-[#24B6C1]" /> {property.detalles?.superficie} m²
                 </div>
               </div>
               <div className="space-y-1">
-                <span className="text-gray-400 text-[10px] uppercase font-bold tracking-widest">Dormitorios</span>
-                <div className="flex items-center gap-2 font-bold text-lg italic">
+                <span className="text-gray-400 text-[9px] md:text-[10px] uppercase font-bold tracking-widest block">Dormitorios</span>
+                <div className="flex items-center gap-2 font-bold text-base md:text-lg italic">
                   <FaBed className="text-[#24B6C1]" /> {property.detalles?.dormitorios || "0"} Dorm.
                 </div>
               </div>
               <div className="space-y-1">
-                <span className="text-gray-400 text-[10px] uppercase font-bold tracking-widest">Baños</span>
-                <div className="flex items-center gap-2 font-bold text-lg italic">
+                <span className="text-gray-400 text-[9px] md:text-[10px] uppercase font-bold tracking-widest block">Baños</span>
+                <div className="flex items-center gap-2 font-bold text-base md:text-lg italic">
                   <FaBath className="text-[#24B6C1]" /> {property.detalles?.banos || "0"} Baños
                 </div>
               </div>
               <div className="space-y-1">
-                <span className="text-gray-400 text-[10px] uppercase font-bold tracking-widest">Estacionamiento</span>
-                <div className="flex items-center gap-2 font-bold text-lg italic">
+                <span className="text-gray-400 text-[9px] md:text-[10px] uppercase font-bold tracking-widest block">Estacionamiento</span>
+                <div className="flex items-center gap-2 font-bold text-base md:text-lg italic">
                   <FaCar className="text-[#24B6C1]" /> {property.detalles?.estacionamientos || "0"} Estac.
                 </div>
               </div>
             </section>
 
             {/* Descripción */}
-            <section className="space-y-4">
-              <h3 className="text-2xl font-bold uppercase italic tracking-tighter">Descripción de la propiedad</h3>
-              <p className="text-gray-600 leading-relaxed whitespace-pre-line text-base md:text-lg">
+            <section className="space-y-3">
+              <h3 className="text-xl md:text-2xl font-bold uppercase italic tracking-tighter">Descripción de la propiedad</h3>
+              <p className="text-gray-600 leading-relaxed whitespace-pre-line text-sm md:text-lg">
                 {property.detalles?.descripcion || "Contáctanos para obtener más detalles."}
               </p>
             </section>
 
             {/* 5. ENTORNO Y MAPA */}
-            <section className="space-y-6">
-              <div className="flex flex-wrap justify-between items-end gap-4">
-                <h3 className="text-2xl font-bold uppercase italic tracking-tighter">Conoce el entorno</h3>
-                <div className="flex gap-2">
+            <section className="space-y-4">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-3">
+                <h3 className="text-xl md:text-2xl font-bold uppercase italic tracking-tighter">Conoce el entorno</h3>
+                <div className="flex gap-1.5 overflow-x-auto pb-1 sm:pb-0">
                   {["Transporte", "Servicios", "Educación"].map(tag => (
                     <button 
                       key={tag} 
                       onClick={() => handleFilterClick(tag)}
-                      className={`px-4 py-1.5 border rounded-lg text-[10px] font-bold transition-all duration-300 ${
+                      className={`px-3.5 py-1.5 border rounded-lg text-[9px] md:text-[10px] font-bold transition-all duration-300 shrink-0 ${
                         activeFilter === tag
                           ? "bg-[#24B6C1] text-white border-[#24B6C1] shadow-md scale-105"
                           : "bg-white border-gray-200 text-gray-700 hover:bg-gray-50"
@@ -259,7 +258,7 @@ const PropertyDetail = ({ property }) => {
                 </div>
               </div>
               
-              <div className="w-full h-[350px] md:h-[400px] rounded-[30px] overflow-hidden border border-gray-100 shadow-lg">
+              <div className="w-full h-[280px] sm:h-[350px] md:h-[400px] rounded-[24px] md:rounded-[30px] overflow-hidden border border-gray-100 shadow-lg">
                 <MapView 
                   propiedades={[property]} 
                   selectedProperty={property} 
@@ -271,18 +270,18 @@ const PropertyDetail = ({ property }) => {
           </div>
         </div>
 
-        {/* COLUMNA DERECHA: SIDEBAR */}
-        <div className="lg:col-span-4">
-          <div className="sticky top-24 space-y-8">
+        {/* COLUMNA DERECHA: SIDEBAR (Se acopla abajo en celular/tablet, se queda fijo a la derecha en escritorio) */}
+        <div className="col-span-1 lg:col-span-4">
+          <div className="lg:sticky lg:top-24 space-y-6 md:space-y-8">
             
-            {/* WIDGET DE AGENDA CON TOPES HORARIOS DINÁMICOS */}
-            <div className="bg-white/95 backdrop-blur-sm rounded-[40px] p-6 md:p-8 border border-gray-100 shadow-sm">
-              <h3 className="text-xl font-bold mb-1 text-gray-900">Agenda tu visita</h3>
-              <p className="text-gray-400 text-xs mb-6">Elige el día y rango horario que más te acomode.</p>
+            {/* WIDGET DE AGENDA */}
+            <div className="bg-white/95 backdrop-blur-sm rounded-[24px] md:rounded-[40px] p-5 md:p-8 border border-gray-100 shadow-sm">
+              <h3 className="text-lg md:text-xl font-bold mb-1 text-gray-900">Agenda tu visita</h3>
+              <p className="text-gray-400 text-xs mb-4 md:mb-6">Elige el día y rango horario que más te acomode.</p>
               
               {/* Selector de Días Horizontal */}
-              <div className="space-y-2 mb-6">
-                <label className="text-xs font-bold uppercase tracking-wider text-gray-400 flex items-center gap-1.5">
+              <div className="space-y-2 mb-5">
+                <label className="text-[11px] font-bold uppercase tracking-wider text-gray-400 flex items-center gap-1.5">
                   <FaCalendarAlt className="text-[#24B6C1]" /> 1. Selecciona el día
                 </label>
                 <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin snap-x">
@@ -293,23 +292,23 @@ const PropertyDetail = ({ property }) => {
                         key={dia.id}
                         type="button"
                         onClick={() => setDiaSeleccionado(dia)}
-                        className={`flex flex-col items-center justify-center min-w-[55px] h-[65px] rounded-2xl border transition-all snap-center ${
+                        className={`flex flex-col items-center justify-center min-w-[52px] h-[60px] rounded-xl border transition-all snap-center ${
                           isSelected
                             ? "bg-[#24B6C1] text-white border-[#24B6C1] shadow-md scale-105"
                             : "bg-gray-50 text-gray-700 border-gray-100 hover:bg-gray-100"
                         }`}
                       >
-                        <span className="text-[10px] font-bold tracking-tight opacity-80">{dia.nombre}</span>
-                        <span className="text-lg font-black tracking-tighter mt-0.5">{dia.numero}</span>
+                        <span className="text-[9px] font-bold tracking-tight opacity-80">{dia.nombre}</span>
+                        <span className="text-base font-black tracking-tighter mt-0.5">{dia.numero}</span>
                       </button>
                     );
                   })}
                 </div>
               </div>
 
-              {/* Selector de Bloques Horarios Modificado */}
-              <div className="space-y-4 mb-6">
-                <label className="text-xs font-bold uppercase tracking-wider text-gray-400 flex items-center gap-1.5">
+              {/* Selector de Bloques Horarios */}
+              <div className="space-y-4 mb-5">
+                <label className="text-[11px] font-bold uppercase tracking-wider text-gray-400 flex items-center gap-1.5">
                   <FaClock className="text-[#24B6C1]" /> 2. Selecciona el horario
                 </label>
                 
@@ -319,35 +318,35 @@ const PropertyDetail = ({ property }) => {
                     <button
                       type="button"
                       onClick={() => { setBloqueHorario("manana"); setHoraSeleccionada(null); }}
-                      className={`flex items-center justify-between p-4 rounded-2xl border transition-all text-left ${
+                      className={`flex items-center justify-between p-3.5 rounded-xl border transition-all text-left ${
                         bloqueHorario === "manana"
                           ? "border-[#24B6C1] bg-[#24B6C1]/5 shadow-sm"
                           : "border-gray-100 bg-gray-50/50 hover:bg-gray-50"
                       }`}
                     >
                       <div className="flex items-center gap-3">
-                        <div className={`p-2.5 rounded-xl ${bloqueHorario === "manana" ? "bg-[#24B6C1] text-white" : "bg-gray-100 text-gray-500"}`}>
-                          <FaSun size={14} />
+                        <div className={`p-2 rounded-lg ${bloqueHorario === "manana" ? "bg-[#24B6C1] text-white" : "bg-gray-100 text-gray-500"}`}>
+                          <FaSun size={13} />
                         </div>
                         <div>
-                          <div className="text-sm font-bold text-gray-800">Bloque Mañana</div>
-                          <div className="text-xs text-gray-500 mt-0.5">09:00 a 13:00 hrs</div>
+                          <div className="text-xs md:text-sm font-bold text-gray-800">Bloque Mañana</div>
+                          <div className="text-[11px] text-gray-500 mt-0.5">09:00 a 13:00 hrs</div>
                         </div>
                       </div>
                       <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${bloqueHorario === "manana" ? "border-[#24B6C1]" : "border-gray-300"}`}>
-                        {bloqueHorario === "manana" && <div className="w-2 h-2 bg-[#24B6C1] rounded-full" />}
+                        {bloqueHorario === "manana" && <div className="w-1.5 h-1.5 bg-[#24B6C1] rounded-full" />}
                       </div>
                     </button>
 
-                    {/* 🌟 Horas detalladas para el Bloque Mañana */}
+                    {/* Horas para el Bloque Mañana */}
                     {bloqueHorario === "manana" && (
-                      <div className="grid grid-cols-4 gap-2 p-3 bg-gray-50 rounded-2xl border border-gray-100 animate-fadeIn">
+                      <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 p-2.5 bg-gray-50 rounded-xl border border-gray-100 animate-fadeIn">
                         {rangoManana.map((hora) => (
                           <button
                             key={hora}
                             type="button"
                             onClick={() => setHoraSeleccionada(hora)}
-                            className={`py-2 text-xs font-bold rounded-xl text-center border transition-all ${
+                            className={`py-1.5 text-[11px] font-bold rounded-lg text-center border transition-all ${
                               horaSeleccionada === hora
                                 ? "bg-[#24B6C1] text-white border-[#24B6C1] shadow-sm"
                                 : "bg-white text-gray-700 border-gray-200/60 hover:bg-gray-100"
@@ -365,35 +364,35 @@ const PropertyDetail = ({ property }) => {
                     <button
                       type="button"
                       onClick={() => { setBloqueHorario("tarde"); setHoraSeleccionada(null); }}
-                      className={`flex items-center justify-between p-4 rounded-2xl border transition-all text-left ${
+                      className={`flex items-center justify-between p-3.5 rounded-xl border transition-all text-left ${
                         bloqueHorario === "tarde"
                           ? "border-[#24B6C1] bg-[#24B6C1]/5 shadow-sm"
                           : "border-gray-100 bg-gray-50/50 hover:bg-gray-50"
                       }`}
                     >
                       <div className="flex items-center gap-3">
-                        <div className={`p-2.5 rounded-xl ${bloqueHorario === "tarde" ? "bg-[#24B6C1] text-white" : "bg-gray-100 text-gray-500"}`}>
-                          <FaMoon size={14} />
+                        <div className={`p-2 rounded-lg ${bloqueHorario === "tarde" ? "bg-[#24B6C1] text-white" : "bg-gray-100 text-gray-500"}`}>
+                          <FaMoon size={13} />
                         </div>
                         <div>
-                          <div className="text-sm font-bold text-gray-800">Bloque Tarde</div>
-                          <div className="text-xs text-gray-500 mt-0.5">14:30 a 18:00 hrs</div>
+                          <div className="text-xs md:text-sm font-bold text-gray-800">Bloque Tarde</div>
+                          <div className="text-[11px] text-gray-500 mt-0.5">14:30 a 18:00 hrs</div>
                         </div>
                       </div>
                       <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${bloqueHorario === "tarde" ? "border-[#24B6C1]" : "border-gray-300"}`}>
-                        {bloqueHorario === "tarde" && <div className="w-2 h-2 bg-[#24B6C1] rounded-full" />}
+                        {bloqueHorario === "tarde" && <div className="w-1.5 h-1.5 bg-[#24B6C1] rounded-full" />}
                       </div>
                     </button>
 
-                    {/* 🌟 Horas detalladas para el Bloque Tarde */}
+                    {/* Horas para el Bloque Tarde */}
                     {bloqueHorario === "tarde" && (
-                      <div className="grid grid-cols-4 gap-2 p-3 bg-gray-50 rounded-2xl border border-gray-100 animate-fadeIn">
+                      <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 p-2.5 bg-gray-50 rounded-xl border border-gray-100 animate-fadeIn">
                         {rangoTarde.map((hora) => (
                           <button
                             key={hora}
                             type="button"
                             onClick={() => setHoraSeleccionada(hora)}
-                            className={`py-2 text-xs font-bold rounded-xl text-center border transition-all ${
+                            className={`py-1.5 text-[11px] font-bold rounded-lg text-center border transition-all ${
                               horaSeleccionada === hora
                                 ? "bg-[#24B6C1] text-white border-[#24B6C1] shadow-sm"
                                 : "bg-white text-gray-700 border-gray-200/60 hover:bg-gray-100"
@@ -411,8 +410,14 @@ const PropertyDetail = ({ property }) => {
               {/* Botón de Confirmación */}
               <button 
                 type="button"
-                onClick={handleConfirmarVisita}
-                className="w-full py-4 bg-[#24B6C1] hover:bg-[#1da0ab] text-white rounded-2xl font-bold uppercase text-xs tracking-widest shadow-lg shadow-[#24B6C1]/20 active:scale-[0.98] transition-all duration-200"
+                onClick={() => {
+                  if (!diaSeleccionado || !bloqueHorario || !horaSeleccionada) {
+                    alert("Por favor, selecciona un día, un bloque y la hora exacta de tu visita.");
+                    return;
+                  }
+                  alert(`¡Solicitud enviada!\nPropiedad: ${property.codigo}\nFecha: ${diaSeleccionado.fechaCompleta}\nHora: ${horaSeleccionada} hrs.`);
+                }}
+                className="w-full py-3.5 bg-[#24B6C1] hover:bg-[#1da0ab] text-white rounded-xl font-bold uppercase text-xs tracking-widest shadow-lg shadow-[#24B6C1]/20 active:scale-[0.98] transition-all duration-200"
               >
                 Confirmar Visita
               </button>
@@ -420,7 +425,7 @@ const PropertyDetail = ({ property }) => {
 
             {/* Formulario de Contacto Modular */}
             <ContactForm 
-              className="!rounded-[40px] !p-8 border border-gray-100 shadow-sm md:w-full bg-white/95 backdrop-blur-sm"
+              className="!rounded-[24px] md:!rounded-[40px] !p-5 md:!p-8 border border-gray-100 shadow-sm md:w-full bg-white/95 backdrop-blur-sm"
               onSubmitSuccess={handleContactSubmit}
             />
           </div>
@@ -428,42 +433,45 @@ const PropertyDetail = ({ property }) => {
 
       </div>
 
-      {/* MODAL LIGHTBOX FULL-SCREEN CON NAVEGACIÓN */}
+      {/* MODAL LIGHTBOX FULL-SCREEN CON CONTROL TOTALMENTE RESPONSIVO */}
       {isLightboxOpen && (
         <div className="fixed inset-0 bg-black/95 z-[9999] flex flex-col items-center justify-center p-4 shadow-xl">
+          {/* Botón Cerrar */}
           <button 
             onClick={() => setIsLightboxOpen(false)} 
-            className="absolute right-6 top-6 text-white/70 hover:text-white p-3 bg-white/10 rounded-full transition z-10"
+            className="absolute right-4 top-4 text-white/70 hover:text-white p-2.5 bg-white/10 rounded-full transition backdrop-blur-md z-20"
           >
-            <FaTimes size={24} />
+            <FaTimes size={20} />
           </button>
 
-          <div className="relative max-w-5xl max-h-[85vh] w-full flex items-center justify-center">
+          <div className="relative max-w-5xl max-h-[80vh] w-full flex items-center justify-center px-2">
+            {/* Imagen */}
             <img 
               src={imagenes[activeImage]} 
-              className="max-w-full max-h-[85vh] object-contain rounded-lg select-none" 
+              className="max-w-full max-h-[80vh] object-contain rounded-lg select-none shadow-2xl" 
               alt={`Zoom imagen ${activeImage + 1}`} 
             />
 
+            {/* Flechas de navegación adaptativas (Se mueven levemente hacia adentro en móviles) */}
             {imagenes.length > 1 && (
               <>
                 <button 
                   onClick={prevImage} 
-                  className="absolute left-0 md:-left-20 top-1/2 -translate-y-1/2 text-white/70 hover:text-white p-4 bg-black/30 hover:bg-black/50 rounded-full transition group z-10"
+                  className="absolute left-4 md:-left-20 top-1/2 -translate-y-1/2 text-white/70 hover:text-white p-3 bg-black/40 hover:bg-black/60 rounded-full transition group z-10"
                 >
-                  <FaChevronLeft size={30} className="group-hover:scale-110 transition-transform"/>
+                  <FaChevronLeft size={20} className="md:size-[26px] group-hover:scale-110 transition-transform"/>
                 </button>
                 <button 
                   onClick={nextImage} 
-                  className="absolute right-0 md:-right-20 top-1/2 -translate-y-1/2 text-white/70 hover:text-white p-4 bg-black/30 hover:bg-black/50 rounded-full transition group z-10"
+                  className="absolute right-4 md:-right-20 top-1/2 -translate-y-1/2 text-white/70 hover:text-white p-3 bg-black/40 hover:bg-black/60 rounded-full transition group z-10"
                 >
-                  <FaChevronRight size={30} className="group-hover:scale-110 transition-transform"/>
+                  <FaChevronRight size={20} className="md:size-[26px] group-hover:scale-110 transition-transform"/>
                 </button>
               </>
             )}
           </div>
           
-          <div className="text-white/70 mt-4 font-light">
+          <div className="text-white/60 mt-4 text-xs font-bold tracking-widest bg-white/5 px-4 py-1.5 rounded-full border border-white/5">
             {activeImage + 1} / {imagenes.length}
           </div>
         </div>
