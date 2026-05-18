@@ -58,16 +58,16 @@ const Footer = () => {
             <div className="flex items-start gap-8">
               {/* Contenedor vertical para redes sociales */}
               <div className="flex flex-col gap-5">
-                <a href="#" target="_blank" rel="noopener noreferrer" className="text-[#05FFEA] hover:text-white transition text-3xl">
+                <a href="https://www.linkedin.com/company/alaluf-propiedades/" target="_blank" rel="noopener noreferrer" className="text-[#05FFEA] hover:text-white transition text-3xl">
                   <FaLinkedin />
                 </a>
-                <a href="#" target="_blank" rel="noopener noreferrer" className="text-[#05FFEA] hover:text-white transition text-3xl">
+                <a href="https://www.instagram.com/alaluf_residencial/" target="_blank" rel="noopener noreferrer" className="text-[#05FFEA] hover:text-white transition text-3xl">
                   <FaInstagram />
                 </a>
-                <a href="#" target="_blank" rel="noopener noreferrer" className="text-[#05FFEA] hover:text-white transition text-3xl">
+                <a href="https://www.youtube.com/channel/UCT0IvZYM3AaoSodAFkWM87w" target="_blank" rel="noopener noreferrer" className="text-[#05FFEA] hover:text-white transition text-3xl">
                   <FaYoutube />
                 </a>
-                <a href="#" target="_blank" rel="noopener noreferrer" className="text-[#05FFEA] hover:text-white transition text-3xl">
+                <a href="https://www.facebook.com/AlalufPropiedades/" target="_blank" rel="noopener noreferrer" className="text-[#05FFEA] hover:text-white transition text-3xl">
                   <FaSquareFacebook />
                 </a>
               </div>
