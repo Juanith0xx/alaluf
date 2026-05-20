@@ -8,10 +8,9 @@ import fondoMarmol from '../assets/Marmol.jpg';
 const Residencial = () => {
   const navigate = useNavigate();
 
-  // 🌟 ESTADOS PARA LOS SELECTORES DE LAS TARJETAS
-  // ID 1 = Casas, ID 2 = Departamentos
-  const [tipoComprar, setTipoComprar] = useState(1); // Por defecto busca Casas para comprar
-  const [tipoArrendar, setTipoArrendar] = useState(2); // Por defecto busca Deptos para arrendar
+  // 🌟 ESTADOS PARA LOS SELECTORES DE LAS TARJETAS (Mantienen la consistencia visual de Casas/Deptos)
+  const [tipoComprar, setTipoComprar] = useState(1); 
+  const [tipoArrendar, setTipoArrendar] = useState(2); 
 
   const subservicios = [
     {
@@ -34,12 +33,14 @@ const Residencial = () => {
     },
   ];
 
-  // 🌟 MANEJADOR DE CLICS CON LA SELECCIÓN PRECISA PARA PROTEGER LA API PHP
+  // 🌟 MANEJADOR DE CLICS ACTUALIZADO CON LA NUEVA LÓGICA DE ENDPOINT UNIFICADO (tipo_prop=1A)
   const handleSubservicioClick = (action) => {
     if (action === "COMPRAR") {
-      navigate(`/buscar?obj=1&tipo_prop=${tipoComprar}`);
+      // Comprar = obj=1 con tipo_prop=1A (Casas y Deptos)
+      navigate(`/buscar?tipo_prop=1A&obj=1`);
     } else if (action === "ARRENDAR") {
-      navigate(`/buscar?obj=2&tipo_prop=${tipoArrendar}`);
+      // Arrendar = obj=2 con tipo_prop=1A (Casas y Deptos)
+      navigate(`/buscar?tipo_prop=1A&obj=2`);
     } else if (action === "VENDER") {
       navigate("/#contacto");
     }
@@ -117,7 +118,7 @@ const Residencial = () => {
                     {subservicio.description}
                   </p>
                   
-                  {/* 🌟 SELECTOR INTEGRADO (Solo para Comprar y Arrendar) */}
+                  {/* SELECTOR VISUAL INTEGRADO */}
                   {subservicio.title === "COMPRAR" && (
                     <div className="flex bg-gray-100/80 p-1.5 rounded-xl mb-6 shadow-inner border border-gray-200">
                       <button
@@ -151,6 +152,7 @@ const Residencial = () => {
                       </button>
                     </div>
                   )}
+                  
                   {/* Espaciador para la tarjeta de Vender para que mantenga la misma altura */}
                   {subservicio.title === "VENDER" && <div className="h-[52px] mb-6"></div>}
                   
