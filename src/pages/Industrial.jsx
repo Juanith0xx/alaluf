@@ -1,10 +1,23 @@
-import React from 'react';
+import React, { useState } from 'react'; // 🌟 Importamos useState para controlar la pestaña activa
+import { useNavigate } from 'react-router-dom';
 
 // Importación de imágenes
 import fondoIndustrial from '../assets/industria.png'; 
 import fondoMarmol from '../assets/Marmol.jpg'; 
 
 const Industrial = () => {
+  const navigate = useNavigate();
+  
+  // 🌟 Estado para manejar la operación seleccionada ('arrendar' o 'comprar')
+  const [operacion, setOperacion] = useState('arrendar');
+
+  const handleVerPropiedades = () => {
+    // 🌟 Mapeamos dinámicamente el código de objetivo según la pestaña activa
+    // obj=1 para Comprar (Venta) y obj=2 para Arrendar
+    const objCodigo = operacion === 'comprar' ? '1' : '2';
+    navigate(`/buscar?tipo_prop=7A&obj=${objCodigo}`);
+  };
+
   return (
     <main 
       className="w-full min-h-screen bg-cover bg-center bg-fixed"
@@ -27,8 +40,8 @@ const Industrial = () => {
         <div 
           className="absolute z-20 w-auto"
           style={{ 
-            left: '8%',    // Ajusta este % para mover a la derecha/izquierda
-            bottom: '38%',  // Ajusta este % para mover arriba/abajo
+            left: '8%',    
+            bottom: '38%',  
           }}
         >
           <h1 className="text-white text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight uppercase drop-shadow-lg">
@@ -61,15 +74,44 @@ const Industrial = () => {
             <h4 className="text-3xl md:text-4xl font-extrabold mb-4">
               No busques bodegas. Busca la operación correcta.
             </h4>
-            <p className="text-lg md:text-xl font-medium max-w-4xl mb-10 leading-relaxed">
+            <p className="text-lg md:text-xl font-medium max-w-4xl mb-8 leading-relaxed">
               Analizamos accesos, flujos, normativa y rentabilidad para que tu próxima bodega no sea solo un espacio — sea una ventaja competitiva.
             </p>
-            <a 
-              href="#" 
-              className="bg-white text-[#0091A4] hover:bg-gray-100 font-bold text-lg px-12 py-4 rounded-xl shadow-md transition duration-300 active:scale-95"
+            
+            {/* 🌟 NUEVO SELECTOR DE PESTAÑAS (COMPRAR / ARRENDAR) */}
+            <div className="bg-white/10 backdrop-blur-md p-1.5 rounded-xl flex items-center mb-8 border border-white/10 w-full max-w-[280px]">
+              <button
+                type="button"
+                onClick={() => setOperacion('comprar')}
+                className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all duration-300 ${
+                  operacion === 'comprar'
+                    ? "bg-white text-[#0091A4] shadow-md"
+                    : "text-white/80 hover:text-white hover:bg-white/5"
+                }`}
+              >
+                Comprar
+              </button>
+              <button
+                type="button"
+                onClick={() => setOperacion('arrendar')}
+                className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all duration-300 ${
+                  operacion === 'arrendar'
+                    ? "bg-white text-[#0091A4] shadow-md"
+                    : "text-white/80 hover:text-white hover:bg-white/5"
+                }`}
+              >
+                Arrendar
+              </button>
+            </div>
+            
+            {/* Botón Principal de Acción */}
+            <button 
+              type="button"
+              onClick={handleVerPropiedades}
+              className="bg-white text-[#0091A4] hover:bg-gray-100 font-bold text-lg px-12 py-4 rounded-xl shadow-md transition duration-300 active:scale-95 cursor-pointer uppercase tracking-wider"
             >
               Ver propiedades industriales
-            </a>
+            </button>
           </div>
         </div>
       </section>
