@@ -1,27 +1,33 @@
 import React, { useState } from 'react';
 
-import bg from "../assets/Marmol.jpg"
-import imgThree from "../assets/ciudad.jpg"
-import imgTwo from "../assets/Volcan.jpg"
-import mapImage from "../assets/mapa.jpg"
-import imgc from "../assets/chile.png"
+import bg from "../assets/Marmol.jpg";
+import imgThree from "../assets/ciudad.jpg";
+import imgTwo from "../assets/Volcan.jpg";
+import mapImage from "../assets/mapa.jpg";
+import imgc from "../assets/chile.png";
 
-import logoFalabella from "../assets/logos/falabella.png"
-import logoCencosud from "../assets/logos/cencosud.png"
-import logoSmu from "../assets/logos/smu.png"
-import logoRipley from "../assets/logos/ripley.png"
-import logoSodimac from "../assets/logos/sodimac.png"
-import logoParqueArauco from "../assets/logos/parque.png"
+import logoFalabella from "../assets/logos/falabella.png";
+import logoCencosud from "../assets/logos/cencosud.png";
+import logoSmu from "../assets/logos/smu.png";
+import logoRipley from "../assets/logos/ripley.png";
+import logoSodimac from "../assets/logos/sodimac.png";
+import logoParqueArauco from "../assets/logos/parque.png";
 
 const ExperienceSection = () => {
-  // ESTADOS PARA EL RUT Y SU VALIDACIÓN
   const [rut, setRut] = useState("");
   const [rutError, setRutError] = useState("");
+  
+  // 🌟 NUEVO ESTADO: Agregamos id_tipo_propiedad (por defecto 1 = Residencial)
+  const [formData, setFormData] = useState({
+    razon_social: "",
+    email: "",
+    fono: "",
+    requerimiento: "",
+    id_tipo_propiedad: "1" 
+  });
 
-  // 1. ALGORITMO MÓDULO 11 (VALIDACIÓN REAL)
   const validarRutChileno = (rutCompleto) => {
     const rutLimpio = rutCompleto.replace(/[^0-9kK]/g, "").toUpperCase();
-    
     if (rutLimpio.length < 2) return false;
 
     const cuerpo = rutLimpio.slice(0, -1);
@@ -45,25 +51,19 @@ const ExperienceSection = () => {
     return dvFinal === dv;
   };
 
-  // 2. FORMATEADOR AUTOMÁTICO CORREGIDO 🌟
   const handleRutChange = (e) => {
-    let value = e.target.value.replace(/[^0-9kK]/g, ""); // Solo permite números y K
-    
-    if (value.length > 9) return; // Límite máximo de caracteres limpios (ej: 12345678K)
+    let value = e.target.value.replace(/[^0-9kK]/g, ""); 
+    if (value.length > 9) return;
 
-    // Formatear dinámicamente con puntos y guión
     if (value.length > 1) {
       const dv = value.slice(-1);
       const cuerpo = value.slice(0, -1);
-      
-      // Aplicar puntos al cuerpo matemáticamente
       const cuerpoFormateado = cuerpo.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-      value = `${cuerpoFormateado}-${dv}`; // 🌟 Corregido el typo aquí
+      value = `${cuerpoFormateado}-${dv}`; 
     }
 
     setRut(value);
 
-    // Validar en tiempo real si el usuario ya escribió el RUT básico completo
     const caracteresLimpios = value.replace(/[^0-9kK]/g, "");
     if (caracteresLimpios.length >= 8) {
       if (validarRutChileno(value)) {
@@ -76,8 +76,16 @@ const ExperienceSection = () => {
     }
   };
 
-  // 3. VALIDACIÓN AL ENVIAR EL FORMULARIO
-  const handleSubmit = (e) => {
+  // 🌟 MANEJADOR DE CAMBIOS GENERAL PARA INPUTS Y SELECT
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (!rut) {
@@ -90,7 +98,48 @@ const ExperienceSection = () => {
       return;
     }
 
-    alert("Formulario enviado con éxito, RUT verificado.");
+    if (!formData.email && !formData.fono) {
+      alert("Debes ingresar al menos un correo electrónico o un teléfono de contacto.");
+      return;
+    }
+
+    try {
+      const rutSanitizado = rut.replace(/\./g, "");
+
+      // 🌟 Añadimos el id_tipo_propiedad al payload asegurándonos de que viaje como número
+      const payload = {
+        razon_social: formData.razon_social,
+        rut: rutSanitizado,
+        email: formData.email,
+        fono: formData.fono,
+        requerimiento: formData.requerimiento,
+        id_tipo_propiedad: Number(formData.id_tipo_propiedad) 
+      };
+
+      const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
+      const response = await fetch(`${API_URL}/api/indicadores/leads`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        alert("¡Tu requerimiento ha sido enviado con éxito! Un asesor se contactará contigo.");
+        setRut("");
+        setFormData({ razon_social: "", email: "", fono: "", requerimiento: "", id_tipo_propiedad: "1" });
+      } else {
+        alert(`Hubo un problema al procesar el envío: ${result.message}`);
+      }
+
+    } catch (error) {
+      console.error("Error enviando el formulario:", error);
+      alert("Error de conexión. Por favor, vuelve a intentarlo más tarde.");
+    }
   };
 
   return (
@@ -169,13 +218,21 @@ const ExperienceSection = () => {
               <form onSubmit={handleSubmit} className="space-y-8 font-[Outfit]">
                 <div className="grid md:grid-cols-2 gap-4">
                   
-                  {/* Nombre */}
+                  {/* Nombre / Razon Social */}
                   <div className="space-y-2">
                     <label className="text-sm font-semibold">Nombre completo *</label>
-                    <input type="text" placeholder="Tu nombre" className="w-full bg-white border border-gray-200 px-6 py-2 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#24B6C1] mt-2" required />
+                    <input 
+                      type="text" 
+                      name="razon_social"
+                      value={formData.razon_social}
+                      onChange={handleInputChange}
+                      placeholder="Tu nombre" 
+                      className="w-full bg-white border border-gray-200 px-6 py-2 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#24B6C1] mt-2" 
+                      required 
+                    />
                   </div>
 
-                  {/* Campo Rut Corregido y Funcional */}
+                  {/* Campo Rut */}
                   <div className="space-y-2 relative">
                     <label className="text-sm font-semibold">Rut *</label>
                     <input
@@ -199,19 +256,58 @@ const ExperienceSection = () => {
                   {/* Email */}
                   <div className="space-y-2">
                     <label className="text-sm font-semibold">Correo electrónico *</label>
-                    <input type="email" placeholder="tu@email.com" className="w-full bg-white border border-gray-200 px-6 py-2 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#24B6C1] mt-2" required />
+                    <input 
+                      type="email" 
+                      name="email"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      placeholder="tu@email.com" 
+                      className="w-full bg-white border border-gray-200 px-6 py-2 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#24B6C1] mt-2" 
+                    />
                   </div>
 
                   {/* Teléfono */}
                   <div className="space-y-2">
                     <label className="text-sm font-semibold">Teléfono</label>
-                    <input type="text" placeholder="+56 9 1234 5678" className="w-full bg-white border border-gray-200 px-6 py-2 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#24B6C1] mt-2" />
+                    <input 
+                      type="text" 
+                      name="fono"
+                      value={formData.fono}
+                      onChange={handleInputChange}
+                      placeholder="+56 9 1234 5678" 
+                      className="w-full bg-white border border-gray-200 px-6 py-2 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#24B6C1] mt-2" 
+                    />
                   </div>
 
-                  {/* Textarea */}
+                  {/* 🌟 NUEVO SELECTOR: Tipo de Propiedad / Servicio */}
+                  <div className="md:col-span-2 space-y-2">
+                    <label className="text-sm font-semibold">¿Qué estás buscando?</label>
+                    <select
+                      name="id_tipo_propiedad"
+                      value={formData.id_tipo_propiedad}
+                      onChange={handleInputChange}
+                      className="w-full bg-white border border-gray-200 px-5 py-2.5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#24B6C1] mt-2 cursor-pointer"
+                    >
+                      <option value="1">Residencial</option>
+                      <option value="3">Oficina</option>
+                      <option value="4">Retail</option>
+                      <option value="7">Industrial</option>
+                      <option value="6">Terreno para Proyecto</option>
+                      <option value="8">Administración de Arriendos</option>
+                    </select>
+                  </div>
+
+                  {/* Requerimiento / Textarea */}
                   <div className="md:col-span-2 space-y-2">
                     <label className="text-sm font-semibold">Hablemos de lo que necesitas.</label>
-                    <textarea rows="5" placeholder="Cuéntanos qué tienes en mente..." className="w-full bg-white border border-gray-200 px-4 py-4 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#24B6C1] mt-2" />
+                    <textarea 
+                      rows="4" 
+                      name="requerimiento"
+                      value={formData.requerimiento}
+                      onChange={handleInputChange}
+                      placeholder="Cuéntanos qué tienes en mente..." 
+                      className="w-full bg-white border border-gray-200 px-4 py-4 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#24B6C1] mt-2" 
+                    />
                   </div>
                 </div>
 
@@ -224,7 +320,7 @@ const ExperienceSection = () => {
         </div>
       </div>
     </section>
-  )
-}
+  );
+};
 
 export default ExperienceSection;
