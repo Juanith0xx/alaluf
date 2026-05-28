@@ -425,9 +425,13 @@ const PropertyDetail = ({ property }) => {
 
             {/* Formulario de Contacto Modular */}
             <ContactForm 
-              className="!rounded-[24px] md:!rounded-[40px] !p-5 md:!p-8 border border-gray-100 shadow-sm md:w-full bg-white/95 backdrop-blur-sm"
-              onSubmitSuccess={handleContactSubmit}
-            />
+  className="..."
+  propiedadId={String(property.codigo)}
+  comunaId={property.ubicacion?.comuna_id || 0}
+  objetivoLlamada={property.precios?.venta?.valor ? 1 : 2}
+  tipoPropiedadNombre={property.titulo || ""}
+  onSubmitSuccess={handleContactSubmit}
+/>
           </div>
         </div>
 
