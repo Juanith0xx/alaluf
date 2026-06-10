@@ -1,21 +1,61 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Search, ChevronDown } from "lucide-react"; // Importamos ChevronDown para indicar desplegable
+import { Menu, X, Search, ChevronDown } from "lucide-react"; 
 import logo from "../assets/Logo_A.png";
 import { Link, useNavigate } from 'react-router-dom';
+
+/* =========================
+   UTILERÍA: SCROLL PERSONALIZADO
+========================= */
+// Función para hacer scroll con tiempo exacto (duration en milisegundos)
+const customSmoothScroll = (targetId, duration = 1000) => {
+  const target = document.getElementById(targetId);
+  if (!target) return;
+
+  // Calculamos la posición considerando un pequeño margen (ej. -80px para el header)
+  const targetPosition = target.getBoundingClientRect().top + window.scrollY - 80;
+  const startPosition = window.scrollY;
+  const distance = targetPosition - startPosition;
+  let startTime = null;
+
+  // Ecuación de suavizado (EaseInOutQuad) para un movimiento elegante
+  const easeInOutQuad = (t, b, c, d) => {
+    t /= d / 2;
+    if (t < 1) return (c / 2) * t * t + b;
+    t--;
+    return (-c / 2) * (t * (t - 2) - 1) + b;
+  };
+
+  const animation = (currentTime) => {
+    if (startTime === null) startTime = currentTime;
+    const timeElapsed = currentTime - startTime;
+    
+    // Calculamos la siguiente posición
+    const run = easeInOutQuad(timeElapsed, startPosition, distance, duration);
+    window.scrollTo(0, run);
+    
+    // Continuamos la animación hasta alcanzar la duración
+    if (timeElapsed < duration) {
+      requestAnimationFrame(animation);
+    } else {
+      window.scrollTo(0, targetPosition); // Aseguramos posición final exacta
+    }
+  };
+
+  requestAnimationFrame(animation);
+};
 
 /* =========================
    DESKTOP NAVBAR
 ========================= */
 const NavbarDesktop = ({ 
   openDropdown, setOpenDropdown, 
-  openToolsDropdown, setOpenToolsDropdown, // 🌟 Nuevos estados para herramientas
+  openToolsDropdown, setOpenToolsDropdown,
   searchCode, setSearchCode, onSearch 
 }) => (
   <nav className="fixed w-full z-50 bg-black/50 text-white font-[Outfit] pt-8 hidden lg:block">
     <div className="max-w-7xl mx-auto px-6 py-4 flex items-center">
 
-      {/* LEFT SECTION (Logo + Links) */}
       <div className="flex items-center flex-1">
         <Link to="/" className="flex items-center -ml-3">
           <img
@@ -27,7 +67,6 @@ const NavbarDesktop = ({
 
         <div className="flex items-center text-[15px] tracking-wide ml-auto gap-11">
           <div className="flex items-center gap-12">
-            {/* Servicios Dropdown */}
             <div
               className="relative"
               onMouseEnter={() => setOpenDropdown(true)}
@@ -77,7 +116,6 @@ const NavbarDesktop = ({
             <Link to="/nosotros" className="hover:text-teal-400 transition duration-300 font-medium">Nosotros</Link>
             <a href="https://alaluf.cl/pressroom2.php" className="hover:text-teal-400 transition duration-300 font-medium">Newsletter</a>
             
-            {/* 🌟 NUEVA SECCIÓN: Herramientas Dropdown (Desktop) */}
             <div
               className="relative"
               onMouseEnter={() => setOpenToolsDropdown(true)}
@@ -106,7 +144,17 @@ const NavbarDesktop = ({
               </AnimatePresence>
             </div>
 
-            <a href="#" className="hover:text-teal-400 transition duration-300 font-medium">Contacto</a>
+            {/* 🌟 AQUÍ LLAMAMOS A LA FUNCIÓN (ej. 1200ms = 1.2 segundos de duración) */}
+            <a 
+              href="#contacto" 
+              onClick={(e) => {
+                e.preventDefault();
+                customSmoothScroll('contacto', 1200); // <-- Cambia este número para controlar la velocidad
+              }}
+              className="hover:text-teal-400 transition duration-300 font-medium"
+            >
+              Contacto
+            </a>
           </div>
 
           <a href="https://alaluf.cl/mialaluf/" className="ml-auto hover:text-teal-400 transition duration-300 font-medium">
@@ -115,7 +163,6 @@ const NavbarDesktop = ({
         </div>
       </div>
 
-      {/* SEARCH FUNCIONAL */}
       <div className="hidden lg:flex items-center bg-white/10 px-4 py-2 rounded-xl backdrop-blur-md border border-white/10 hover:border-teal-400/50 transition ml-10">
         <input
           type="text"
@@ -143,7 +190,7 @@ const NavbarDesktop = ({
 ========================= */
 const NavbarMobile = ({ 
   openMenu, setOpenMenu, 
-  openMobileTools, setOpenMobileTools, // 🌟 Estado herramientas mobile
+  openMobileTools, setOpenMobileTools,
   searchCode, setSearchCode, onSearch 
 }) => (
   <nav className="fixed w-full z-50 bg-black/60 text-white font-[Outfit] pt-6 lg:hidden">
@@ -174,7 +221,6 @@ const NavbarMobile = ({
             <Link to="/nosotros" onClick={() => setOpenMenu(false)} className="hover:text-teal-400 transition">Nosotros</Link>
             <a href="https://alaluf.cl/pressroom2.php" className="hover:text-teal-400 transition">Newsletter</a>
             
-            {/* 🌟 NUEVA SECCIÓN: Herramientas Desplegable (Mobile Accordion) */}
             <div className="flex flex-col">
               <span 
                 onClick={() => setOpenMobileTools(!openMobileTools)} 
@@ -202,10 +248,23 @@ const NavbarMobile = ({
               </AnimatePresence>
             </div>
 
-            <a href="#" className="hover:text-teal-400 transition">Contacto</a>
+            {/* 🌟 AQUÍ LLAMAMOS A LA FUNCIÓN EN MÓVIL */}
+            <a 
+              href="#contacto" 
+              onClick={(e) => {
+                e.preventDefault();
+                setOpenMenu(false); // Cierra el menú hamburguesa
+                setTimeout(() => {
+                  customSmoothScroll('contacto', 1200); // <-- Velocidad parametrizada
+                }, 150);
+              }} 
+              className="hover:text-teal-400 transition"
+            >
+              Contacto
+            </a>
+            
             <a href="https://alaluf.cl/mialaluf/" className="hover:text-teal-400 transition font-semibold">Mi Alaluf</a>
 
-            {/* Mobile Search Funcional */}
             <div className="flex items-center bg-white/10 px-4 py-2 rounded-xl mt-4">
               <input
                 type="text"
@@ -235,8 +294,8 @@ const NavbarMobile = ({
 const Navbar = () => {
   const [openMenu, setOpenMenu] = useState(false);
   const [openDropdown, setOpenDropdown] = useState(false);
-  const [openToolsDropdown, setOpenToolsDropdown] = useState(false); // 🌟 Estado Desktop
-  const [openMobileTools, setOpenMobileTools] = useState(false); // 🌟 Estado Mobile
+  const [openToolsDropdown, setOpenToolsDropdown] = useState(false); 
+  const [openMobileTools, setOpenMobileTools] = useState(false); 
   const [searchCode, setSearchCode] = useState(""); 
   const navigate = useNavigate();
 

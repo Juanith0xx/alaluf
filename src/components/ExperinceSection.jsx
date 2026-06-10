@@ -17,7 +17,6 @@ const ExperienceSection = () => {
   const [rut, setRut] = useState("");
   const [rutError, setRutError] = useState("");
   
-  // 🌟 NUEVO ESTADO: Agregamos id_tipo_propiedad (por defecto 1 = Residencial)
   const [formData, setFormData] = useState({
     razon_social: "",
     email: "",
@@ -76,7 +75,6 @@ const ExperienceSection = () => {
     }
   };
 
-  // 🌟 MANEJADOR DE CAMBIOS GENERAL PARA INPUTS Y SELECT
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -106,7 +104,6 @@ const ExperienceSection = () => {
     try {
       const rutSanitizado = rut.replace(/\./g, "");
 
-      // 🌟 Añadimos el id_tipo_propiedad al payload asegurándonos de que viaje como número
       const payload = {
         razon_social: formData.razon_social,
         rut: rutSanitizado,
@@ -209,8 +206,8 @@ const ExperienceSection = () => {
               </div>
             </div>
 
-            {/* DERECHA — Formulario */}
-            <div className="bg-white text-gray-800 rounded-[80px] p-12 shadow-2xl -mt-23 -ml-34">
+            {/* 🌟 DERECHA — Formulario CON EL ID CONTACTO Y SCROLL-MT */}
+            <div id="contacto" className="bg-white text-gray-800 rounded-[80px] p-12 shadow-2xl -mt-23 -ml-34 scroll-mt-32">
               <h2 className="text-2xl md:text-3xl font-medium mb-10 text-start font-[Outfit]">
                 Lo primero es entenderte.
               </h2>
@@ -279,7 +276,7 @@ const ExperienceSection = () => {
                     />
                   </div>
 
-                  {/* 🌟 NUEVO SELECTOR: Tipo de Propiedad / Servicio */}
+                  {/* SELECTOR */}
                   <div className="md:col-span-2 space-y-2">
                     <label className="text-sm font-semibold">¿Qué estás buscando?</label>
                     <select

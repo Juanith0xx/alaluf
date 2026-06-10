@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
   FaRulerCombined, FaMapMarkerAlt, FaPhoneAlt, 
   FaChevronLeft, FaChevronRight, FaBed, FaBath, 
-  FaCar, FaBuilding, FaTag 
+  FaCar, FaBuilding, FaTag, FaRulerVertical,
+  FaCheckCircle, FaDoorClosed 
 } from "react-icons/fa";
 
 const PropertyCard = ({ item, onSelect, isActive }) => {
@@ -35,7 +36,13 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
   };
 
   const renderizarDetalles = () => {
-    const tipo = (item.titulo || "").toLowerCase();
+    const tipo = (
+  item.tipoPropiedad ||
+  item.tipo ||
+  item.categoria ||
+  item.titulo ||
+  ""
+).toLowerCase();
     
     const dorms = item.detalles?.dormitorios || 0;
     const banos = item.detalles?.banos || 0;
@@ -52,6 +59,7 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
       </div>
     );
 
+    // Lógica para CASAS
     if (tipo.includes("casa") && !tipo.includes("comercial")) {
       return (
         <div className="flex flex-wrap gap-2 mt-3">
@@ -63,6 +71,7 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
       );
     }
     
+    // Lógica para DEPARTAMENTOS
     if (tipo.includes("departamento")) {
       return (
         <div className="flex flex-wrap gap-2 mt-3">
@@ -74,26 +83,61 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
       );
     }
 
+    // 🌟 LÓGICA PARA OFICINAS (Actualizada con los nuevos campos solicitados)
     if (tipo.includes("oficina")) {
       const tipoEdificio = obtenerCampoExtra("tipo edificio");
+      const habilitada = obtenerCampoExtra("habilitada");
+      const privados = obtenerCampoExtra("privados");
+
       return (
         <div className="flex flex-wrap gap-2 mt-3">
-          <InfoItem icon={FaRulerCombined} text={`${m2Construidos} m² Const.`} />
-          {estac > 0 && <InfoItem icon={FaCar} text={`${estac} Estac.`} />}
-          {tipoEdificio && <InfoItem icon={FaBuilding} text={`Clase ${tipoEdificio}`} />}
+          <InfoItem icon={FaRulerCombined} text={`${m2Construidos} m²`} />
+          {habilitada && <InfoItem icon={FaCheckCircle} text={`Habitada: ${habilitada}`} />}
+          {tipoEdificio && <InfoItem icon={FaBuilding} text={`Edificio ${tipoEdificio}`} />}
+          {privados !== null && parseInt(privados) > 0 && (
+            <InfoItem icon={FaDoorClosed} text={`${privados} Privados`} />
+          )}
         </div>
       );
     }
 
+    // Lógica para LOCALES
     if (tipo.includes("local")) {
-      return (
-        <div className="flex flex-wrap gap-2 mt-3">
-          <InfoItem icon={FaRulerCombined} text={`${m2Construidos} m² Const.`} />
-          {estac > 0 && <InfoItem icon={FaCar} text={`${estac} Estac.`} />}
-        </div>
+  const habilitado = obtenerCampoExtra("habilitado");
+  const banosLocal = item.detalles?.banos || 0;
+
+  return (
+    <div className="flex flex-wrap gap-2 mt-3">
+      <InfoItem
+        icon={FaRulerCombined}
+        text={`${m2Construidos} m²`}
+      />
+
+      {habilitado && (
+        <InfoItem
+          icon={FaCheckCircle}
+          text={`Habilitado: ${habilitado}`}
+        />
+      )}
+
+      {estac > 0 && (
+        <InfoItem
+          icon={FaCar}
+          text={`${estac} Estac.`}
+        />
+      )}
+
+      {banosLocal > 0 && (
+        <InfoItem
+          icon={FaBath}
+          text={`${banosLocal} Baños`}
+        />
+      )}
+    </div>
       );
     }
 
+    // Lógica para COMERCIAL
     if (tipo.includes("comercial")) {
       return (
         <div className="flex flex-wrap gap-2 mt-3">
@@ -103,40 +147,107 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
         </div>
       );
     }
+    if (
+  tipo.includes("terreno industrial") ||
+  tipo.includes("industrial")
+) {
+  const frente = obtenerCampoExtra("frente");
+  const fondo = obtenerCampoExtra("fondo");
 
-    if (tipo.includes("terreno") && tipo.includes("proyecto")) {
-      const uso = obtenerCampoExtra("uso") || obtenerCampoExtra("destino");
-      return (
-        <div className="flex flex-wrap gap-2 mt-3">
-          <InfoItem icon={FaRulerCombined} text={`${m2Terreno} m² Terr.`} />
-          {uso && <InfoItem icon={FaTag} text={uso} />}
-        </div>
+  return (
+    <div className="flex flex-wrap gap-2 mt-3">
+      <InfoItem
+        icon={FaRulerCombined}
+        text={`${m2Terreno} m²`}
+      />
+
+      {frente && (
+        <InfoItem
+          icon={FaRulerVertical}
+          text={`Frente: ${frente} mts`}
+        />
+      )}
+
+      {fondo && (
+        <InfoItem
+          icon={FaRulerVertical}
+          text={`Fondo: ${fondo} mts`}
+        />
+      )}
+    </div>
+  );
+}
+
+    // Lógica para TERRENOS
+    if (tipo.includes("terreno")) {
+  const uso = obtenerCampoExtra("uso") || obtenerCampoExtra("destino");
+  const densidad = obtenerCampoExtra("densidad");
+  const altura = obtenerCampoExtra("altura");
+
+  return (
+    <div className="flex flex-wrap gap-2 mt-3">
+      <InfoItem
+        icon={FaRulerCombined}
+        text={`${m2Terreno} m²`}
+      />
+
+      {uso && (
+        <InfoItem
+          icon={FaTag}
+          text={uso}
+        />
+      )}
+
+      {densidad && (
+        <InfoItem
+          icon={FaBuilding}
+          text={`Densidad: ${densidad}`}
+        />
+      )}
+
+      {altura && (
+        <InfoItem
+          icon={FaRulerVertical}
+          text={`Altura: ${altura}`}
+        />
+      )}
+    </div>
       );
     }
 
-    if (tipo.includes("terreno") && tipo.includes("industrial")) {
-      return (
-        <div className="flex flex-wrap gap-2 mt-3">
-          <InfoItem icon={FaRulerCombined} text={`${m2Terreno} m² Terr.`} />
-        </div>
-      );
-    }
-
+    // Lógica para GALPONES
     if (tipo.includes("galpón") || tipo.includes("galpon")) {
-      return (
-        <div className="flex flex-wrap gap-2 mt-3">
-          <InfoItem icon={FaRulerCombined} text={`${m2Construidos} m² Const.`} />
-          <InfoItem icon={FaRulerCombined} text={`${m2Terreno} m² Terr.`} />
-        </div>
-      );
-    }
+  const trifasica = obtenerCampoExtra("trifásica") ||
+                    obtenerCampoExtra("trifasica");
 
-    if (tipo.includes("parcela") || tipo.includes("fundo")) {
-      const supTerreno = obtenerCampoExtra("superficie") || m2Terreno;
-      return (
-        <div className="flex flex-wrap gap-2 mt-3">
-          <InfoItem icon={FaRulerCombined} text={`${supTerreno} m² Terr.`} />
-        </div>
+  const alturaGalpon = obtenerCampoExtra("altura");
+
+  return (
+    <div className="flex flex-wrap gap-2 mt-3">
+      <InfoItem
+        icon={FaRulerCombined}
+        text={`${m2Construidos} m² Const.`}
+      />
+
+      <InfoItem
+        icon={FaRulerCombined}
+        text={`${m2Terreno} m² Terr.`}
+      />
+
+      {trifasica && (
+        <InfoItem
+          icon={FaCheckCircle}
+          text={`Trifásica: ${trifasica}`}
+        />
+      )}
+
+      {alturaGalpon && (
+        <InfoItem
+          icon={FaRulerVertical}
+          text={`Altura: ${alturaGalpon}`}
+        />
+      )}
+    </div>
       );
     }
 
@@ -156,102 +267,45 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
     >
       <div className="relative h-64 overflow-hidden bg-gray-200">
         <img 
-          src={imagenes.length > 0 ? imagenes[currentImageIndex] : "https://via.placeholder.com/600x400?text=Imagen+No+Disponible+Alaluf"} 
+          src={imagenes.length > 0 ? imagenes[currentImageIndex] : "https://via.placeholder.com/600x400?text=Imagen+No+Disponible"} 
           className="w-full h-full object-cover transition-opacity duration-500"
-          alt={`${item.titulo} - Imagen ${currentImageIndex + 1}`}
-          onError={(e) => {
-            e.target.src = "https://via.placeholder.com/600x400?text=Error+al+cargar+foto+de+servidor";
-          }}
+          alt={item.titulo}
         />
 
         {imagenes.length > 1 && (
           <>
-            <button 
-              onClick={prevImage}
-              className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full backdrop-blur-sm transition-all opacity-0 group-hover:opacity-100 z-10"
-            >
-              <FaChevronLeft size={12} />
-            </button>
-            <button 
-              onClick={nextImage}
-              className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full backdrop-blur-sm transition-all opacity-0 group-hover:opacity-100 z-10"
-            >
-              <FaChevronRight size={12} />
-            </button>
-            
-            <div className="absolute bottom-3 right-3 bg-black/60 text-white text-[10px] px-2 py-1 rounded-md font-bold backdrop-blur-sm">
-              {currentImageIndex + 1} / {imagenes.length}
-            </div>
+            <button onClick={prevImage} className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/30 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 z-10"><FaChevronLeft size={12} /></button>
+            <button onClick={nextImage} className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/30 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 z-10"><FaChevronRight size={12} /></button>
+            <div className="absolute bottom-3 right-3 bg-black/60 text-white text-[10px] px-2 py-1 rounded-md font-bold">{currentImageIndex + 1} / {imagenes.length}</div>
           </>
         )}
-
-        <div className="absolute top-4 left-4 flex gap-2">
-          <span className="bg-white/90 text-black text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-tighter shadow-sm">
-            {item.titulo || "Propiedad"}
-          </span>
-        </div>
       </div>
 
       <div className="p-6 text-black">
-        <h3 className="text-xl font-bold mb-3 leading-tight uppercase line-clamp-1 text-ellipsis">
-          {item.ubicacion?.sector || "Sector No Especificado"}
-        </h3>
-        
+        <h3 className="text-xl font-bold mb-3 leading-tight uppercase line-clamp-1">{item.ubicacion?.sector || "Sector No Especificado"}</h3>
         <div className="mb-6">
           <div className="flex items-center gap-2 text-gray-500 text-sm">
             <FaMapMarkerAlt className="text-[#24B6C1]" /> 
             <span>{item.ubicacion?.comuna || "Sin Comuna"}, {item.ubicacion?.region || "Chile"}</span>
           </div>
-          
           {renderizarDetalles()}
-
-          <div className="text-[10px] text-gray-400 mt-3 font-medium tracking-wide">
-            CÓDIGO {item.codigo || item.id}
-          </div>
         </div>
 
         <div className="border-t border-gray-100 pt-4 flex items-center justify-between">
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col">
             {tieneArriendo && (
-              <div>
-                <span className="block text-[10px] text-[#24B6C1] uppercase font-bold tracking-widest leading-none">Arriendo</span>
-                <span className="text-gray-900 font-black text-lg">
-                  {item.precios.arriendo.valor} <span className="text-xs font-semibold text-gray-500">{item.precios.arriendo.moneda || "UF/m²"}</span>
-                </span>
-              </div>
+              <span className="text-gray-900 font-black text-lg">{item.precios.arriendo.valor} <span className="text-xs text-gray-500">{item.precios.arriendo.moneda}</span></span>
             )}
-            
             {tieneVenta && (
-              <div>
-                <span className="block text-[10px] text-[#24B6C1] uppercase font-bold tracking-widest leading-none">Venta</span>
-                <span className="text-gray-900 font-black text-lg">
-                  {item.precios.venta.valor} <span className="text-xs font-semibold text-gray-500">{item.precios.venta.moneda || "UF/m²"}</span>
-                </span>
-              </div>
-            )}
-
-            {!tieneArriendo && !tieneVenta && (
-              <span className="text-[#24B6C1] font-bold text-sm tracking-tight uppercase">Consultar Precio</span>
+              <span className="text-gray-900 font-black text-lg">{item.precios.venta.valor} <span className="text-xs text-gray-500">{item.precios.venta.moneda}</span></span>
             )}
           </div>
-
-          <div className="flex gap-2 items-end">
-            <button 
-              className="p-3 bg-[#24B6C1]/10 text-[#24B6C1] rounded-xl hover:bg-[#24B6C1] hover:text-white transition"
-              onClick={(e) => e.stopPropagation()} 
-            >
-              <FaPhoneAlt size={14} />
-            </button>
-            <button 
-              className="px-5 py-3 bg-[#24B6C1] text-white rounded-xl font-bold text-xs uppercase tracking-wider shadow-md hover:bg-cyan-600 transition"
-              onClick={(e) => {
-                e.stopPropagation();
-                navigate(`/propiedad/${item.codigo || item.id}`);
-              }} 
-            >
-              Ficha
-            </button>
-          </div>
+          <button 
+            className="px-5 py-3 bg-[#24B6C1] text-white rounded-xl font-bold text-xs uppercase shadow-md hover:bg-cyan-600 transition"
+            onClick={(e) => { e.stopPropagation(); navigate(`/propiedad/${item.codigo || item.id}`); }} 
+          >
+            Ficha
+          </button>
         </div>
       </div>
     </div>

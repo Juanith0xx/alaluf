@@ -1,10 +1,27 @@
 import React, { useState } from "react";
-import { 
-  FaRulerCombined, FaBed, FaBath, FaCar, FaMapMarkerAlt, 
-  FaChevronLeft, FaChevronRight, FaCalendarAlt, FaClock,
-  FaCheckCircle, FaArrowLeft, FaInfoCircle, FaWhatsapp, 
-  FaFacebookF, FaEnvelope, FaInstagram, FaTiktok, FaTimes,
-  FaSun, FaMoon 
+import {
+  FaRulerCombined,
+  FaBed,
+  FaBath,
+  FaCar,
+  FaMapMarkerAlt,
+  FaChevronLeft,
+  FaChevronRight,
+  FaCalendarAlt,
+  FaClock,
+  FaCheckCircle,
+  FaArrowLeft,
+  FaInfoCircle,
+  FaWhatsapp,
+  FaFacebookF,
+  FaEnvelope,
+  FaInstagram,
+  FaTiktok,
+  FaTimes,
+  FaSun,
+  FaMoon,
+  FaBuilding,
+  FaDoorClosed
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import MapView from "./MapView"; 
@@ -25,6 +42,7 @@ const PropertyDetail = ({ property }) => {
   const [horaSeleccionada, setHoraSeleccionada] = useState(null); 
 
   if (!property) return null;
+  console.log("PROPERTY DETAIL:", property);
 
   const imagenes = property.imagenes || [];
   const precioPrincipal = property.precios?.venta?.valor || property.precios?.arriendo?.valor;
@@ -39,6 +57,22 @@ const PropertyDetail = ({ property }) => {
       c => c.label.toLowerCase().includes(label.toLowerCase())
     )?.value || "No especificado";
   };
+
+  const getCampo = (texto) => {
+  const campo = property.campos_especificos?.find(
+    c => c.label?.toLowerCase().includes(texto.toLowerCase())
+  );
+
+  if (
+    campo?.value === null ||
+    campo?.value === undefined ||
+    campo?.value === ""
+  ) {
+    return "Sin información";
+  }
+
+  return campo.value;
+};
 
   const handleContactSubmit = (data) => {
     console.log("Contacto para propiedad:", property.codigo, data);
@@ -95,6 +129,47 @@ const PropertyDetail = ({ property }) => {
   if (!diaSeleccionado && diasDisponibles.length > 0) {
     setDiaSeleccionado(diasDisponibles[0]);
   }
+
+const tipo = (
+  property.desc_tipo ||
+  property.tipoPropiedad ||
+  property.tipo ||
+  property.categoria ||
+  property.titulo ||
+  ""
+).toLowerCase();
+
+const getExtraValue = (texto) => {
+  const campo = property.detalles?.caracteristicasExtra?.find(
+    c => c.label?.toLowerCase().includes(texto.toLowerCase())
+  );
+
+  if (
+    campo?.value === null ||
+    campo?.value === undefined ||
+    campo?.value === ""
+  ) {
+    return "Sin información";
+  }
+
+  return campo.value;
+};
+
+const Feature = ({ icon: Icon, title, value }) => (
+  <div className="space-y-1">
+    <span className="text-gray-400 text-[10px] uppercase font-bold tracking-widest block">
+      {title}
+    </span>
+
+    <div className="flex items-center gap-2 font-bold text-lg italic">
+      <Icon className="text-[#24B6C1]" />
+      {value}
+    </div>
+  </div>
+);
+
+
+
 
   return (
     <div 
@@ -203,37 +278,215 @@ const PropertyDetail = ({ property }) => {
 
             {/* Características Técnicas (Grid fluido) */}
             <section className="grid grid-cols-2 sm:grid-cols-4 gap-4 py-6 md:py-8 border-y border-gray-100">
-              <div className="space-y-1">
-                <span className="text-gray-400 text-[9px] md:text-[10px] uppercase font-bold tracking-widest block">Superficie</span>
-                <div className="flex items-center gap-2 font-bold text-base md:text-lg italic">
-                  <FaRulerCombined className="text-[#24B6C1]" /> {property.detalles?.superficie} m²
-                </div>
-              </div>
-              <div className="space-y-1">
-                <span className="text-gray-400 text-[9px] md:text-[10px] uppercase font-bold tracking-widest block">Dormitorios</span>
-                <div className="flex items-center gap-2 font-bold text-base md:text-lg italic">
-                  <FaBed className="text-[#24B6C1]" /> {property.detalles?.dormitorios || "0"} Dorm.
-                </div>
-              </div>
-              <div className="space-y-1">
-                <span className="text-gray-400 text-[9px] md:text-[10px] uppercase font-bold tracking-widest block">Baños</span>
-                <div className="flex items-center gap-2 font-bold text-base md:text-lg italic">
-                  <FaBath className="text-[#24B6C1]" /> {property.detalles?.banos || "0"} Baños
-                </div>
-              </div>
-              <div className="space-y-1">
-                <span className="text-gray-400 text-[9px] md:text-[10px] uppercase font-bold tracking-widest block">Estacionamiento</span>
-                <div className="flex items-center gap-2 font-bold text-base md:text-lg italic">
-                  <FaCar className="text-[#24B6C1]" /> {property.detalles?.estacionamientos || "0"} Estac.
-                </div>
-              </div>
-            </section>
+
+  {/* CASAS */}
+  {tipo.includes("casa") && !tipo.includes("comercial") && (
+    <>
+      <Feature
+        icon={FaRulerCombined}
+        title="Construidos"
+        value={`${getExtraValue("construidos") || getCampo("terreno")|| 0} m²`}
+      />
+
+      <Feature
+        icon={FaRulerCombined}
+        title="Terreno"
+        value={`${getExtraValue("terreno") || property.detalles?.superficie || 0} m²`}
+      />
+
+      <Feature
+        icon={FaBed}
+        title="Dormitorios"
+        value={`${property.detalles?.dormitorios || 0}`}
+      />
+
+      <Feature
+        icon={FaBath}
+        title="Baños"
+        value={`${property.detalles?.banos || 0}`}
+      />
+    </>
+  )}
+
+  {/* DEPARTAMENTOS */}
+  {tipo.includes("departamento") && (
+    <>
+      <Feature
+        icon={FaRulerCombined}
+        title="Superficie Total"
+        value={`${getExtraValue("totales") || 0} m²`}
+      />
+
+      <Feature
+        icon={FaRulerCombined}
+        title="Superficie Útil"
+        value={`${getExtraValue("útiles") || 0} m²`}
+      />
+
+      <Feature
+        icon={FaBed}
+        title="Dormitorios"
+        value={`${property.detalles?.dormitorios || 0}`}
+      />
+
+      <Feature
+        icon={FaBath}
+        title="Baños"
+        value={`${property.detalles?.banos || 0}`}
+      />
+    </>
+  )}
+
+  {/* OFICINAS */}
+  {tipo.includes("oficina") && (
+    <>
+      <Feature
+        icon={FaRulerCombined}
+        title="Superficie"
+        value={`${getExtraValue("construidos") || property.detalles?.superficie || 0} m²`}
+      />
+
+      <Feature
+        icon={FaCheckCircle}
+        title="Habilitada"
+        value={getExtraValue("habilitada") || "No"}
+      />
+
+      <Feature
+        icon={FaBuilding}
+        title="Tipo Edificio"
+        value={getExtraValue("tipo edificio") || "-"}
+      />
+
+      <Feature
+        icon={FaDoorClosed}
+        title="Privados"
+        value={getExtraValue("privados") || "0"}
+      />
+    </>
+  )}
+
+  {/* LOCALES */}
+  {tipo.includes("local") && (
+    <>
+      <Feature
+        icon={FaRulerCombined}
+        title="Superficie"
+        value={`${property.detalles?.superficie || 0} m²`}
+      />
+
+      <Feature
+        icon={FaCheckCircle}
+        title="Habilitado"
+        value={getExtraValue("habilitado") || "No"}
+      />
+
+      <Feature
+        icon={FaBath}
+        title="Baños"
+        value={`${property.detalles?.banos || 0}`}
+      />
+
+      <Feature
+        icon={FaCar}
+        title="Estacionamientos"
+        value={`${property.detalles?.estacionamientos || 0}`}
+      />
+    </>
+  )}
+
+  {/* GALPONES */}
+  {(tipo.includes("galpon") || tipo.includes("galpón")) && (
+    <>
+      <Feature
+        icon={FaRulerCombined}
+        title="Construidos"
+        value={`${getExtraValue("construidos") || 0} m²`}
+      />
+
+      <Feature
+        icon={FaRulerCombined}
+        title="Terreno"
+        value={`${getExtraValue("terreno") || 0} m²`}
+      />
+
+      <Feature
+        icon={FaCheckCircle}
+        title="Trifásica"
+        value={getExtraValue("trifasica") || "No"}
+      />
+
+      <Feature
+        icon={FaRulerCombined}
+        title="Altura"
+        value={getExtraValue("altura") || "-"}
+      />
+    </>
+  )}
+
+  {/* TERRENOS INDUSTRIALES */}
+  {tipo.includes("industrial") && (
+    <>
+      <Feature
+        icon={FaRulerCombined}
+        title="Superficie"
+        value={`${property.detalles?.superficie || 0} m²`}
+      />
+
+      <Feature
+        icon={FaRulerCombined}
+        title="Frente"
+        value={`${getExtraValue("frente") || 0} mts`}
+      />
+
+      <Feature
+        icon={FaRulerCombined}
+        title="Fondo"
+        value={`${getExtraValue("fondo") || 0} mts`}
+      />
+    </>
+  )}
+
+  {/* TERRENOS */}
+  {tipo.includes("terreno") &&
+    !tipo.includes("industrial") && (
+    <>
+      <Feature
+  icon={FaRulerCombined}
+  title="Superficie"
+  value={`${getExtraValue("terreno")} m²`}
+/>
+
+<Feature
+  icon={FaInfoCircle}
+  title="Uso"
+  value={getExtraValue("uso")}
+/>
+
+<Feature
+  icon={FaInfoCircle}
+  title="Densidad"
+  value={getExtraValue("densidad")}
+/>
+
+<Feature
+  icon={FaInfoCircle}
+  title="Altura"
+  value={getExtraValue("altura")}
+/>
+    </>
+  )}
+</section>
 
             {/* Descripción */}
             <section className="space-y-3">
               <h3 className="text-xl md:text-2xl font-bold uppercase italic tracking-tighter">Descripción de la propiedad</h3>
               <p className="text-gray-600 leading-relaxed whitespace-pre-line text-sm md:text-lg">
-                {property.detalles?.descripcion || "Contáctanos para obtener más detalles."}
+                {
+  property.caracteristicas_internet ||
+  property.detalles?.descripcion ||
+  "Contáctanos para obtener más detalles."
+}
               </p>
             </section>
 
