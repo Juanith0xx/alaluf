@@ -16,7 +16,7 @@ const TerrenoProyecto = () => {
     const objCodigo = operacion === 'comprar' ? '1' : '2';
     
     // 🛠️ Se cambia '7A' por '6' para que coincida con el ID de "Terreno Proyectos" de tu dataset original
-    navigate(`/buscar?tipo_prop=6&obj=${objCodigo}`);
+    navigate(`/buscar?tipo_prop=6A&obj=${objCodigo}`);
   };
 
   return (
