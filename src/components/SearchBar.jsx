@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, MapPin, ChevronDown, Check, ChevronRight } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from 'react-router-dom';
 
 const SearchBar = () => {
   const [tipoPropiedad, setTipoPropiedad] = useState(null);
@@ -228,6 +228,12 @@ const SearchBar = () => {
     : [];
 
   const handleSearch = () => {
+    // 🌟 1. Si está en la pestaña "Vender", redirige directo al formulario
+    if (accionActiva === "Vender") {
+      navigate('/vender');
+      return;
+    }
+
     const textInput = searchQuery.trim();
     const numericCode = textInput.replace(/\D/g, "");
     
@@ -236,7 +242,7 @@ const SearchBar = () => {
       return;
     }
 
-    const objID = (accionActiva === "Comprar" || accionActiva === "Vender") ? 1 : 2;
+    const objID = accionActiva === "Comprar" ? 1 : 2;
     const comunaID = selectedComuna?.id || "";
 
     if (!tipoPropiedad || !comunaID) {
@@ -271,7 +277,13 @@ const SearchBar = () => {
           {["Comprar", "Vender", "Arrendar"].map((accion) => (
             <button
               key={accion}
-              onClick={() => setAccionActiva(accion)}
+              onClick={() => {
+                setAccionActiva(accion);
+                // 🌟 2. Si presiona la pestaña "Vender", navega inmediatamente
+                if (accion === "Vender") {
+                  navigate('/vender');
+                }
+              }}
               className={`px-6 py-3 rounded-lg text-sm font-medium transition-all duration-300 ${
                 accionActiva === accion ? "bg-[#24B6C1] text-white shadow-lg" : "text-white/60 hover:text-white"
               }`}
@@ -304,7 +316,7 @@ const SearchBar = () => {
                         <ChevronRight size={14} className="text-gray-600" />
                       </div>
                       
-                      {/* 🛠️ FIJO: Contenedor invisible que actúa como puente */}
+                      {/* Contenedor invisible que actúa como puente */}
                       <div className="absolute top-0 left-full pl-2 w-66 hidden group-hover:block z-50">
                         <ul className="bg-[#1a1a1a] backdrop-blur-2xl rounded-xl border border-white/10 p-2 shadow-2xl space-y-0.5">
                           {prop.sub.map((sub, j) => (
