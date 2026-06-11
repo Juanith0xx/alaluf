@@ -1,7 +1,7 @@
 import React from 'react';
 
 // Importación de imágenes
-import heroAdmin from '../assets/admin_activos.png'; // Reemplazar con la ruta real de la imagen de las llaves
+import heroAdmin from '../assets/admin_activos.png'; 
 import fondoMarmol from '../assets/Marmol.jpg'; 
 
 const AdministracionActivo = () => {
@@ -12,8 +12,9 @@ const AdministracionActivo = () => {
   ];
 
   return (
+    // 🌟 CLASE ACTUALIZADA A font-[Outfix]
     <main 
-      className="w-full min-h-screen bg-cover bg-center font-[Outfit] bg-fixed" 
+      className="w-full min-h-screen bg-cover bg-center font-[Outfix] bg-fixed" 
       style={{ backgroundImage: `url(${fondoMarmol})` }}
     >
       
@@ -53,7 +54,7 @@ const AdministracionActivo = () => {
           <p>
             Administramos tu propiedad como si fuera nuestra. Arrendatario correcto, <br></br>
             contrato blindado, cobros a tiempo y reporte mensual. Sin llamadas<br></br> 
-            innecesarias, sin sorpresas, sin vacancia innecesaria.
+            innecesarias, sin surprises, sin vacancia innecesaria.
           </p>
         </div>
 

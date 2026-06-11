@@ -179,7 +179,6 @@ const SearchBar = () => {
     { label: "San Francisco de Mostazal", id: "16103" }
   ];
 
-  // Categorías actualizadas según hoja 'Tipos Propiedad'
   const propiedades = [
     { 
       nombre: "Residencial", 
@@ -198,21 +197,28 @@ const SearchBar = () => {
       ] 
     },
     { 
+      nombre: "Terrenos para proyecto", 
+      sub: [
+        { label: "Terreno Proyectos", id: 6 }
+      ] 
+    },
+    { 
       nombre: "Industrial / Terrenos", 
       sub: [
         { label: "Galpones", id: 8 }, 
-        { label: "Bodega Industrial", id: 17 },
-        { label: "Terreno Proyectos", id: 6 }, 
-        { label: "Terreno Industrial", id: 7 } 
+        { label: "Bodega Industrial", id: 17 },         
+        { label: "Terreno Industrial", id: 7 }         
       ] 
     },
     { 
       nombre: "Otros", 
       sub: [
+        { label: "Campos", id: 15 },
         { label: "Parcela / Sitio", id: 10 }, 
-        { label: "Parcela", id: 11 },
         { label: "Edificios Corporativos", id: 12 },
-        { label: "Campos", id: 15 }
+        { label: "Parcela", id: 11 },
+        { label: "Estacionamientos",id: 50},
+        { label: "Propiedades con Ruta",id: 51}
       ] 
     },
   ];
@@ -223,8 +229,6 @@ const SearchBar = () => {
 
   const handleSearch = () => {
     const textInput = searchQuery.trim();
-    
-    // Detección mejorada de Código o ID (ej: 26250 o ID14653)
     const numericCode = textInput.replace(/\D/g, "");
     
     if (numericCode !== "" && (textInput.toLowerCase().startsWith("id") || !isNaN(textInput))) {
@@ -232,7 +236,6 @@ const SearchBar = () => {
       return;
     }
 
-    // Mapeo según hoja 'Objetivos': Venta = 1, Arriendo = 2
     const objID = (accionActiva === "Comprar" || accionActiva === "Vender") ? 1 : 2;
     const comunaID = selectedComuna?.id || "";
 
@@ -263,7 +266,7 @@ const SearchBar = () => {
     <div className="relative z-30 px-4 pt-22 font-[Outfit]">
       <div className="max-w-6xl mx-auto bg-gray-200/20 backdrop-blur-md p-4 flex flex-wrap items-center gap-3 justify-center rounded-[40px] border border-white/20 shadow-2xl">
         
-        {/* Selector de Objetivo (Hoja Objetivos) */}
+        {/* Selector de Objetivo */}
         <div className="flex bg-black/60 p-1 rounded-xl border border-white/5">
           {["Comprar", "Vender", "Arrendar"].map((accion) => (
             <button
@@ -278,7 +281,7 @@ const SearchBar = () => {
           ))}
         </div>
 
-        {/* Dropdown Tipo Propiedad (Hoja Tipos Propiedad) */}
+        {/* Dropdown Tipo Propiedad */}
         <div className="relative w-full sm:w-56" ref={dropdownRef}>
           <button
             onClick={() => setOpenDropdown(!openDropdown)}
@@ -300,15 +303,20 @@ const SearchBar = () => {
                         <span className="text-sm font-semibold">{prop.nombre}</span>
                         <ChevronRight size={14} className="text-gray-600" />
                       </div>
-                      <ul className="absolute top-0 left-full ml-2 hidden group-hover:block bg-[#1a1a1a] backdrop-blur-2xl w-64 rounded-xl border border-white/10 p-2 shadow-2xl">
-                        {prop.sub.map((sub, j) => (
-                          <li key={j} onClick={() => { setTipoPropiedad(sub); setOpenDropdown(false); }}
-                            className="flex items-center justify-between px-4 py-2.5 rounded-lg cursor-pointer text-sm text-gray-300 hover:bg-[#24B6C1]/10 hover:text-[#24B6C1]"
-                          >
-                            {sub.label} {tipoPropiedad?.id === sub.id && <Check size={14} className="text-[#24B6C1]" />}
-                          </li>
-                        ))}
-                      </ul>
+                      
+                      {/* 🛠️ FIJO: Contenedor invisible que actúa como puente */}
+                      <div className="absolute top-0 left-full pl-2 w-66 hidden group-hover:block z-50">
+                        <ul className="bg-[#1a1a1a] backdrop-blur-2xl rounded-xl border border-white/10 p-2 shadow-2xl space-y-0.5">
+                          {prop.sub.map((sub, j) => (
+                            <li key={j} onClick={() => { setTipoPropiedad(sub); setOpenDropdown(false); }}
+                              className="flex items-center justify-between px-4 py-2.5 rounded-lg cursor-pointer text-sm text-gray-300 hover:bg-[#24B6C1]/10 hover:text-[#24B6C1] whitespace-nowrap"
+                            >
+                              {sub.label} {tipoPropiedad?.id === sub.id && <Check size={14} className="text-[#24B6C1]" />}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+
                     </li>
                   ))}
                 </ul>
@@ -317,7 +325,7 @@ const SearchBar = () => {
           </AnimatePresence>
         </div>
 
-        {/* Input Comuna con Autocomplete (Hoja Comunas) */}
+        {/* Input Comuna con Autocomplete */}
         <div className="flex-1 min-w-[240px] relative" ref={suggestionRef}>
           <input
             type="text"

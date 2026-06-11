@@ -9,7 +9,7 @@ const Licitaciones = () => {
     "Plazo definido",
     "Plan de marketing específico",
     "Precio mínimo establecido",
-    "Máxima competencia entre compradores"
+    "Maximización del precio"
   ];
 
   const comparativaVentaDirecta = [

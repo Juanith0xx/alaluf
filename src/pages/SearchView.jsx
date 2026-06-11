@@ -15,6 +15,7 @@ import MapView from "../components/MapView";
 import fondoMarmol from '../assets/Marmol.jpg';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+console.log("API_URL:", API_URL);
 
 const SearchView = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -149,7 +150,6 @@ const SearchView = () => {
         }
 
         let url = "";
-        
         if (query) {
           url = `${API_URL}/api/propiedades/${query}`;
         } else {
@@ -160,8 +160,16 @@ const SearchView = () => {
           const safeObj = obj || "1"; // Por defecto buscar ventas
           const safeComuna = comuna || ""; 
           
-          url = `${API_URL}/api/propiedades/buscar?tipo_prop=${safeTipoProp}&obj=${safeObj}&comuna=${safeComuna}&page=${paginaActual}&limit=10`;
+         url = `${API_URL}/api/propiedades/buscar?tipo_prop=${safeTipoProp}&obj=${safeObj}&comuna=${safeComuna}&page=${paginaActual}&limit=10`;
         }
+        console.log("API_URL:", API_URL);
+console.log("QUERY:", query);
+console.log("TIPO:", tipo_prop);
+console.log("OBJ:", obj);
+console.log("COMUNA:", comuna);
+console.log("PAGINA:", paginaActual);
+
+console.log("URL CONSULTADA:", url);
 
         const response = await fetch(url);
         const data = await response.json();

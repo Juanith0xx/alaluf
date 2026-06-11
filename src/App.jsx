@@ -24,6 +24,7 @@ import PropertyPage from './pages/PropertyPage';
 
 // 🌟 NUEVA IMPORTACIÓN: SIMULADOR HIPOTECARIO
 import MortgageCalculator from './pages/MortgageCalculator';
+import TerrenoProyecto from './pages/TerrenosProyecto';
 
 function App() {
   return (
@@ -54,6 +55,7 @@ function App() {
         {/* RESTO DE PAGINAS */}
         <Route path="/licitaciones" element={<Licitaciones />} />
         <Route path="/industrial" element={<Industrial />} />
+        <Route path="/terrenos_proyectos" element={<TerrenoProyecto />} />
         <Route path="/comercial" element={<Comercial />} />
         <Route path="/residencial" element={<Residencial />} />
         <Route path="/administracion-activo" element={<AdministracionActivo />} />

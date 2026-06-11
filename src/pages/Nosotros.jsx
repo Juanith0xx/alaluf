@@ -35,9 +35,9 @@ const Nosotros = () => {
 
   const teamMembers = [
     { name: "Jack Alaluf", title: "Director Ejecutivo", image: jackImage },
-    { name: "Leonor Alvo", title: "Directora", image: leonorImage },
+    { name: "Leonor Alvo", title: "Gerente Industrial", image: leonorImage },
     { name: "Alejandra Alaluf", title: "Gerente General", image: alejandraImage },    
-    { name: "Natalie Alaluf", title: "Gerente Industrial", image: natalieImage },
+    { name: "Natalie Alaluf", title: "Coordinadora Comercial e Industrial", image: natalieImage },
     { name: "Sebastian Casals", title: "Gerente Comercial", image: danielImage },
   ];
 

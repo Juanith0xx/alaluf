@@ -93,6 +93,9 @@ const NavbarDesktop = ({
                         <Link to="/industrial" className="block w-full">Industrial</Link>
                       </li>
                       <li className="relative cursor-pointer transition hover:text-teal-400 before:content-['>'] before:absolute before:-left-4 before:opacity-0 hover:before:opacity-100">
+                        <Link to="/terrenos_proyectos" className="block w-full">Terrenos para Proyectos</Link>
+                      </li>
+                      <li className="relative cursor-pointer transition hover:text-teal-400 before:content-['>'] before:absolute before:-left-4 before:opacity-0 hover:before:opacity-100">
                         <Link to="/comercial" className="block w-full">Comercial</Link>
                       </li>
                       <li className="relative cursor-pointer transition hover:text-teal-400 before:content-['>'] before:absolute before:-left-4 before:opacity-0 hover:before:opacity-100">

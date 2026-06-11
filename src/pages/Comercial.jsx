@@ -5,24 +5,10 @@ import fondoComercial from '../assets/comercial.jpeg';
 import fondoMarmol from '../assets/Marmol.jpg'; 
 
 const Comercial = () => {
-  // 1. DEFINICIÓN DE DATOS (Necesario para evitar el error de "not defined")
-  const comparativaLicitacion = [
-    "Plazo definido",
-    "Plan de marketing específico",
-    "Precio mínimo establecido",
-    "Máxima competencia entre compradores"
-  ];
-
-  const comparativaVentaDirecta = [
-    "Sin plazo fijo",
-    "Plan de marketing general",
-    "Ofertas desde precio hacia abajo",
-    "Mayor flexibilidad en el proceso"
-  ];
-
   return (
+    // 🌟 SE AGREGÓ 'font-[Outfit]' AQUÍ PARA QUE TODO EL COMPONENTE LA HEREDE
     <main 
-      className="w-full min-h-screen bg-cover bg-center bg-fixed"
+      className="w-full min-h-screen bg-cover bg-center bg-fixed font-[Outfit]"
       style={{ backgroundImage: `url(${fondoMarmol})` }}
     >
       
@@ -43,7 +29,7 @@ const Comercial = () => {
           className="absolute z-20 w-auto"
           style={{ 
             left: '8%',    
-            bottom: '38%', // Mantengo tu valor del 38%
+            bottom: '38%', 
           }}
         >
           <h1 className="text-white text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight uppercase drop-shadow-lg">
@@ -53,57 +39,79 @@ const Comercial = () => {
       </section>
 
       {/* SECCIÓN TEXTO INTRODUCTORIO */}
-      <section className="container mx-auto px-6 py-16 md:py-24 max-w-7xl text-center relative z-10">
+      <section className="container mx-auto px-6 py-16 md:py-10 max-w-7xl text-center relative z-10">
         <h2 className="text-3xl md:text-4xl font-bold text-white mb-2 drop-shadow-md">
-          Acceso a Oportunidades Exclusivas
+          Estrategia Comercial Inmobiliaria
         </h2>
         <p className="text-[#0091A4] text-xl font-semibold mb-10">
-          Los mejores activos no se publican. Se consiguen.
+          Estudiamos dónde crece tu negocio antes de mostrarte solo un espacio.
         </p>
-        <div className="space-y-6 text-gray-200 max-w-5xl mx-auto leading-relaxed text-base md:text-lg drop-shadow-sm">
-          <p>
-            Terrenos, edificios y activos de alto valor que no llegan al mercado abierto. En 45 años hemos
-            estructurado y ganado las licitaciones más complejas de Chile — con el respaldo, la red y el criterio que
-            cada operación exige.
-          </p>
-          <p>
-            La licitación no es solo una forma de vender — es la forma más inteligente de hacerlo. Es un proceso
-            transparente, con plazo definido y un objetivo claro: maximizar el valor de tu activo.
-          </p>
-        </div>
       </section>
 
-      {/* SECCIÓN COMPARATIVA */}
-      <section className="py-2 px-6 md:px-20">
+      {/* SECCIÓN TARJETAS (LOCALES Y OFICINAS ACTUALIZADA) */}
+      <section className="py-2 px-6 md:px-20 relative z-10">
         <div className="container mx-auto max-w-7xl">
-          <h3 className="text-2xl md:text-3xl font-bold text-center text-white uppercase tracking-wider mb-12 drop-shadow-md">
-            LA DIFERENCIA ENTRE UNA LICITACIÓN VERSUS VENTA DIRECTA:
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 max-w-6xl mx-auto">
-            {/* Tarjeta LICITACIÓN */}
-            <div className="bg-white text-gray-800 rounded-xl p-8 md:p-10 shadow-2xl flex flex-col border border-gray-100">
-              <div className="bg-[#3e3e3e] text-center text-white rounded-full py-3 px-6 -mx-4 -mt-4 mb-8 font-semibold tracking-wide uppercase shadow-md">
-                LOCALES
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 max-w-6xl mx-auto items-stretch">
+            
+            {/* Tarjeta LOCALES */}
+            <div className="bg-white text-gray-800 rounded-3xl p-8 md:p-10 shadow-2xl flex flex-col justify-between border border-gray-100">
+              <div>
+                {/* Header Gris Oscuro */}
+                <div className="bg-[#404040] text-center text-white rounded-xl py-3 px-6 mb-6 font-bold tracking-wider uppercase text-sm shadow-sm">
+                  Locales
+                </div>
+                {/* Texto Destacado */}
+                <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-4 leading-snug">
+                  El local correcto no es el más barato. Es el que más vende.
+                </h3>
+                {/* Párrafo Informativo */}
+                <p className="text-gray-700 text-sm md:text-base leading-relaxed mb-6 font-normal">
+                  Locales comerciales, casas comerciales y retail en el sector oriente de Santiago. 
+                  Estudiamos flujo peatonal, perfil del barrio, competencia y proyección antes de 
+                  recomendarte cualquier espacio — porque un local mal elegido no se corrige con marketing.
+                </p>
               </div>
-              <ul className="space-y-4 text-base md:text-lg list-disc list-inside marker:text-[#0091A4]">
-                {comparativaLicitacion.map((item, index) => <li key={index}>{item}</li>)}
-              </ul>
+              {/* Botón CTA */}
+              <button className="w-fit bg-[#0091A4] hover:bg-[#007a8a] text-white font-bold py-3 px-6 rounded-xl transition duration-300 active:scale-95 text-sm md:text-base shadow-md">
+                Explorar locales comerciales
+              </button>
             </div>
-            {/* Tarjeta VENTA DIRECTA */}
-            <div className="bg-white text-gray-800 rounded-xl p-8 md:p-10 shadow-2xl flex flex-col border border-gray-100">
-              <div className="bg-[#3e3e3e] text-center text-white rounded-full py-3 px-6 -mx-4 -mt-4 mb-8 font-semibold tracking-wide uppercase shadow-md">
-                VENTA DIRECTA
+
+            {/* Tarjeta OFICINAS */}
+            <div className="bg-white text-gray-800 rounded-3xl p-8 md:p-10 shadow-2xl flex flex-col justify-between border border-gray-100">
+              <div>
+                {/* Header Gris Oscuro */}
+                <div className="bg-[#404040] text-center text-white rounded-xl py-3 px-6 mb-6 font-bold tracking-wider uppercase text-sm shadow-sm">
+                  Oficinas
+                </div>
+                {/* Texto Destacado */}
+                <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-4 leading-snug">
+                  El mercado de oficinas en Santiago vive su mejor momento en 5 años. ¿Sabes cómo aprovecharlo?
+                </h3>
+                {/* Párrafo Informativo */}
+                <p className="text-gray-700 text-sm md:text-base leading-relaxed mb-3 font-normal">
+                  La vacancia de oficinas Clase A en Santiago cerró 2025 en 9,54% — la más baja de los 
+                  últimos cinco años — y Las Condes lidera con solo un 5,59% de disponibilidad. El mercado 
+                  se está apretando. Las mejores oficinas se están yendo rápido. Analizamos contigo la 
+                  opción correcta antes de que desaparezca.
+                </p>
+                {/* Nota de la Fuente */}
+                <span className="block text-[11px] text-gray-400 font-medium mb-6">
+                  Fuente: CBRE Chile, Informe Mercado de Oficinas A+B, Q4 2025.
+                </span>
               </div>
-              <ul className="space-y-4 text-base md:text-lg list-disc list-inside marker:text-[#0091A4]">
-                {comparativaVentaDirecta.map((item, index) => <li key={index}>{item}</li>)}
-              </ul>
+              {/* Botón CTA */}
+              <button className="w-fit bg-[#0091A4] hover:bg-[#007a8a] text-white font-bold py-3 px-6 rounded-xl transition duration-300 active:scale-95 text-sm md:text-base shadow-md">
+                Encontrar oficinas
+              </button>
             </div>
+
           </div>
         </div>
       </section>
 
       {/* BANNER CTA */}
-      <section className="py-16 px-6 md:px-20">
+      <section className="py-16 px-6 md:px-20 relative z-10">
         <div className="container mx-auto max-w-7xl">
           <div className="bg-[#0091A4] text-center text-white rounded-2xl p-10 md:p-14 flex flex-col items-center shadow-2xl transition-transform hover:scale-[1.01]">
             <h4 className="text-3xl md:text-4xl font-extrabold mb-4">Accede antes que el mercado</h4>
