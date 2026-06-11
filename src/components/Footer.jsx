@@ -61,7 +61,7 @@ const Footer = () => {
                 <a href="https://www.linkedin.com/company/alaluf-propiedades/" target="_blank" rel="noopener noreferrer" className="text-[#05FFEA] hover:text-white transition text-3xl">
                   <FaLinkedin />
                 </a>
-                <a href="https://www.instagram.com/alaluf_residencial/" target="_blank" rel="noopener noreferrer" className="text-[#05FFEA] hover:text-white transition text-3xl">
+                <a href="https://www.instagram.com/alaluf.cl?igsh=MWxkd2N4djYxanZlNQ==" target="_blank" rel="noopener noreferrer" className="text-[#05FFEA] hover:text-white transition text-3xl">
                   <FaInstagram />
                 </a>
                 <a href="https://www.youtube.com/channel/UCT0IvZYM3AaoSodAFkWM87w" target="_blank" rel="noopener noreferrer" className="text-[#05FFEA] hover:text-white transition text-3xl">

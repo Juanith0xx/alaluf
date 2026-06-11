@@ -193,17 +193,21 @@ const SearchBar = () => {
         { label: "Oficinas", id: 3 }, 
         { label: "Locales", id: 4 },
         { label: "Casa Comercial", id: 5 },
-        { label: "Hotelería", id: 13 }
+        { label: "Hotelería", id: 13 },
+        { label: "Edificios Corporativos", id: 12 },
+        { label: "Propiedades con Renta",id: 51}
       ] 
     },
     { 
-      nombre: "Terrenos para proyecto", 
+      nombre: "Terreno para proyecto", 
       sub: [
-        { label: "Terreno Proyectos", id: 6 }
+        { label: "Terrenos para Proyectos", id: 6 },
+        { label: "Parcela / Sitio", id: 10 }, 
+        { label: "Campos", id: 15 },
       ] 
     },
     { 
-      nombre: "Industria", 
+      nombre: "Industrial", 
       sub: [
         { label: "Galpones", id: 8 }, 
         { label: "Bodega Industrial", id: 17 },         
@@ -213,12 +217,9 @@ const SearchBar = () => {
     { 
       nombre: "Otros", 
       sub: [
-        { label: "Campos", id: 15 },
-        { label: "Parcela / Sitio", id: 10 }, 
-        { label: "Edificios Corporativos", id: 12 },
-        { label: "Parcela", id: 11 },
-        { label: "Estacionamientos",id: 50},
-        { label: "Propiedades con Ruta",id: 51}
+        
+        
+        { label: "Estacionamientos",id: 50}
       ] 
     },
   ];
@@ -274,7 +275,7 @@ const SearchBar = () => {
         
         {/* Selector de Objetivo */}
         <div className="flex bg-black/60 p-1 rounded-xl border border-white/5">
-          {["Comprar", "Vender", "Arrendar"].map((accion) => (
+          {["Comprar", "Arrendar", "Vender"].map((accion) => (
             <button
               key={accion}
               onClick={() => {
