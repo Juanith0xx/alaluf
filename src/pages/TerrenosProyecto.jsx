@@ -47,7 +47,7 @@ const TerrenoProyecto = () => {
           }}
         >
           <h1 className="text-white text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight uppercase drop-shadow-lg">
-            TERRENO PARA PROYECTO
+            TERRENOS PARA PROYECTOS
           </h1>
         </div>
       </section>
@@ -70,7 +70,7 @@ const TerrenoProyecto = () => {
               No busques solo metros cuadrados. Busca potencial de desarrollo.
             </h4>
             <p className="text-lg md:text-xl font-medium max-w-4xl mb-8 leading-relaxed">
-              Analizamos normativas, CIP, constructibilidad y plusvalía para que tu próximo terreno no sea solo un trozo de tierra — sea la base sólida de un gran proyecto.
+              Normativas, CIP, constructibilidad, plusvalía. Lo analizamos todo para que tu terreno no sea solo tierra, sino la base de un gran proyecto.
             </p>
             
             {/* SELECTOR DE PESTAÑAS (COMPRAR / ARRENDAR) */}
