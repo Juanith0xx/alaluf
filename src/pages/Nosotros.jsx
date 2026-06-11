@@ -3,8 +3,6 @@ import React from 'react';
 // Importación de imágenes
 import heroNosotros from '../assets/nosotros.png'; 
 import fondoMarmol from '../assets/Marmol.jpg'; 
-
-// 🌟 NUEVA IMPORTACIÓN: Imagen para el bloque de preguntas (puedes cambiar 'ciudad.jpg' por el archivo que gustes)
 import preguntaIzquierdaImage from "../assets/hero6.jpg"; 
 
 // Importación de fotos del equipo
@@ -15,6 +13,7 @@ import natalieImage from '../assets/equipo/Natalie-Alaluf2.png';
 import danielImage from '../assets/equipo/sebastian_Casals.png';
 
 const Nosotros = () => {
+  // Array de pilares (mantenido igual)
   const pilares = [
     {
       id: "01",
@@ -33,17 +32,18 @@ const Nosotros = () => {
     }
   ];
 
+  // 🌟 Se agregó la propiedad "email" a cada miembro del equipo
   const teamMembers = [
-    { name: "Jack Alaluf", title: "Director Ejecutivo", image: jackImage },
-    { name: "Leonor Alvo", title: "Gerente Industrial", image: leonorImage },
-    { name: "Alejandra Alaluf", title: "Gerente General", image: alejandraImage },    
-    { name: "Natalie Alaluf", title: "Coordinadora Comercial e Industrial", image: natalieImage },
-    { name: "Sebastian Casals", title: "Gerente Comercial", image: danielImage },
+    { name: "Jack Alaluf", title: "Director Ejecutivo", image: jackImage, email: "jack@alaluf.com" },
+    { name: "Leonor Alvo", title: "Gerente Industrial", image: leonorImage, email: "lalvo@alaluf.com" },
+    { name: "Alejandra Alaluf", title: "Gerente General", image: alejandraImage, email: "alejandra@alaluf.com" },    
+    { name: "Natalie Alaluf", title: "Coordinadora Comercial e Industrial", image: natalieImage, email: "natalie@alaluf.com" },
+    { name: "Sebastian Casals", title: "Gerente Comercial", image: danielImage, email: "scasals@alaluf.com" },
   ];
 
   return (
     <main 
-      className="w-full min-h-screen bg-cover bg-center font-[Outfit] bg-fixed" 
+      className="w-full min-h-screen bg-cover bg-center font-outfit bg-fixed" 
       style={{ backgroundImage: `url(${fondoMarmol})` }}
     >
       
@@ -84,14 +84,22 @@ const Nosotros = () => {
           <div className="flex flex-wrap justify-center gap-x-12 gap-y-16 max-w-7xl mx-auto mb-8">
             {teamMembers.map((member, index) => (
               <div key={index} className="flex flex-col items-center text-center w-[200px] transition-transform hover:scale-105 duration-300">
-                <div className="relative mb-6">
-                  <div className="absolute -inset-2 bg-[#0091A4]/20 rounded-full blur-sm"></div>
+                
+                {/* 🌟 CONTENEDOR DE IMAGEN CONVERTIDO A ENLACE (mailto) */}
+                <a 
+                  href={`mailto:${member.email}?subject=Contacto%20Sitio%20Web%20-%20Atención%20${member.name}`} 
+                  className="relative mb-6 cursor-pointer group block"
+                  title={`Enviar correo a ${member.name}`}
+                >
+                  {/* Se agregó group-hover para dar un pequeño brillo extra al pasar el cursor */}
+                  <div className="absolute -inset-2 bg-[#0091A4]/20 rounded-full blur-sm transition-colors duration-300 group-hover:bg-[#0091A4]/40"></div>
                   <img 
                     src={member.image} 
                     alt={member.name}
                     className="relative w-36 h-36 rounded-full object-cover border-2 border-[#0091A4]/30 shadow-xl"
                   />
-                </div>
+                </a>
+
                 <p className="text-xl font-bold mb-1 tracking-tight">{member.name}</p>
                 <p className="text-xs text-[#0091A4] font-bold uppercase tracking-[0.2em]">{member.title}</p>
               </div>
@@ -100,13 +108,9 @@ const Nosotros = () => {
         </div>
       </section>
 
-      {/* 🌟 SECCIÓN CONTENEDORA PERFECCIONADA: 100% RESPONSIVA */}
+      {/* SECCIÓN CONTENEDORA PREGUNTAS */}
       <section className="container mx-auto px-6 pb-24 relative z-20 flex flex-col md:flex-row md:items-stretch gap-6 lg:block lg:min-h-[460px]">
         
-        {/* IMAGEN IZQUIERDA COMPLETAMENTE RESPONSIVA 
-            - En móvil y tablet mantiene proporciones equilibradas.
-            - En pantallas grandes (lg), se activa el absoluto lateral izquierdo adaptándose al espacio remanente.
-        */}
         <div className="w-full h-64 md:h-auto md:w-1/2 lg:absolute lg:left-0 lg:top-0 lg:bottom-0 lg:w-[calc(100%-660px)] xl:w-[calc(100%-700px)] z-10 rounded-sm overflow-hidden shadow-xl">
           <img 
             src={preguntaIzquierdaImage} 
@@ -115,22 +119,24 @@ const Nosotros = () => {
           />
         </div>
 
-        {/* TU BLOQUE DE TEXTO ORIGINAL OPTIMIZADO
-            - En móvil y tablet ocupa su espacio correspondiente de forma segura y legible.
-            - En escritorio se ancla exactamente en la derecha con los anchos y desfases de diseño solicitados.
-        */}
+        {/* Limpié el font-[Outfit] suelto que tenías en este div para que herede correctamente el font-outfit de arriba */}
         <div className="bg-[#e9e9e9] p-8 md:p-10 lg:p-12 rounded-sm shadow-xl w-full md:w-1/2 lg:absolute lg:right-12 xl:right-32 lg:top-8 lg:w-[600px] xl:w-[630px] z-10">
-          <h2 className="text-2xl md:text-[30px] lg:text-[36px] font-medium mb-4 text-gray-800 font-[Outfit] whitespace-nowrap">
+          <h2 className="text-2xl md:text-[30px] lg:text-[36px] font-medium mb-4 text-gray-800 whitespace-nowrap">
             ¿Tienes alguna pregunta?
           </h2>
-          <p className="text-sm md:text-base lg:text-xl text-gray-600 leading-relaxed font-light mb-6 font-[Outfit]">
+          <p className="text-sm md:text-base lg:text-xl text-gray-600 leading-relaxed font-light mb-6">
             <span className="font-bold text-black">Lo primero es entenderte a ti:</span> tus objetivos, tu <br className="hidden lg:block"></br>situación y 
             asesorarte en el camino más inteligente para<br className="hidden lg:block"></br> 
             llegar donde quieres.
           </p>
-          <button className="text-[#24B6C1] font-light text-lg lg:text-xl font-[Outfit] flex items-center gap-2 hover:gap-3 transition-all">
+          
+          <a 
+            href="mailto:contacto@alaluf.com?subject=Consulta%20desde%20Sitio%20Web%20-%20Nosotros" 
+            className="text-[#24B6C1] inline-flex font-light text-lg lg:text-xl items-center gap-2 hover:gap-3 transition-all"
+          >
             INICIAR LA CONVERSACIÓN
-          </button>
+            <span className="text-xl">→</span>
+          </a>
         </div>
 
       </section>

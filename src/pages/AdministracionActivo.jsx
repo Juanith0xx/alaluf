@@ -12,9 +12,9 @@ const AdministracionActivo = () => {
   ];
 
   return (
-    // 🌟 CLASE ACTUALIZADA A font-[Outfix]
+    // 🌟 Corregido a 'font-outfit' para que coincida con tu tailwind.config.js
     <main 
-      className="w-full min-h-screen bg-cover bg-center font-[Outfix] bg-fixed" 
+      className="w-full min-h-screen bg-cover bg-center font-outfit bg-fixed" 
       style={{ backgroundImage: `url(${fondoMarmol})` }}
     >
       
@@ -51,10 +51,11 @@ const AdministracionActivo = () => {
         </p>
 
         <div className="space-y-6 text-white max-w-4xl mx-auto leading-relaxed text-base md:text-lg lg:text-xl font-medium drop-shadow-sm">
+          {/* Se optimizó el flujo del texto sin saltos de línea rígidos */}
           <p>
-            Administramos tu propiedad como si fuera nuestra. Arrendatario correcto, <br></br>
-            contrato blindado, cobros a tiempo y reporte mensual. Sin llamadas<br></br> 
-            innecesarias, sin surprises, sin vacancia innecesaria.
+            Administramos tu propiedad como si fuera nuestra. Arrendatario correcto, 
+            contrato blindado, cobros a tiempo y reporte mensual. Sin llamadas 
+            innecesarias, sin sorpresas y sin vacancia innecesaria.
           </p>
         </div>
 
@@ -75,11 +76,11 @@ const AdministracionActivo = () => {
       <section className="pb-24 px-6 md:px-12">
         <div className="mx-auto w-full max-w-5xl">
           <div className="bg-[#0091A4] text-white rounded-[2rem] p-10 md:p-14 text-center shadow-2xl">
-            <h3 className="!text-4xl md:text-4xl lg:text-5xl font-bold mb-6">
+            <h3 className="text-4xl md:text-4xl lg:text-5xl font-bold mb-6">
               Tu propiedad renta. Tú descansas.
             </h3>
             
-            <p className="text-lg md:!text-lg lg:text-2xl mb-10 opacity-95 max-w-4xl mx-auto font-medium">
+            <p className="text-lg lg:text-2xl mb-10 opacity-95 max-w-4xl mx-auto font-medium">
               Nos encargamos de todo: selección de arrendatario, contrato, cobros y reportes. 
               Sin vacancia, sin sorpresas, sin que tengas que intervenir.
             </p>

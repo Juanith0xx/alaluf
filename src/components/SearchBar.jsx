@@ -203,7 +203,7 @@ const SearchBar = () => {
       ] 
     },
     { 
-      nombre: "Industrial / Terrenos", 
+      nombre: "Industria", 
       sub: [
         { label: "Galpones", id: 8 }, 
         { label: "Bodega Industrial", id: 17 },         

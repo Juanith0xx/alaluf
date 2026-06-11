@@ -20,8 +20,9 @@ const Licitaciones = () => {
   ];
 
   return (
+    // Se aplica tu clase personalizada 'font-outfit' aquí
     <main 
-      className="w-full min-h-screen bg-cover bg-center bg-fixed"
+      className="w-full min-h-screen bg-cover bg-center bg-fixed font-outfit"
       style={{ backgroundImage: `url(${fondoMarmol})` }}
     >
       
@@ -41,8 +42,8 @@ const Licitaciones = () => {
         <div 
           className="absolute z-20 w-auto"
           style={{ 
-            left: '8%',    // Mueve horizontalmente (Aumenta para ir a la derecha)
-            bottom: '38%', // Mueve verticalmente (Aumenta para ir hacia arriba)
+            left: '8%',    
+            bottom: '38%', 
           }}
         >
           <h1 className="text-white text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight uppercase drop-shadow-lg">
@@ -60,12 +61,12 @@ const Licitaciones = () => {
           Los mejores activos no se publican. Se consiguen.
         </p>
         <div className="space-y-6 text-gray-200 max-w-5xl mx-auto leading-relaxed text-base md:text-lg drop-shadow-sm">
-          <p>
+          <p className="font-light">
             Terrenos, edificios y activos de alto valor que no llegan al mercado abierto. En 45 años hemos
             estructurado y ganado las licitaciones más complejas de Chile — con el respaldo, la red y el criterio que
             cada operación exige.
           </p>
-          <p>
+          <p className="font-light">
             La licitación no es solo una forma de vender — es la forma más inteligente de hacerlo. Es un proceso
             transparente, con plazo definido y un objetivo claro: maximizar el valor de tu activo. Puedes licitar
             cualquier tipo de propiedad y en 4 a 7 meses tienes el negocio cerrado.
@@ -85,7 +86,7 @@ const Licitaciones = () => {
               <div className="bg-[#3e3e3e] text-center text-white rounded-full py-3 px-6 -mx-4 -mt-4 mb-8 font-semibold tracking-wide uppercase shadow-md">
                 LICITACIÓN
               </div>
-              <ul className="space-y-4 text-base md:text-lg list-disc list-inside marker:text-[#0091A4]">
+              <ul className="space-y-4 text-base md:text-lg list-disc list-inside marker:text-[#0091A4] font-medium">
                 {comparativaLicitacion.map((item, index) => <li key={index}>{item}</li>)}
               </ul>
             </div>
@@ -94,7 +95,7 @@ const Licitaciones = () => {
               <div className="bg-[#3e3e3e] text-center text-white rounded-full py-3 px-6 -mx-4 -mt-4 mb-8 font-semibold tracking-wide uppercase shadow-md">
                 VENTA DIRECTA
               </div>
-              <ul className="space-y-4 text-base md:text-lg list-disc list-inside marker:text-[#0091A4]">
+              <ul className="space-y-4 text-base md:text-lg list-disc list-inside marker:text-[#0091A4] font-medium">
                 {comparativaVentaDirecta.map((item, index) => <li key={index}>{item}</li>)}
               </ul>
             </div>
@@ -106,8 +107,8 @@ const Licitaciones = () => {
       <section className="py-16 px-6 md:px-20">
         <div className="container mx-auto max-w-7xl">
           <div className="bg-[#0091A4] text-center text-white rounded-2xl p-10 md:p-14 flex flex-col items-center shadow-2xl transition-transform hover:scale-[1.01]">
-            <h4 className="text-3xl md:text-4xl font-medium mb-4">Accede antes que el mercado</h4>
-            <p className="text-lg md:text-xl font-medium max-w-4xl mb-10">
+            <h4 className="text-3xl md:text-4xl font-semibold mb-4">Accede antes que el mercado</h4>
+            <p className="text-lg md:text-xl font-light max-w-4xl mb-10 text-cyan-50">
               Recibe oportunidades de licitación que no se publican abiertamente. Solo para inversionistas calificados.
             </p>
             <a href="#" className="bg-white text-[#0091A4] hover:bg-gray-100 font-bold text-lg px-12 py-4 rounded-xl shadow-md transition duration-300 active:scale-95">
