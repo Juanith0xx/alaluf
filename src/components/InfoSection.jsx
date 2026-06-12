@@ -1,21 +1,26 @@
 import imagen from "../assets/hero6.jpg";
-import img2 from "../assets/imagen_1.png"; // Ya la tenías importada, ahora la usaremos
+import img2 from "../assets/imagen_1.png";
 
 const InfoSection = () => {
   return (
-    <section className="w-full bg-[#f3f3f3] py-12 md:py-15">
-      <div className="max-w-7xl mx-auto px-6 space-y-20">
+    <section className="w-full bg-[#f3f3f3] py-12 md:py-20 overflow-hidden">
+      {/* Ajustamos el padding y la separación vertical para distintos tamaños */}
+      <div className="max-w-7xl mx-auto px-6 space-y-16 lg:space-y-32">
 
-        {/* BLOQUE 1 - Usa "imagen" */}
-        <div className="relative flex flex-col md:flex-row items-center gap-10">
+        {/* BLOQUE 1 */}
+        {/* Cambiamos md:flex-row a lg:flex-row para que en tablet siga siendo columna */}
+        <div className="relative flex flex-col lg:flex-row items-center">
           
-          <div className="bg-black text-white p-8 md:p-12 rounded-sm shadow-2xl md:absolute md:left-0 md:w-[700px] z-10">
-            <h2 className="text-2xl md:text-[36px] font-medium font-[Outfit] mb-4">
-              <span>Tienes un activo.</span><br></br>
-              <span className="text-[#0091A4]">Alaluf lo gestiona con criterio y
-                <br></br> visión a futuro.</span>
+          {/* El recuadro negro. Se posiciona absoluto solo en pantallas grandes (lg) */}
+          <div className="bg-black text-white p-8 md:p-10 lg:p-12 rounded-sm shadow-2xl w-full lg:absolute lg:left-0 lg:w-[55%] xl:w-[700px] z-10 order-2 lg:order-1 -mt-10 lg:mt-0 relative">
+            <h2 className="text-2xl md:text-3xl lg:text-[36px] font-medium font-[Outfit] mb-4">
+              <span>Tienes un activo.</span><br />
+              <span className="text-[#0091A4]">
+                Alaluf lo gestiona con criterio y
+                <br className="hidden lg:block" /> visión a futuro.
+              </span>
             </h2>
-            <p className="text-sm md:text-base font-[Outfit] text-white/80 leading-relaxed mb-6">
+            <p className="text-sm md:text-base lg:text-lg font-[Outfit] text-white/80 leading-relaxed mb-2 lg:mb-6">
               Tu propiedad merece más que un aviso en un portal. En Alaluf,
               cada propiedad entra como un activo y sale como una decisión
               bien tomada. Diseñamos contigo la estrategia correcta — para
@@ -24,36 +29,38 @@ const InfoSection = () => {
             </p>
           </div>
 
-          <div className="w-full md:w-[50%] md:ml-auto">
+          {/* La imagen ocupa el 100% en móvil/tablet y el 50% en escritorio */}
+          <div className="w-full lg:w-[60%] lg:ml-auto order-1 lg:order-2">
             <img
-              src={img2} // PRIMERA IMAGEN
+              src={img2}
               alt="Gestión de activos"
-              className="w-full h-[320px] md:h-[380px] object-cover"
+              className="w-full h-[300px] md:h-[450px] object-cover rounded-sm shadow-md"
             />
           </div>
         </div>
 
-        {/* BLOQUE 2 - Usa "img2" */}
-        <div className="relative flex flex-col md:flex-row items-center gap-10">
+        {/* BLOQUE 2 */}
+        <div className="relative flex flex-col lg:flex-row items-center">
           
-          <div className="w-full md:w-[56%]">
+          <div className="w-full lg:w-[60%]">
             <img
-              src={imagen} // SEGUNDA IMAGEN (img2)
+              src={imagen}
               alt="Contacto y asesoría"
-              className="w-full h-[300px] md:h-[380px] object-cover"
+              className="w-full h-[300px] md:h-[450px] object-cover rounded-sm shadow-md"
             />
           </div>
 
-          <div className="bg-[#e9e9e9] p-8 md:p-12 rounded-sm shadow-xl md:absolute md:right-0 md:w-[650px] z-10">
-            <h2 className="text-2xl md:text-[36px] font-medium mb-4 text-gray-800 font-[Outfit] whitespace-nowrap">
+          <div className="bg-[#e9e9e9] p-8 md:p-10 lg:p-12 rounded-sm shadow-xl w-full lg:absolute lg:right-0 lg:w-[55%] xl:w-[650px] z-10 -mt-10 lg:mt-0 relative">
+            {/* Quitamos whitespace-nowrap fijo para evitar desbordamientos en móvil */}
+            <h2 className="text-2xl md:text-3xl lg:text-[36px] font-medium mb-4 text-gray-800 font-[Outfit] whitespace-normal sm:whitespace-nowrap">
               ¿Tienes alguna pregunta?
             </h2>
-            <p className="text-sm md:text-xl text-gray-600 leading-relaxed font-light mb-6 font-[Outfit]">
-              <span className="font-bold text-black">Lo primero es entenderte a ti:</span> tus objetivos, tu <br></br>situación y 
-              asesorarte en el camino más inteligente para<br></br> 
-              llegar donde quieres.
+            <p className="text-sm md:text-lg lg:text-xl text-gray-600 leading-relaxed font-light mb-6 font-[Outfit]">
+              <span className="font-bold text-black">Lo primero es entenderte a ti:</span> tus objetivos, tu 
+              <br className="hidden md:block" /> situación y asesorarte en el camino más inteligente para
+              <br className="hidden md:block" /> llegar donde quieres.
             </p>
-            <button className="text-[#24B6C1] font-light text-xl font-[Outfit] flex items-center gap-2 hover:gap-3 transition-all">
+            <button className="text-[#24B6C1] font-light text-lg md:text-xl font-[Outfit] flex items-center gap-2 hover:gap-3 transition-all">
               INICIAR LA CONVERSACIÓN
             </button>
           </div>
