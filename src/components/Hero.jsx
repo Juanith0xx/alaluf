@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import SearchBar from "./SearchBar"; // Importación del componente
@@ -36,12 +37,12 @@ const slides = [
         tiempos y hace crecer tu negocio.
       </p>
       <div className="flex flex-col md:flex-row items-start md:items-center gap-y-4 md:gap-x-8 mt-6 md:mt-8">
-        <a 
-          href="/tu-ruta-de-busqueda" 
-          className="text-[#0091A4] font-bold text-sm md:text-base uppercase tracking-wider hover:text-[#24B6C1] transition-all whitespace-normal md:whitespace-nowrap"
+        <Link
+        to="/buscar?tipo_prop=7&obj=1"
+        className="text-[#0091A4] font-bold text-sm md:text-base uppercase tracking-wider hover:text-[#24B6C1] transition-all whitespace-normal md:whitespace-nowrap cursor-pointer"
         >
-          QUIERO ENCONTRAR
-        </a>
+        QUIERO ENCONTRAR
+      </Link>
       </div>
       </div>  
     ),
@@ -72,19 +73,19 @@ const slides = [
         tu negocio y cliente para que cada metro cuadrado contribuya a tu rentabilidad. 
       </p>
       <div className="flex flex-col md:flex-row items-start md:items-center gap-y-4 md:gap-x-8 mt-6 md:mt-8">
-          <a 
-            href="/ruta-local" 
+          <Link
+            to="/buscar?tipo_prop=4A&obj=1"
             className="text-[#0091A4] font-bold text-sm md:text-base uppercase tracking-wider hover:text-[#24B6C1] transition-all whitespace-normal md:whitespace-nowrap"
           >
             Quiero encontrar mi local 
-          </a>
+          </Link>
 
-          <a 
-            href="/ruta-oficina" 
+          <Link
+            to="/buscar?tipo_prop=3A&obj=1" 
             className="text-[#0091A4] font-bold text-sm md:text-base uppercase tracking-wider hover:text-[#24B6C1] transition-all whitespace-normal md:whitespace-nowrap"
           >
             Quiero encontrar mi oficina
-          </a>
+          </Link>
         </div>
       </div>
     ),
@@ -114,21 +115,22 @@ const slides = [
         con el criterio de quien conoce cada barrio desde hace 45 años y la inteligencia para que tomes siempre la mejor decisión.
       </p>
       <div className="flex flex-col md:flex-row items-start md:items-center gap-y-4 md:gap-x-8 mt-6 md:mt-8">
-          <a 
-            href="/ruta-local" 
+          <Link
+            to="/buscar?tipo_prop=1A&obj=1" 
             className="text-[#0091A4] font-bold text-sm md:text-base uppercase tracking-wider hover:text-[#24B6C1] transition-all whitespace-normal md:whitespace-nowrap"
           >
             QUIERO COMPRAR   
-          </a>
+          </Link>
 
-          <a 
-            href="/ruta-oficina" 
+          <Link
+            to="/buscar?tipo_prop=1A&obj=2" 
             className="text-[#0091A4] font-bold text-sm md:text-base uppercase tracking-wider hover:text-[#24B6C1] transition-all whitespace-normal md:whitespace-nowrap"
           >
             QUIERO ARRENDAR  
-          </a>
-           <a 
-            href="/ruta-oficina" 
+          </Link>
+          
+           <a
+            href="/vender" 
             className="text-[#0091A4] font-bold text-sm md:text-base uppercase tracking-wider hover:text-[#24B6C1] transition-all whitespace-normal md:whitespace-nowrap"
           >
              QUIERO VENDER
@@ -164,12 +166,12 @@ const slides = [
         — porque el potencial no está en la superficie. Está en estudiarlo. 
       </p>
       <div className="flex flex-col md:flex-row items-start md:items-center gap-y-4 md:gap-x-8 mt-6 md:mt-8">
-        <a 
-          href="/tu-ruta-de-busqueda" 
+        <Link
+          to="/buscar?tipo_prop=6A&obj=2" 
           className="text-[#0091A4] font-bold text-sm md:text-base uppercase tracking-wider hover:text-[#24B6C1] transition-all whitespace-normal md:whitespace-nowrap"
         >
           QUIERO EVALUAR UN TERRENO
-        </a>
+        </Link>
       </div>
       </div>
     ),

@@ -11,7 +11,7 @@ const SearchBar = () => {
   const [openDropdown, setOpenDropdown] = useState(false);
   const [accionActiva, setAccionActiva] = useState("Arrendar");
   
-  // Estado para manejar las subcategorías en acordeón (ideal para pantallas táctiles)
+  // Estado para manejar las subcategorías en acordeón (solo para móvil)
   const [activeCategory, setActiveCategory] = useState(null);
   
   const dropdownRef = useRef(null);
@@ -197,7 +197,8 @@ const SearchBar = () => {
         { label: "Casa Comercial", id: 5 },
         { label: "Hotelería", id: 13 },
         { label: "Edificios Corporativos", id: 12 },
-        { label: "Propiedades con Renta",id: 51}
+        //{ label: "Propiedades con Renta",id: 51}
+        //{ label: "Estacionamientos",id: 50}
       ] 
     },
     { 
@@ -216,13 +217,7 @@ const SearchBar = () => {
         { label: "Terreno Industrial", id: 7 }         
       ] 
     },
-    { 
-      nombre: "Otros", 
-      sub: [
-        { label: "Estacionamientos",id: 50}
-      ] 
-    },
-  ];
+      ];
 
   const filteredComunas = searchQuery.length > 1 
     ? comunasDataset.filter(c => c.label.toLowerCase().includes(searchQuery.toLowerCase()))
@@ -308,47 +303,83 @@ const SearchBar = () => {
           <AnimatePresence>
             {openDropdown && (
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 10 }}
-                className="absolute top-full mt-3 left-0 bg-[#1a1a1a]/95 backdrop-blur-2xl p-4 shadow-2xl w-full sm:w-72 border border-white/10 rounded-2xl z-50 max-h-72 overflow-y-auto"
+                className="absolute top-full mt-3 left-0 bg-[#1a1a1a]/95 backdrop-blur-2xl p-4 shadow-2xl w-full sm:w-72 border border-white/10 rounded-2xl z-50 max-h-72 overflow-y-visible sm:overflow-visible overflow-x-visible"
               >
-                {!activeCategory ? (
+                
+                {/* 🌟 VISTA EXCLUSIVA MÓVIL (Acordeón de clicks) 🌟 */}
+                <div className="sm:hidden overflow-y-auto max-h-60">
+                  {!activeCategory ? (
+                    <ul className="space-y-1">
+                      {propiedades.map((prop, i) => (
+                        <li key={i} className="relative">
+                          <div 
+                            onClick={() => setActiveCategory(prop)}
+                            className="w-full text-left px-4 py-3 rounded-xl hover:bg-[#24B6C1]/10 text-white/80 transition flex items-center justify-between cursor-pointer"
+                          >
+                            <span className="text-sm font-semibold">{prop.nombre}</span>
+                            <ChevronRight size={14} className="text-gray-400" />
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <div>
+                      <button 
+                        onClick={() => setActiveCategory(null)}
+                        className="flex items-center gap-2 text-xs font-bold text-[#24B6C1] mb-3 px-2 py-1 hover:underline uppercase tracking-wider"
+                      >
+                        ← Volver atrás
+                      </button>
+                      <ul className="space-y-0.5">
+                        {activeCategory.sub.map((sub, j) => (
+                          <li key={j} 
+                            onClick={() => { 
+                              setTipoPropiedad(sub); 
+                              setOpenDropdown(false); 
+                              setActiveCategory(null);
+                            }}
+                            className="flex items-center justify-between px-4 py-3 rounded-lg cursor-pointer text-sm text-gray-300 hover:bg-[#24B6C1]/10 hover:text-[#24B6C1] whitespace-nowrap"
+                          >
+                            {sub.label} {tipoPropiedad?.id === sub.id && <Check size={14} className="text-[#24B6C1]" />}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+
+                {/* 🌟 VISTA EXCLUSIVA DESKTOP (Fly-out hacia la derecha) 🌟 */}
+                <div className="hidden sm:block">
                   <ul className="space-y-1">
                     {propiedades.map((prop, i) => (
-                      <li key={i} className="relative">
-                        <div 
-                          onClick={() => setActiveCategory(prop)}
-                          className="w-full text-left px-4 py-3 rounded-xl hover:bg-[#24B6C1]/10 text-white/80 hover:text-[#24B6C1] transition flex items-center justify-between cursor-pointer"
-                        >
-                          <span className="text-sm font-semibold">{prop.nombre}</span>
-                          <ChevronRight size={14} className="text-gray-400" />
+                      <li key={i} className="group relative">
+                        <div className="w-full text-left px-4 py-3 rounded-xl hover:bg-[#24B6C1]/10 text-white/80 transition flex items-center justify-between cursor-pointer">
+                          <span className="text-sm font-semibold group-hover:text-[#24B6C1] transition-colors">{prop.nombre}</span>
+                          <ChevronRight size={14} className="text-gray-400 group-hover:text-[#24B6C1] transition-colors" />
+                        </div>
+
+                        {/* SUBMENÚ QUE NACE A LA DERECHA */}
+                        <div className="hidden group-hover:block absolute left-full top-0 ml-2 bg-[#1a1a1a]/95 backdrop-blur-2xl p-2 shadow-2xl w-60 border border-white/10 rounded-2xl z-50">
+                          <ul className="space-y-0.5">
+                            {prop.sub.map((sub, j) => (
+                              <li key={j} 
+                                onClick={(e) => { 
+                                  e.stopPropagation(); // Evita que el click cierre componentes padres incorrectamente
+                                  setTipoPropiedad(sub); 
+                                  setOpenDropdown(false); 
+                                }}
+                                className="flex items-center justify-between px-4 py-3 rounded-lg cursor-pointer text-sm text-gray-300 hover:bg-[#24B6C1]/10 hover:text-[#24B6C1] hover:translate-x-1 transition-all duration-300 whitespace-nowrap"
+                              >
+                                {sub.label} {tipoPropiedad?.id === sub.id && <Check size={14} className="text-[#24B6C1]" />}
+                              </li>
+                            ))}
+                          </ul>
                         </div>
                       </li>
                     ))}
                   </ul>
-                ) : (
-                  /* Acordeón táctil desplegable para sub-categorías */
-                  <div>
-                    <button 
-                      onClick={() => setActiveCategory(null)}
-                      className="flex items-center gap-2 text-xs font-bold text-[#24B6C1] mb-3 px-2 py-1 hover:underline uppercase tracking-wider"
-                    >
-                      ← Volver atrás
-                    </button>
-                    <ul className="space-y-0.5">
-                      {activeCategory.sub.map((sub, j) => (
-                        <li key={j} 
-                          onClick={() => { 
-                            setTipoPropiedad(sub); 
-                            setOpenDropdown(false); 
-                            setActiveCategory(null);
-                          }}
-                          className="flex items-center justify-between px-4 py-3 rounded-lg cursor-pointer text-sm text-gray-300 hover:bg-[#24B6C1]/10 hover:text-[#24B6C1] whitespace-nowrap"
-                        >
-                          {sub.label} {tipoPropiedad?.id === sub.id && <Check size={14} className="text-[#24B6C1]" />}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
+                </div>
+
               </motion.div>
             )}
           </AnimatePresence>
