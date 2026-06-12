@@ -59,25 +59,25 @@ const EspecialPorArea = () => {
 
   return (
     <section
-      className="relative py-20 bg-cover bg-center text-white"
+      className="relative py-12 md:py-20 bg-cover bg-center text-white overflow-hidden"
       style={{ backgroundImage: `url(${fondo})` }}
     >
-      <div className="relative z-10 max-w-6xl mx-auto px-6">
+      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6">
         
-        {/* Barra de Tabs con líneas */}
-        <div className="relative flex items-center justify-center mb-8 font-[Outfit] text-sm md:text-base">
-          {/* Línea izquierda */}
-          <div className="absolute -left-50 top-1/2 -translate-y-1/2 h-[1px] bg-[#05FFEA] w-[44%]"></div>
+        {/* Barra de Tabs (Con scroll horizontal en móviles) */}
+        <div className="relative flex items-center justify-center mb-8 md:mb-12 font-[Outfit] text-sm md:text-base w-full">
+          {/* Línea izquierda (solo desktop) */}
+          <div className="hidden lg:block absolute -left-50 top-1/2 -translate-y-1/2 h-[1px] bg-[#05FFEA] w-[44%]"></div>
 
-          {/* Tabs */}
-          <div className="relative flex gap-8 px-6">
+          {/* Tabs con desbordamiento controlado */}
+          <div className="relative flex gap-6 md:gap-8 px-2 md:px-6 overflow-x-auto whitespace-nowrap scrollbar-hide w-full lg:w-auto justify-start lg:justify-center pb-2">
             {tabs.map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 className={`transition pb-1 ${
                   activeTab === tab
-                    ? "text-cyan-400 font-semibold"
+                    ? "text-cyan-400 font-semibold border-b border-cyan-400"
                     : "text-gray-300 hover:text-white"
                 }`}
               >
@@ -86,26 +86,26 @@ const EspecialPorArea = () => {
             ))}
           </div>
 
-          {/* Línea derecha */}
-          <div className="absolute -right-50 top-1/2 -translate-y-1/2 h-[1px] bg-[#05FFEA] w-[44%]"></div>
+          {/* Línea derecha (solo desktop) */}
+          <div className="hidden lg:block absolute -right-50 top-1/2 -translate-y-1/2 h-[1px] bg-[#05FFEA] w-[44%]"></div>
         </div>
 
         {/* Título principal */}
-        <div className="text-center mb-12 font-[Outfit]">
-          <h2 className="text-2xl md:text-[36px] font-medium text-[#0091A4]">
+        <div className="text-center mb-8 md:mb-12 font-[Outfit] px-2">
+          <h2 className="text-2xl md:text-[36px] font-medium text-[#0091A4] leading-tight mb-2">
             ESPECIAL POR ÁREA
           </h2>
-          <p className="text-gray-300">
+          <p className="text-gray-300 text-sm md:text-base">
             Propiedades seleccionadas por nuestro equipo
           </p>
         </div>
 
-        {/* Carrusel */}
-        <div className="relative flex items-center justify-center gap-6">
-          {/* Flecha izquierda */}
+        {/* Carrusel (Padding top extra para que el scale y el translate-y no corten la carta) */}
+        <div className="relative flex items-center justify-center gap-6 pt-10 md:pt-14 pb-8 md:pb-12">
+          {/* Flecha izquierda (Desktop) */}
           <button
             onClick={handlePrev}
-            className="hidden md:flex absolute -left-16 text-cyan-400 hover:scale-110 transition"
+            className="hidden md:flex absolute -left-12 lg:-left-16 text-cyan-400 hover:scale-110 transition z-30"
           >
             <ArrowLeft size={36} />
           </button>
@@ -116,7 +116,7 @@ const EspecialPorArea = () => {
 
             return (
               <motion.div
-                key={index}
+                key={`${index}-${offset}`}
                 initial={{ scale: 0.85, opacity: 0.6 }}
                 animate={{
                   scale: isActive ? 1.25 : 0.85,
@@ -124,55 +124,55 @@ const EspecialPorArea = () => {
                   y: isActive ? -20 : 0,
                 }}
                 transition={{ duration: 0.5 }}
-                className={`flex flex-col md:flex-row shadow-2xl overflow-hidden relative ${
+                className={`flex flex-col md:flex-row shadow-2xl overflow-hidden relative rounded-xl md:rounded-none ${
                   isActive
-                    ? "z-20 md:w-[480px]"
-                    : "z-10 md:w-[300px] grayscale"
+                    ? "z-20 flex w-[260px] sm:w-[320px] md:w-[480px]"
+                    : "z-10 hidden md:flex md:w-[300px] grayscale"
                 }`}
               >
-                {/* Imagen */}
-                <div className="relative w-full md:w-1/2">
+                {/* Imagen (Ajustada para móvil) */}
+                <div className="relative w-full h-[180px] sm:h-[220px] md:h-auto md:w-1/2">
                   <img
                     src={cards[index].img}
                     alt="Propiedad"
                     className="w-full h-full object-cover"
                   />
-                  <span className="absolute top-4 left-4 bg-white text-black text-sm px-4 py-1 font-medium font-[Outfit]">
+                  <span className="absolute top-3 left-3 md:top-4 md:left-4 bg-white text-black text-xs md:text-sm px-3 md:px-4 py-1 font-medium font-[Outfit]">
                     {cards[index].tipo}
                   </span>
                 </div>
 
-                {/* Panel derecho */}
-                <div className="md:w-1/2 bg-[#3a3a3a]/95 p-6 flex flex-col justify-center font-[Outfit]">
-                  <h3 className="text-lg md:text-xl font-semibold mb-4">
+                {/* Panel derecho (Textos fluidos) */}
+                <div className="w-full md:w-1/2 bg-[#3a3a3a]/95 p-5 md:p-6 flex flex-col justify-center font-[Outfit]">
+                  <h3 className="text-base sm:text-lg md:text-xl font-semibold mb-3 md:mb-4 leading-tight">
                     {cards[index].titulo}
                   </h3>
 
-                  <div className="flex items-center gap-2 text-gray-300 mb-2">
-                    <MapPin size={18} className="text-cyan-400" />
-                    {cards[index].ubicacion}
+                  <div className="flex items-center gap-2 text-gray-300 mb-2 text-xs sm:text-sm md:text-base">
+                    <MapPin size={16} className="text-cyan-400 shrink-0" />
+                    <span className="truncate">{cards[index].ubicacion}</span>
                   </div>
 
-                  <div className="flex items-center gap-2 text-gray-300 mb-6">
-                    <Move size={18} className="text-cyan-400" />
+                  <div className="flex items-center gap-2 text-gray-300 mb-4 md:mb-6 text-xs sm:text-sm md:text-base">
+                    <Move size={16} className="text-cyan-400 shrink-0" />
                     {cards[index].size}
                   </div>
 
-                  <div className="w-full h-[1px] bg-cyan-400 mb-6"></div>
+                  <div className="w-full h-[1px] bg-cyan-400 mb-4 md:mb-6"></div>
 
-                  <div className="mb-6">
-                    <p className="text-gray-300">Precio</p>
-                    <p className="text-cyan-400 text-xl font-semibold">
+                  <div className="mb-4 md:mb-6">
+                    <p className="text-gray-300 text-xs sm:text-sm">Precio</p>
+                    <p className="text-cyan-400 text-lg md:text-xl font-semibold">
                       {cards[index].precio}
                     </p>
                   </div>
 
-                  <div className="flex items-center gap-4">
-                    <button className="flex-1 border border-cyan-400 text-white py-2 hover:bg-cyan-400/10 transition">
+                  <div className="flex items-center gap-3 md:gap-4">
+                    <button className="flex-1 border border-cyan-400 text-white text-xs sm:text-sm py-2 hover:bg-cyan-400/10 transition">
                       Ver ficha
                     </button>
                     <button className="p-2 border border-cyan-400 hover:bg-cyan-400/10 transition">
-                      <Phone size={20} className="text-cyan-400" />
+                      <Phone size={18} className="text-cyan-400 md:w-5 md:h-5" />
                     </button>
                   </div>
                 </div>
@@ -180,23 +180,39 @@ const EspecialPorArea = () => {
             );
           })}
 
-          {/* Flecha derecha */}
+          {/* Flecha derecha (Desktop) */}
           <button
             onClick={handleNext}
-            className="hidden md:flex absolute -right-16 text-cyan-400 hover:scale-110 transition"
+            className="hidden md:flex absolute -right-12 lg:-right-16 text-cyan-400 hover:scale-110 transition z-30"
           >
             <ArrowRight size={36} />
           </button>
         </div>
 
+        {/* 🌟 Controles de navegación táctil (Solo Móvil) */}
+        <div className="flex md:hidden items-center justify-center gap-8 mt-2">
+          <button
+            onClick={handlePrev}
+            className="text-cyan-400 bg-white/10 p-2 rounded-full hover:bg-cyan-400/20 transition"
+          >
+            <ArrowLeft size={24} />
+          </button>
+          <button
+            onClick={handleNext}
+            className="text-cyan-400 bg-white/10 p-2 rounded-full hover:bg-cyan-400/20 transition"
+          >
+            <ArrowRight size={24} />
+          </button>
+        </div>
+
         {/* Indicadores */}
-        <div className="flex justify-center gap-3 mt-6">
+        <div className="flex justify-center gap-3 mt-6 md:mt-8">
           {cards.map((_, index) => (
             <button
               key={index}
               onClick={() => setActiveIndex(index)}
-              className={`w-3 h-3 rounded-full ${
-                index === activeIndex ? "bg-[#05FFEA]" : "bg-white/50"
+              className={`w-2.5 h-2.5 md:w-3 md:h-3 rounded-full transition-all ${
+                index === activeIndex ? "bg-[#05FFEA] scale-110" : "bg-white/50 hover:bg-white/70"
               }`}
             />
           ))}

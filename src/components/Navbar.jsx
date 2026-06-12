@@ -191,12 +191,18 @@ const NavbarDesktop = ({
 /* =========================
    MOBILE NAVBAR
 ========================= */
-const NavbarMobile = ({ 
-  openMenu, setOpenMenu, 
-  openMobileTools, setOpenMobileTools,
-  searchCode, setSearchCode, onSearch 
+const NavbarMobile = ({
+  openMenu,
+  setOpenMenu,
+  openMobileTools,
+  setOpenMobileTools,
+  openMobileServices,
+  setOpenMobileServices,
+  searchCode,
+  setSearchCode,
+  onSearch
 }) => (
-  <nav className="fixed w-full z-50 bg-black/60 text-white font-[Outfit] pt-6 lg:hidden">
+  <nav className="fixed w-screen z-50 bg-black/60 text-white font-[Outfit] pt-6 pb-4 lg:hidden">
     <div className="flex items-center justify-between px-6 py-4">
       <Link to="/" className="flex items-center">
         <img
@@ -220,15 +226,126 @@ const NavbarMobile = ({
           className="bg-black/80 backdrop-blur-2xl px-6 pb-6 border-t border-white/10"
         >
           <div className="flex flex-col gap-5 text-base mt-4">
-            <span className="cursor-pointer hover:text-teal-400 transition">Servicios</span>
+
+            <div className="flex flex-col">
+              <span 
+                onClick={() => setOpenMobileServices(!openMobileServices)}
+                className="cursor-pointer hover:text-teal-400 transition flex items-center justify-between">
+                Servicios <ChevronDown
+  size={16}
+  className={`transition-transform duration-200 ${
+    openMobileServices
+      ? "rotate-180 text-teal-400"
+      : "opacity-70"
+  }`}
+/>
+              </span>
+              <AnimatePresence>
+                {openMobileServices && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="pl-4 mt-3 space-y-3 border-l border-white/10 text-sm font-medium overflow-hidden"
+                  >
+                    <Link
+  to="/licitaciones"
+  onClick={() => {
+    setOpenMenu(false);
+    setOpenMobileServices(false);
+  }}
+  className="block hover:text-teal-400 transition py-1"
+>
+  Licitaciones
+</Link>
+
+<Link
+  to="/industrial"
+  onClick={() => {
+    setOpenMenu(false);
+    setOpenMobileServices(false);
+  }}
+  className="block hover:text-teal-400 transition py-1"
+>
+  Industrial
+</Link>
+
+<Link
+  to="/terrenos_proyectos"
+  onClick={() => {
+    setOpenMenu(false);
+    setOpenMobileServices(false);
+  }}
+  className="block hover:text-teal-400 transition py-1"
+>
+  Terrenos para Proyectos
+</Link>
+
+<Link
+  to="/comercial"
+  onClick={() => {
+    setOpenMenu(false);
+    setOpenMobileServices(false);
+  }}
+  className="block hover:text-teal-400 transition py-1"
+>
+  Comercial
+</Link>
+
+<Link
+  to="/residencial"
+  onClick={() => {
+    setOpenMenu(false);
+    setOpenMobileServices(false);
+  }}
+  className="block hover:text-teal-400 transition py-1"
+>
+  Residencial
+</Link>
+
+<Link
+  to="/administracion-activo"
+  onClick={() => {
+    setOpenMenu(false);
+    setOpenMobileServices(false);
+  }}
+  className="block hover:text-teal-400 transition py-1"
+>
+  Administración de Arriendos
+</Link>
+
+<Link
+  to="/tasacion-activo"
+  onClick={() => {
+    setOpenMenu(false);
+    setOpenMobileServices(false);
+  }}
+  className="block hover:text-teal-400 transition py-1"
+>
+  Tasación de Activos
+</Link>
+
+<Link
+  to="/club_deals_inversiones"
+  onClick={() => {
+    setOpenMenu(false);
+    setOpenMobileServices(false);
+  }}
+  className="block hover:text-teal-400 transition py-1"
+>
+  Club Deals e Inversiones
+</Link>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
             <Link to="/nosotros" onClick={() => setOpenMenu(false)} className="hover:text-teal-400 transition">Nosotros</Link>
             <a href="https://alaluf.cl/pressroom2.php" className="hover:text-teal-400 transition">Newsletter</a>
             
             <div className="flex flex-col">
               <span 
                 onClick={() => setOpenMobileTools(!openMobileTools)} 
-                className="cursor-pointer hover:text-teal-400 transition flex items-center justify-between"
-              >
+                className="cursor-pointer hover:text-teal-400 transition flex items-center justify-between">
                 Herramientas <ChevronDown size={16} className={`transition-transform duration-200 ${openMobileTools ? "rotate-180 text-teal-400" : "opacity-70"}`} />
               </span>
               <AnimatePresence>
@@ -299,6 +416,7 @@ const Navbar = () => {
   const [openDropdown, setOpenDropdown] = useState(false);
   const [openToolsDropdown, setOpenToolsDropdown] = useState(false); 
   const [openMobileTools, setOpenMobileTools] = useState(false); 
+  const [openMobileServices, setOpenMobileServices] = useState(false);
   const [searchCode, setSearchCode] = useState(""); 
   const navigate = useNavigate();
 
@@ -322,14 +440,16 @@ const Navbar = () => {
         onSearch={handleSearch}
       />
       <NavbarMobile
-        openMenu={openMenu}
-        setOpenMenu={setOpenMenu}
-        openMobileTools={openMobileTools}
-        setOpenMobileTools={setOpenMobileTools}
-        searchCode={searchCode}
-        setSearchCode={setSearchCode}
-        onSearch={handleSearch}
-      />
+          openMenu={openMenu}
+          setOpenMenu={setOpenMenu}
+          openMobileTools={openMobileTools}
+          setOpenMobileTools={setOpenMobileTools}
+          openMobileServices={openMobileServices}
+          setOpenMobileServices={setOpenMobileServices}
+          searchCode={searchCode}
+          setSearchCode={setSearchCode}
+          onSearch={handleSearch}
+    />
     </>
   );
 };

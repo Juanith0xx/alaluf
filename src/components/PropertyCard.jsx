@@ -304,7 +304,7 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
             className="px-5 py-3 bg-[#24B6C1] text-white rounded-xl font-bold text-xs uppercase shadow-md hover:bg-cyan-600 transition"
             onClick={(e) => { e.stopPropagation(); navigate(`/propiedad/${item.codigo || item.id}`); }} 
           >
-            Ficha
+            Ver Ficha
           </button>
         </div>
       </div>

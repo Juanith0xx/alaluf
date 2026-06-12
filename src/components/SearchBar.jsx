@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, MapPin, ChevronDown, Check, ChevronRight } from "lucide-react";
-import { Link, useNavigate } from 'react-router-dom';
+import { Search, ChevronDown, Check, ChevronRight } from "lucide-react";
+import { useNavigate } from 'react-router-dom';
 
 const SearchBar = () => {
   const [tipoPropiedad, setTipoPropiedad] = useState(null);
@@ -11,11 +11,13 @@ const SearchBar = () => {
   const [openDropdown, setOpenDropdown] = useState(false);
   const [accionActiva, setAccionActiva] = useState("Arrendar");
   
+  // Estado para manejar las subcategorías en acordeón (ideal para pantallas táctiles)
+  const [activeCategory, setActiveCategory] = useState(null);
+  
   const dropdownRef = useRef(null);
   const suggestionRef = useRef(null);
   const navigate = useNavigate();
 
-  // 🌟 DATASET COMPLETO DE COMUNAS ACTUALIZADO
   const comunasDataset = [
     { label: "Iquique", id: "1101" },
     { label: "Alto Hospicio", id: "1211" },
@@ -217,8 +219,6 @@ const SearchBar = () => {
     { 
       nombre: "Otros", 
       sub: [
-        
-        
         { label: "Estacionamientos",id: 50}
       ] 
     },
@@ -229,7 +229,6 @@ const SearchBar = () => {
     : [];
 
   const handleSearch = () => {
-    // 🌟 1. Si está en la pestaña "Vender", redirige directo al formulario
     if (accionActiva === "Vender") {
       navigate('/vender');
       return;
@@ -262,7 +261,10 @@ const SearchBar = () => {
 
   useEffect(() => {
     const handleClickOutside = (e) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) setOpenDropdown(false);
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setOpenDropdown(false);
+        setActiveCategory(null);
+      }
       if (suggestionRef.current && !suggestionRef.current.contains(e.target)) setShowSuggestions(false);
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -270,22 +272,21 @@ const SearchBar = () => {
   }, []);
 
   return (
-    <div className="relative z-30 px-4 pt-22 font-[Outfit]">
+    <div className="relative z-30 px-4 pt-4 md:pt-22 font-[Outfit]">
       <div className="max-w-6xl mx-auto bg-gray-200/20 backdrop-blur-md p-4 flex flex-wrap items-center gap-3 justify-center rounded-[40px] border border-white/20 shadow-2xl">
         
-        {/* Selector de Objetivo */}
-        <div className="flex bg-black/60 p-1 rounded-xl border border-white/5">
+        {/* Selector de Acción adaptado a móviles */}
+        <div className="flex flex-wrap sm:flex-nowrap bg-black/60 p-1 rounded-xl border border-white/5 justify-center gap-1 w-full sm:w-auto">
           {["Comprar", "Arrendar", "Vender"].map((accion) => (
             <button
               key={accion}
               onClick={() => {
                 setAccionActiva(accion);
-                // 🌟 2. Si presiona la pestaña "Vender", navega inmediatamente
                 if (accion === "Vender") {
                   navigate('/vender');
                 }
               }}
-              className={`px-6 py-3 rounded-lg text-sm font-medium transition-all duration-300 ${
+              className={`px-4 sm:px-6 py-3 rounded-lg text-xs sm:text-sm font-medium transition-all duration-300 whitespace-nowrap ${
                 accionActiva === accion ? "bg-[#24B6C1] text-white shadow-lg" : "text-white/60 hover:text-white"
               }`}
             >
@@ -294,7 +295,7 @@ const SearchBar = () => {
           ))}
         </div>
 
-        {/* Dropdown Tipo Propiedad */}
+        {/* Dropdown de Propiedad escalable */}
         <div className="relative w-full sm:w-56" ref={dropdownRef}>
           <button
             onClick={() => setOpenDropdown(!openDropdown)}
@@ -307,39 +308,54 @@ const SearchBar = () => {
           <AnimatePresence>
             {openDropdown && (
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 10 }}
-                className="absolute top-full mt-3 left-0 bg-[#1a1a1a]/95 backdrop-blur-2xl p-3 shadow-2xl w-72 border border-white/10 rounded-2xl z-50"
+                className="absolute top-full mt-3 left-0 bg-[#1a1a1a]/95 backdrop-blur-2xl p-4 shadow-2xl w-full sm:w-72 border border-white/10 rounded-2xl z-50 max-h-72 overflow-y-auto"
               >
-                <ul className="space-y-1">
-                  {propiedades.map((prop, i) => (
-                    <li key={i} className="relative group">
-                      <div className="w-full text-left px-4 py-3 rounded-xl hover:bg-[#24B6C1]/10 text-white/80 hover:text-[#24B6C1] transition flex items-center justify-between cursor-default">
-                        <span className="text-sm font-semibold">{prop.nombre}</span>
-                        <ChevronRight size={14} className="text-gray-600" />
-                      </div>
-                      
-                      {/* Contenedor invisible que actúa como puente */}
-                      <div className="absolute top-0 left-full pl-2 w-66 hidden group-hover:block z-50">
-                        <ul className="bg-[#1a1a1a] backdrop-blur-2xl rounded-xl border border-white/10 p-2 shadow-2xl space-y-0.5">
-                          {prop.sub.map((sub, j) => (
-                            <li key={j} onClick={() => { setTipoPropiedad(sub); setOpenDropdown(false); }}
-                              className="flex items-center justify-between px-4 py-2.5 rounded-lg cursor-pointer text-sm text-gray-300 hover:bg-[#24B6C1]/10 hover:text-[#24B6C1] whitespace-nowrap"
-                            >
-                              {sub.label} {tipoPropiedad?.id === sub.id && <Check size={14} className="text-[#24B6C1]" />}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-
-                    </li>
-                  ))}
-                </ul>
+                {!activeCategory ? (
+                  <ul className="space-y-1">
+                    {propiedades.map((prop, i) => (
+                      <li key={i} className="relative">
+                        <div 
+                          onClick={() => setActiveCategory(prop)}
+                          className="w-full text-left px-4 py-3 rounded-xl hover:bg-[#24B6C1]/10 text-white/80 hover:text-[#24B6C1] transition flex items-center justify-between cursor-pointer"
+                        >
+                          <span className="text-sm font-semibold">{prop.nombre}</span>
+                          <ChevronRight size={14} className="text-gray-400" />
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  /* Acordeón táctil desplegable para sub-categorías */
+                  <div>
+                    <button 
+                      onClick={() => setActiveCategory(null)}
+                      className="flex items-center gap-2 text-xs font-bold text-[#24B6C1] mb-3 px-2 py-1 hover:underline uppercase tracking-wider"
+                    >
+                      ← Volver atrás
+                    </button>
+                    <ul className="space-y-0.5">
+                      {activeCategory.sub.map((sub, j) => (
+                        <li key={j} 
+                          onClick={() => { 
+                            setTipoPropiedad(sub); 
+                            setOpenDropdown(false); 
+                            setActiveCategory(null);
+                          }}
+                          className="flex items-center justify-between px-4 py-3 rounded-lg cursor-pointer text-sm text-gray-300 hover:bg-[#24B6C1]/10 hover:text-[#24B6C1] whitespace-nowrap"
+                        >
+                          {sub.label} {tipoPropiedad?.id === sub.id && <Check size={14} className="text-[#24B6C1]" />}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </motion.div>
             )}
           </AnimatePresence>
         </div>
 
         {/* Input Comuna con Autocomplete */}
-        <div className="flex-1 min-w-[240px] relative" ref={suggestionRef}>
+        <div className="flex-1 min-w-[240px] w-full sm:w-auto relative" ref={suggestionRef}>
           <input
             type="text"
             value={searchQuery}
@@ -375,8 +391,9 @@ const SearchBar = () => {
           </AnimatePresence>
         </div>
 
+        {/* Botón de Búsqueda adaptado a ancho completo en móviles */}
         <button onClick={handleSearch}
-          className="px-8 py-4 bg-[#24B6C1] hover:bg-cyan-600 text-white rounded-xl flex items-center gap-2 transition-all group shadow-lg"
+          className="w-full sm:w-auto px-8 py-4 bg-[#24B6C1] hover:bg-cyan-600 text-white rounded-xl flex items-center justify-center gap-2 transition-all group shadow-lg"
         >
           <span className="text-sm font-bold">Buscar</span>
           <Search size={18} className="group-hover:scale-110 transition-transform" />

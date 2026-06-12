@@ -85,8 +85,6 @@ const stats = [
     potencial
     </>
   },
-
-
 ];
 
 const AnimatedNumber = ({ value, prefix = "", suffix = "" }) => {
@@ -142,13 +140,17 @@ const AnimatedNumber = ({ value, prefix = "", suffix = "" }) => {
 const StatsSection = () => {
   return (
     <section
-      className="relative w-full py-15 bg-cover bg-center"
+      // 🌟 Ajustado py-12 en móviles, manteniendo py-15 en escritorio
+      className="relative w-full py-12 lg:py-15 bg-cover bg-center"
       style={{ backgroundImage: `url(${fondo})` }}
     >
       {/* Overlay elegante */}
       <div className="absolute inset-0" />
 
-      <div className="relative z-10 max-w-7xl mx-auto px-46 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 text-center text-white">
+      {/* 🌟 AQUÍ ESTÁ LA MAGIA RESPONSIVA: 
+          - px-6 para móvil, md:px-12 para tablet, lg:px-46 intacto para desktop.
+          - gap-12 en móvil para dar respiro al apilarse, lg:gap-6 intacto. */}
+      <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-12 lg:px-46 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-12 sm:gap-10 lg:gap-6 text-center text-white">
         {stats.map((stat, index) => (
           <motion.div
             key={index}
@@ -158,11 +160,11 @@ const StatsSection = () => {
             viewport={{ once: true }}
             className="space-y-3"
           >
-            {/* Ícono en PNG */}
+            {/* 🌟 Ícono ajustado: w-16 h-16 en móvil, w-20 h-20 en desktop */}
             <img
               src={stat.icon}
-              alt={stat.title}
-              className="mx-auto w-20 h-20 object-contain"
+              alt="Icono Estadística"
+              className="mx-auto w-16 h-16 lg:w-20 lg:h-20 object-contain"
             />
 
             <h3 className="text-4xl md:text-5xl font-bold text-[#05FFEA] font-[Outfit]">
@@ -173,8 +175,13 @@ const StatsSection = () => {
               />
             </h3>
 
-            <p className="font-medium tracking-wide font-[Outfit] mb-1">{stat.title}</p>
-            <p className="text-sm text-gray-400 font-[Outfit] ">{stat.subtitle}</p>
+            {/* 🌟 Textos con ajustes fluidos para que no desborden en pantallas estrechas */}
+            <p className="font-medium tracking-wide font-[Outfit] mb-1 text-[15px] lg:text-base leading-snug">
+              {stat.title}
+            </p>
+            <p className="text-sm text-gray-400 font-[Outfit] leading-snug">
+              {stat.subtitle}
+            </p>
           </motion.div>
         ))}
       </div>
