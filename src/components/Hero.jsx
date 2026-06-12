@@ -254,8 +254,8 @@ const Hero = () => {
       </div>
 
       {/* Indicadores inferiores (Exclusivo para Móvil) */}
-      <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 z-20 flex md:hidden flex-row gap-3 bg-black/20 p-2 rounded-full backdrop-blur-sm">
-        {slides.map((_, index) => (
+      <div className="absolute bottom-0 left-1/2 transform -translate-x-1/5 z-20 flex md:hidden flex-row gap-3 bg-black/20 p-2 rounded-full backdrop-blur-sm">
+           {/* {slides.map((_, index) => (
           <button
             key={index}
             className={`w-2 h-2 rounded-full ${
@@ -263,7 +263,7 @@ const Hero = () => {
             }`}
             onClick={() => setCurrent(index)}
           />
-        ))}
+        ))} */}
       </div>
     </div>
   );
