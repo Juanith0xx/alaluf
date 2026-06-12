@@ -227,7 +227,7 @@ const Hero = () => {
 
       {/* Texto sobre hero con animación (Mantenemos desktop intacto en md:top-1/3 y md:left-50) */}
       <motion.div
-        className="absolute z-20 top-[45%] md:top-1/3 left-6 md:left-50 max-w-[90%] md:max-w-lg text-white"
+        className="absolute z-20 top-[48%] md:top-1/3 left-6 md:left-50 max-w-[90%] md:max-w-lg text-white"
         key={current}
         variants={textVariants}
         initial="hidden"
