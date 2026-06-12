@@ -167,7 +167,7 @@ const ContactForm = ({
   };
 
   return (
-    <div className={`bg-white text-gray-800 rounded-[80px] p-12 shadow-2xl ${className}`}>
+    <div className={`bg-white text-gray-800 rounded-[40px] p-12 shadow-2xl ${className}`}>
       
       <h2 className="text-2xl md:text-3xl font-medium mb-2 text-start font-[Outfit] text-gray-900">
         {esFichaPropiedad ? "Me interesa esta propiedad" : "¿No encuentras lo que buscas?"}

@@ -38,7 +38,7 @@ const SearchView = () => {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [openDropdown, setOpenDropdown] = useState(false);
   
-  // 🌟 MEJORA: Sincroniza automáticamente el botón "Comprar" o "Arrendar" según la URL
+  // Sincroniza automáticamente el botón "Comprar" o "Arrendar" según la URL
   const [accionActiva, setAccionActiva] = useState(() => {
     return searchParams.get("obj") === "2" ? "Arrendar" : "Comprar";
   });
@@ -81,7 +81,6 @@ const SearchView = () => {
     { nombre: "Otros", sub: [{ label: "Parcela / Sitio", id: 10 }, { label: "Parcela", id: 11 }, { label: "Edificios Corporativos", id: 12 }, { label: "Campos", id: 15 }] },
   ];
 
-  // FUNCIÓN AUXILIAR: Obtiene el nombre legible
   const obtenerLabelPorId = (id) => {
     if (!id) return "Propiedades";
     for (let cat of categoriasPropiedades) {
@@ -109,8 +108,6 @@ const SearchView = () => {
     const comunaID = selectedComuna?.id || "";
     const tipoID = tipoPropiedad?.id || "";
 
-    // 🌟 MEJORA: Ya no bloqueamos la búsqueda con un Alert si falta la comuna.
-    // Permitimos búsquedas amplias de forma natural.
     setSearchParams({ 
       ...(tipoID && { tipo_prop: tipoID }), 
       obj: objID, 
@@ -144,7 +141,6 @@ const SearchView = () => {
         const obj = searchParams.get("obj");
         const comuna = searchParams.get("comuna");
 
-        // SINCRONIZACIÓN: Actualizamos el estado tipoPropiedad basándonos en la URL
         if (tipo_prop && (!tipoPropiedad || tipoPropiedad.id != tipo_prop)) {
           setTipoPropiedad({ label: obtenerLabelPorId(tipo_prop), id: tipo_prop });
         }
@@ -153,24 +149,13 @@ const SearchView = () => {
         if (query) {
           url = `${API_URL}/api/propiedades/${query}`;
         } else {
-          // 🌟 FIX CRÍTICO DEL BACKEND: 
-          // Si enviamos "null" literal en la URL, el backend falla y devuelve 0 resultados.
-          // Usamos `|| ""` para enviar un campo vacío, lo que hace que tu backend ignore el filtro y traiga TODO (Casas, Deptos, etc).
           const safeTipoProp = tipo_prop || ""; 
-          const safeObj = obj || "1"; // Por defecto buscar ventas
+          const safeObj = obj || "1"; 
           const safeComuna = comuna || ""; 
           
          url = `${API_URL}/api/propiedades/buscar?tipo_prop=${safeTipoProp}&obj=${safeObj}&comuna=${safeComuna}&page=${paginaActual}&limit=10`;
         }
-        console.log("API_URL:", API_URL);
-console.log("QUERY:", query);
-console.log("TIPO:", tipo_prop);
-console.log("OBJ:", obj);
-console.log("COMUNA:", comuna);
-console.log("PAGINA:", paginaActual);
-
-console.log("URL CONSULTADA:", url);
-
+        
         const response = await fetch(url);
         const data = await response.json();
         
@@ -224,38 +209,37 @@ console.log("URL CONSULTADA:", url);
     <div className="min-h-screen bg-[#0a0a0a] text-white font-[Outfit]">
       <Navbar />
 
-      <div className="bg-[#111111] border-b border-white/5 pt-32 pb-12 shadow-xl relative z-20">
-        <div className="max-w-[1600px] mx-auto px-6 flex items-center gap-8">
-          <button onClick={() => navigate('/')} className="p-4 border border-white/10 rounded-2xl hover:bg-[#24B6C1] transition-all">
+      <div className="bg-[#111111] border-b border-white/5 pt-28 lg:pt-32 pb-8 lg:pb-12 shadow-xl relative z-20">
+        <div className="max-w-[1600px] mx-auto px-4 lg:px-6 flex items-center gap-4 lg:gap-8">
+          <button onClick={() => navigate('/')} className="p-3 lg:p-4 border border-white/10 rounded-xl lg:rounded-2xl hover:bg-[#24B6C1] transition-all shrink-0">
             <FaArrowLeft />
           </button>
           
-          {/* TÍTULO DINÁMICO */}
-          <h1 className=" pt-2 !text-2xl font-bold !font-[Outfit] tracking-tighter uppercase italic">
+          <h1 className="pt-2 text-lg lg:!text-2xl font-bold !font-[Outfit] tracking-tighter uppercase italic leading-tight">
             Total {obtenerLabelPorId(searchParams.get("tipo_prop"))} encontradas <span className="text-[#24B6C1]"> {totalPropiedades}</span> 
           </h1>
         </div>
       </div>
 
-      <div style={fullSectionStyle} className="relative py-12 min-h-screen">
-        <div className="max-w-[1600px] mx-auto px-6 grid lg:grid-cols-12 gap-10 relative z-10">
+      <div style={fullSectionStyle} className="relative py-8 lg:py-12 min-h-screen">
+        <div className="max-w-[1600px] mx-auto px-4 lg:px-6 grid grid-cols-1 lg:grid-cols-12 gap-10 relative z-10">
           
-          <div className="lg:col-span-7 space-y-8">
+          <div className="lg:col-span-7 space-y-6 lg:space-y-8">
             
-            {/* SEARCHBAR INTEGRADO */}
-            <div className="relative z-40 bg-black/60 backdrop-blur-xl p-3 rounded-[35px] border border-white/10 flex flex-wrap gap-2 items-center shadow-2xl">
+            {/* SEARCHBAR */}
+            <div className="relative z-40 bg-black/60 backdrop-blur-xl p-4 lg:p-3 rounded-[25px] lg:rounded-[35px] border border-white/10 flex flex-col lg:flex-row flex-wrap gap-3 lg:gap-2 items-stretch lg:items-center shadow-2xl">
               
-              <div className="flex bg-white/5 p-1 rounded-xl">
+              <div className="flex w-full lg:w-auto bg-white/5 p-1 rounded-xl">
                 {["Comprar", "Vender", "Arrendar"].map((accion) => (
                   <button key={accion} onClick={() => setAccionActiva(accion)}
-                    className={`px-6 py-2.5 rounded-lg text-xs font-bold transition-all ${accionActiva === accion ? "bg-[#24B6C1] text-white shadow-lg" : "text-white/40 hover:text-white"}`}
+                    className={`flex-1 lg:flex-none px-2 sm:px-6 py-2.5 rounded-lg text-[11px] sm:text-xs font-bold transition-all ${accionActiva === accion ? "bg-[#24B6C1] text-white shadow-lg" : "text-white/40 hover:text-white"}`}
                   >
                     {accion}
                   </button>
                 ))}
               </div>
 
-              <div className="relative flex-1 min-w-[160px]" ref={dropdownRef}>
+              <div className="relative w-full lg:w-auto lg:flex-1 lg:min-w-[160px]" ref={dropdownRef}>
                 <button onClick={() => setOpenDropdown(!openDropdown)}
                   className="w-full px-5 py-3.5 bg-white/5 border border-white/10 rounded-xl flex items-center justify-between text-xs"
                 >
@@ -265,17 +249,17 @@ console.log("URL CONSULTADA:", url);
                 <AnimatePresence>
                   {openDropdown && (
                     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 10 }}
-                      className="absolute top-full mt-2 left-0 bg-[#1a1a1a] border border-white/10 rounded-2xl shadow-2xl w-64 z-50 p-2"
+                      className="absolute top-full mt-2 left-0 bg-[#1a1a1a] border border-white/10 rounded-2xl shadow-2xl w-full lg:w-64 z-50 p-2"
                     >
                       {categoriasPropiedades.map((cat, i) => (
                         <div key={i} className="group relative">
-                          <div className="flex items-center justify-between px-4 py-2.5 rounded-xl hover:bg-[#24B6C1]/10 text-xs font-bold text-gray-400">
-                            {cat.nombre} <FaChevronRight size={10} />
+                          <div className="flex items-center justify-between px-4 py-3 lg:py-2.5 rounded-xl hover:bg-[#24B6C1]/10 text-xs font-bold text-gray-400">
+                            {cat.nombre} <FaChevronRight size={10} className="hidden lg:block"/>
                           </div>
-                          <div className="absolute left-full top-0 ml-2 hidden group-hover:block bg-[#1a1a1a] border border-white/10 rounded-xl p-2 w-56 shadow-2xl">
+                          <div className="lg:absolute lg:left-full lg:top-0 lg:ml-2 lg:hidden lg:group-hover:block bg-[#1a1a1a] lg:border lg:border-white/10 rounded-xl p-2 w-full lg:w-56 lg:shadow-2xl">
                             {cat.sub.map((sub, j) => (
                               <div key={j} onClick={() => { setTipoPropiedad(sub); setOpenDropdown(false); }}
-                                className="px-4 py-2 rounded-lg hover:bg-[#24B6C1]/20 text-xs text-gray-300 flex justify-between cursor-pointer"
+                                className="px-4 py-3 lg:py-2 rounded-lg hover:bg-[#24B6C1]/20 text-xs text-gray-300 flex justify-between cursor-pointer"
                               >
                                 {sub.label} {tipoPropiedad?.id === sub.id && <FaCheck size={10} className="text-[#24B6C1]" />}
                               </div>
@@ -288,7 +272,7 @@ console.log("URL CONSULTADA:", url);
                 </AnimatePresence>
               </div>
 
-              <div className="relative flex-[2] min-w-[220px]" ref={suggestionRef}>
+              <div className="relative w-full lg:w-auto lg:flex-[2] lg:min-w-[220px]" ref={suggestionRef}>
                 <input 
                   type="text" 
                   value={searchQueryInput} 
@@ -304,7 +288,7 @@ console.log("URL CONSULTADA:", url);
                     >
                       {filteredComunas.map((c) => (
                         <div key={c.id} onClick={() => { setSearchQueryInput(c.label); setSelectedComuna(c); setShowSuggestions(false); }}
-                          className="px-6 py-3 hover:bg-[#24B6C1]/20 cursor-pointer text-xs text-gray-300 flex justify-between"
+                          className="px-6 py-4 lg:py-3 hover:bg-[#24B6C1]/20 cursor-pointer text-xs text-gray-300 flex justify-between"
                         >
                           {c.label} <span className="text-[10px] text-gray-600">ID: {c.id}</span>
                         </div>
@@ -314,16 +298,25 @@ console.log("URL CONSULTADA:", url);
                 </AnimatePresence>
               </div>
 
-              <button onClick={handleSearch} className="px-6 py-3.5 bg-[#24B6C1] hover:bg-cyan-600 rounded-xl transition-all flex items-center gap-2 shadow-lg">
+              <button onClick={handleSearch} className="w-full lg:w-auto px-6 py-3.5 bg-[#24B6C1] hover:bg-cyan-600 rounded-xl transition-all flex items-center justify-center lg:justify-start gap-2 shadow-lg">
                 <span className="text-xs font-bold uppercase tracking-widest">Buscar</span>
                 <FaSearch size={16} />
               </button>
             </div>
 
+            {/* 🌟 MAPA VERSIÓN MÓVIL (Inyectado justo debajo del buscador) */}
+            <div className="block lg:hidden h-[350px] md:h-[400px] relative overflow-hidden shadow-2xl rounded-[30px] border border-white/20 bg-black z-20">
+              <MapView 
+                propiedades={propiedadesData} 
+                selectedProperty={selectedProperty}
+                setSelectedProperty={setSelectedProperty} 
+              />
+            </div>
+
             {/* GRILLA DE RESULTADOS */}
-            <div className="grid md:grid-cols-2 gap-8 relative z-10">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 relative z-10">
               {loading ? (
-                <div className="col-span-2 py-40 text-center"><div className="w-12 h-12 border-4 border-[#24B6C1] border-t-transparent rounded-full animate-spin inline-block"></div></div>
+                <div className="col-span-1 md:col-span-2 py-40 text-center"><div className="w-12 h-12 border-4 border-[#24B6C1] border-t-transparent rounded-full animate-spin inline-block"></div></div>
               ) : propiedadesData.length > 0 ? (
                 propiedadesData.map((prop) => {
                   const esActiva = selectedProperty && (
@@ -341,7 +334,7 @@ console.log("URL CONSULTADA:", url);
                   );
                 })
               ) : (
-                <div className="col-span-2 py-40 text-center bg-black/40 rounded-[40px] border border-dashed border-white/10">
+                <div className="col-span-1 md:col-span-2 py-40 text-center bg-black/40 rounded-[30px] lg:rounded-[40px] border border-dashed border-white/10">
                   <p className="text-gray-500 font-bold uppercase tracking-widest">Sin resultados en esta zona</p>
                 </div>
               )}
@@ -349,42 +342,45 @@ console.log("URL CONSULTADA:", url);
 
             {/* CONTROLES DE PAGINACIÓN */}
             {!loading && totalPaginas > 1 && !searchParams.get("q") && (
-              <div className="flex justify-center items-center gap-6 mt-12 bg-black/40 p-4 rounded-3xl border border-white/10 backdrop-blur-md w-fit mx-auto shadow-2xl">
+              <div className="flex justify-center items-center gap-3 sm:gap-6 mt-12 bg-black/40 p-3 lg:p-4 rounded-3xl border border-white/10 backdrop-blur-md w-full sm:w-fit mx-auto shadow-2xl">
                 <button
                   onClick={irPaginaAnterior}
                   disabled={paginaActual === 1}
-                  className={`flex items-center gap-2 px-5 py-3 rounded-xl font-bold uppercase tracking-widest text-xs transition-all ${
+                  className={`flex items-center justify-center gap-2 px-4 lg:px-5 py-3 rounded-xl font-bold uppercase tracking-widest text-[10px] lg:text-xs transition-all w-1/3 sm:w-auto ${
                     paginaActual === 1 
                       ? 'bg-white/5 text-white/20 cursor-not-allowed' 
                       : 'bg-[#24B6C1] text-white hover:bg-[#1e9aa3] shadow-lg shadow-[#24B6C1]/20'
                   }`}
                 >
-                  <FaArrowLeft size={12} /> Anterior
+                  <FaArrowLeft size={12} className="hidden sm:block" /> Ant
                 </button>
                 
-                <span className="text-white/60 font-medium text-sm">
+                <span className="text-white/60 font-medium text-xs sm:text-sm text-center flex-1">
                   Página <span className="text-white font-bold">{paginaActual}</span> de <span className="text-white font-bold">{totalPaginas}</span>
                 </span>
                 
                 <button
                   onClick={irPaginaSiguiente}
                   disabled={paginaActual === totalPaginas}
-                  className={`flex items-center gap-2 px-5 py-3 rounded-xl font-bold uppercase tracking-widest text-xs transition-all ${
+                  className={`flex items-center justify-center gap-2 px-4 lg:px-5 py-3 rounded-xl font-bold uppercase tracking-widest text-[10px] lg:text-xs transition-all w-1/3 sm:w-auto ${
                     paginaActual === totalPaginas 
                       ? 'bg-white/5 text-white/20 cursor-not-allowed' 
                       : 'bg-[#24B6C1] text-white hover:bg-[#1e9aa3] shadow-lg shadow-[#24B6C1]/20'
                   }`}
                 >
-                  Siguiente <span className="rotate-180 inline-block"><FaArrowLeft size={12} /></span>
+                  Sig <span className="rotate-180 inline-block hidden sm:block"><FaArrowLeft size={12} /></span>
                 </button>
               </div>
             )}
 
           </div>
 
-          <div className="lg:col-span-5">
-            <div className="sticky top-28 space-y-8">
-              <div className="h-[480px] relative overflow-hidden shadow-2xl rounded-[40px] border border-white/20 bg-black">
+          <div className="lg:col-span-5 mt-10 lg:mt-0">
+            {/* lg:sticky para fijar solo en desktop */}
+            <div className="lg:sticky lg:top-28 space-y-8">
+              
+              {/* 🌟 MAPA VERSIÓN DESKTOP (Oculto en móvil, mantiene el diseño original) */}
+              <div className="hidden lg:block h-[480px] relative overflow-hidden shadow-2xl rounded-[40px] border border-white/20 bg-black">
                 <MapView 
                   propiedades={propiedadesData} 
                   selectedProperty={selectedProperty}
@@ -393,7 +389,7 @@ console.log("URL CONSULTADA:", url);
               </div>
 
               {/* FORMULARIO DE CONTACTO */}
-              <div className="bg-white text-gray-800 rounded-[40px] p-8 lg:p-10 shadow-2xl">
+              <div className="bg-white text-gray-800 rounded-[30px] lg:rounded-[40px] p-6 sm:p-8 lg:p-10 shadow-2xl">
                 <form className="space-y-6 font-[Outfit]">
                   <div className="grid md:grid-cols-2 gap-4">
                     <div className="space-y-2 md:col-span-2 lg:col-span-1">
@@ -431,7 +427,7 @@ console.log("URL CONSULTADA:", url);
                     </div>
                   </div>
 
-                  <button type="submit" className="w-full group bg-[#158F9B] hover:bg-[#127C86] text-white px-8 py-4 rounded-xl text-lg font-bold transition-all duration-300 flex items-center justify-center gap-2 mt-4">
+                  <button type="submit" className="w-full group bg-[#158F9B] hover:bg-[#127C86] text-white px-8 py-4 rounded-xl text-lg font-bold transition-all duration-300 flex items-center justify-center gap-2 mt-4 shadow-lg">
                      Continuar
                   </button>
                 </form>
