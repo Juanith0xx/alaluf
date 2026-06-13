@@ -10,6 +10,7 @@ import {
 import Navbar from "../components/Navbar"; 
 import PropertyCard from "../components/PropertyCard"; 
 import MapView from "../components/MapView"; 
+import FiltrosAvanzados from "../components/FiltrosAvanzados"; 
 
 // IMPORTACIÓN DEL ASSET LOCAL
 import fondoMarmol from '../assets/Marmol.jpg';
@@ -23,6 +24,9 @@ const SearchView = () => {
   const [propiedadesData, setPropiedadesData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedProperty, setSelectedProperty] = useState(null);
+
+  // 🌟 LÓGICA CONDICIONAL: ¿Falta la comuna?
+  const faltaComuna = searchParams.has("tipo_prop") && !searchParams.has("comuna");
 
   // Estado para el conteo total
   const [totalPropiedades, setTotalPropiedades] = useState(0);
@@ -141,6 +145,14 @@ const SearchView = () => {
         const obj = searchParams.get("obj");
         const comuna = searchParams.get("comuna");
 
+        // 🌟 EXTRACCIÓN DE PARÁMETROS DE FILTROS AVANZADOS
+        const supDesde = searchParams.get("sup_desde") || "";
+        const supHasta = searchParams.get("sup_hasta") || "";
+        const precioDesde = searchParams.get("precio_desde") || "";
+        const precioHasta = searchParams.get("precio_hasta") || "";
+        const moneda = searchParams.get("moneda") || "CLP";
+        const orden = searchParams.get("orden") || "desc";
+
         if (tipo_prop && (!tipoPropiedad || tipoPropiedad.id != tipo_prop)) {
           setTipoPropiedad({ label: obtenerLabelPorId(tipo_prop), id: tipo_prop });
         }
@@ -153,7 +165,8 @@ const SearchView = () => {
           const safeObj = obj || "1"; 
           const safeComuna = comuna || ""; 
           
-         url = `${API_URL}/api/propiedades/buscar?tipo_prop=${safeTipoProp}&obj=${safeObj}&comuna=${safeComuna}&page=${paginaActual}&limit=10`;
+          // 🌟 URL ENRIQUECIDA CON FILTROS HORIZONTALES
+          url = `${API_URL}/api/propiedades/buscar?tipo_prop=${safeTipoProp}&obj=${safeObj}&comuna=${safeComuna}&sup_desde=${supDesde}&sup_hasta=${supHasta}&precio_desde=${precioDesde}&precio_hasta=${precioHasta}&moneda=${moneda}&orden=${orden}&page=${paginaActual}&limit=10`;
         }
         
         const response = await fetch(url);
@@ -226,7 +239,7 @@ const SearchView = () => {
           
           <div className="lg:col-span-7 space-y-6 lg:space-y-8">
             
-            {/* SEARCHBAR */}
+            {/* SEARCHBAR PRINCIPAL */}
             <div className="relative z-40 bg-black/60 backdrop-blur-xl p-4 lg:p-3 rounded-[25px] lg:rounded-[35px] border border-white/10 flex flex-col lg:flex-row flex-wrap gap-3 lg:gap-2 items-stretch lg:items-center shadow-2xl">
               
               <div className="flex w-full lg:w-auto bg-white/5 p-1 rounded-xl">
@@ -304,7 +317,28 @@ const SearchView = () => {
               </button>
             </div>
 
-            {/* 🌟 MAPA VERSIÓN MÓVIL (Inyectado justo debajo del buscador) */}
+            {/* 🌟 AVISO INFORMATIVO CONDICIONAL */}
+            <AnimatePresence>
+              {faltaComuna && (
+                <motion.div 
+                  initial={{ opacity: 0, y: -20, height: 0 }} 
+                  animate={{ opacity: 1, y: 0, height: "auto" }} 
+                  exit={{ opacity: 0, y: -20, height: 0 }}
+                  className="relative z-30 overflow-hidden"
+                >
+                  <div className="bg-[#24B6C1]/10 border border-[#24B6C1]/30 text-white px-4 py-3 rounded-2xl mb-4 text-xs sm:text-sm flex items-center gap-3 shadow-lg">
+                    <span>Estás viendo resultados generales. Puedes acotar tu búsqueda usando los filtros opcionales.</span>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* 🌟 FILTROS AVANZADOS HORIZONTALES (SIEMPRE VISIBLE) */}
+            <div className="relative z-30 mb-8">
+               <FiltrosAvanzados />
+            </div>
+
+            {/* 🌟 MAPA VERSIÓN MÓVIL */}
             <div className="block lg:hidden h-[350px] md:h-[400px] relative overflow-hidden shadow-2xl rounded-[30px] border border-white/20 bg-black z-20">
               <MapView 
                 propiedades={propiedadesData} 
@@ -376,10 +410,9 @@ const SearchView = () => {
           </div>
 
           <div className="lg:col-span-5 mt-10 lg:mt-0">
-            {/* lg:sticky para fijar solo en desktop */}
             <div className="lg:sticky lg:top-28 space-y-8">
               
-              {/* 🌟 MAPA VERSIÓN DESKTOP (Oculto en móvil, mantiene el diseño original) */}
+              {/* 🌟 MAPA VERSIÓN DESKTOP */}
               <div className="hidden lg:block h-[480px] relative overflow-hidden shadow-2xl rounded-[40px] border border-white/20 bg-black">
                 <MapView 
                   propiedades={propiedadesData} 

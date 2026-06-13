@@ -52,6 +52,14 @@ const PropertyDetail = ({ property }) => {
   const rangoManana = ["09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00"];
   const rangoTarde = ["14:30", "15:00", "15:30", "16:00", "16:30", "17:00", "17:30", "18:00"];
 
+  // 🌟 FUNCIÓN PARA AÑADIR SEPARADOR DE MILES EN FORMATO CHILENO
+  const formatearPrecio = (valor) => {
+    if (!valor) return "";
+    const numero = parseFloat(valor);
+    if (isNaN(numero)) return valor;
+    return numero.toLocaleString("es-CL");
+  };
+
   const getExtra = (label) => {
     return property.detalles?.caracteristicasExtra?.find(
       c => c.label.toLowerCase().includes(label.toLowerCase())
@@ -168,9 +176,6 @@ const Feature = ({ icon: Icon, title, value }) => (
   </div>
 );
 
-
-
-
   return (
     <div 
       className="min-h-screen bg-cover bg-center bg-fixed font-[Outfit] pb-20 text-gray-900"
@@ -180,7 +185,7 @@ const Feature = ({ icon: Icon, title, value }) => (
       {/* SECCIÓN CONTENEDORA GLOBAL CON FILAS ADAPTATIVAS */}
       <div className="max-w-[1400px] mx-auto px-4 md:px-6 pt-24 sm:pt-28 lg:pt-32 pb-10 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12">
         
-        {/* COLUMNA IZQUIERDA: CONTENIDO PRINCIPAL (Ocupa full ancho en móvil/tablet, 8 de 12 en escritorio) */}
+        {/* COLUMNA IZQUIERDA: CONTENIDO PRINCIPAL */}
         <div className="col-span-1 lg:col-span-8 space-y-6">
           
           {/* 1. GALERÍA ASIMÉTRICA DE FOTOS RESPONSIVA */}
@@ -194,7 +199,7 @@ const Feature = ({ icon: Icon, title, value }) => (
               <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition duration-300" />
             </div>
 
-            {/* Fotos Secundarias Cuadrícula Derecha (Ocultas en celular para no saturar, visibles desde md) */}
+            {/* Fotos Secundarias Cuadrícula Derecha */}
             {[1, 2, 3].map((idx) => (
               <div key={idx} className="hidden md:block md:col-span-1 relative overflow-hidden group cursor-pointer h-full" onClick={() => openLightbox(idx)}>
                 <img src={imagenes[idx] || imagenes[0]} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" alt={`Vista interior ${idx}`} />
@@ -271,7 +276,10 @@ const Feature = ({ icon: Icon, title, value }) => (
                 <span className="line-clamp-2">{property.ubicacion?.direccion}, {property.ubicacion?.comuna}</span>
               </div>
               <div className="pt-2 flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-4">
-                <span className="text-3xl md:text-5xl font-black text-[#24B6C1]">{precioPrincipal} {moneda}</span>
+                {/* 🌟 PRECIO FORMATEADO CON SEPARADOR DE MILES */}
+                <span className="text-3xl md:text-5xl font-black text-[#24B6C1]">
+                  {formatearPrecio(precioPrincipal)} {moneda}
+                </span>
                 <span className="text-gray-400 text-xs md:text-sm font-medium">Gastos comunes: {getExtra("Gastos Comunes")}</span>
               </div>
             </section>
@@ -279,214 +287,209 @@ const Feature = ({ icon: Icon, title, value }) => (
             {/* Características Técnicas (Grid fluido) */}
             <section className="grid grid-cols-2 sm:grid-cols-4 gap-4 py-6 md:py-8 border-y border-gray-100">
 
-  {/* CASAS */}
-  {tipo.includes("casa") && !tipo.includes("comercial") && (
-    <>
-      <Feature
-        icon={FaRulerCombined}
-        title="Construidos"
-        value={`${getExtraValue("construidos") || getCampo("terreno")|| 0} m²`}
-      />
+              {/* CASAS */}
+              {tipo.includes("casa") && !tipo.includes("comercial") && (
+                <>
+                  <Feature
+                    icon={FaRulerCombined}
+                    title="Construidos"
+                    value={`${getExtraValue("construidos") || getCampo("terreno")|| 0} m²`}
+                  />
 
-      <Feature
-        icon={FaRulerCombined}
-        title="Terreno"
-        value={`${getExtraValue("terreno") || property.detalles?.superficie || 0} m²`}
-      />
+                  <Feature
+                    icon={FaRulerCombined}
+                    title="Terreno"
+                    value={`${getExtraValue("terreno") || property.detalles?.superficie || 0} m²`}
+                  />
 
-      <Feature
-        icon={FaBed}
-        title="Dormitorios"
-        value={`${property.detalles?.dormitorios || 0}`}
-      />
+                  <Feature
+                    icon={FaBed}
+                    title="Dormitorios"
+                    value={`${property.detalles?.dormitorios || 0}`}
+                  />
 
-      <Feature
-        icon={FaBath}
-        title="Baños"
-        value={`${property.detalles?.banos || 0}`}
-      />
-    </>
-  )}
+                  <Feature
+                    icon={FaBath}
+                    title="Baños"
+                    value={`${property.detalles?.banos || 0}`}
+                  />
+                </>
+              )}
 
-  {/* DEPARTAMENTOS */}
-  {tipo.includes("departamento") && (
-    <>
-      <Feature
-        icon={FaRulerCombined}
-        title="Superficie Total"
-        value={`${getExtraValue("totales") || 0} m²`}
-      />
+              {/* DEPARTAMENTOS */}
+              {tipo.includes("departamento") && (
+                <>
+                  <Feature
+                    icon={FaRulerCombined}
+                    title="Superficie Total"
+                    value={`${getExtraValue("totales") || 0} m²`}
+                  />
 
-      <Feature
-        icon={FaRulerCombined}
-        title="Superficie Útil"
-        value={`${getExtraValue("útiles") || 0} m²`}
-      />
+                  <Feature
+                    icon={FaRulerCombined}
+                    title="Superficie Útil"
+                    value={`${getExtraValue("útiles") || 0} m²`}
+                  />
 
-      <Feature
-        icon={FaBed}
-        title="Dormitorios"
-        value={`${property.detalles?.dormitorios || 0}`}
-      />
+                  <Feature
+                    icon={FaBed}
+                    title="Dormitorios"
+                    value={`${property.detalles?.dormitorios || 0}`}
+                  />
 
-      <Feature
-        icon={FaBath}
-        title="Baños"
-        value={`${property.detalles?.banos || 0}`}
-      />
-    </>
-  )}
+                  <Feature
+                    icon={FaBath}
+                    title="Baños"
+                    value={`${property.detalles?.banos || 0}`}
+                  />
+                </>
+              )}
 
-  {/* OFICINAS */}
-  {tipo.includes("oficina") && (
-    <>
-      <Feature
-        icon={FaRulerCombined}
-        title="Superficie"
-        value={`${getExtraValue("construidos") || property.detalles?.superficie || 0} m²`}
-      />
+              {/* OFICINAS */}
+              {tipo.includes("oficina") && (
+                <>
+                  <Feature
+                    icon={FaRulerCombined}
+                    title="Superficie"
+                    value={`${getExtraValue("construidos") || property.detalles?.superficie || 0} m²`}
+                  />
 
-      <Feature
-        icon={FaCheckCircle}
-        title="Habilitada"
-        value={getExtraValue("habilitada") || "No"}
-      />
+                  <Feature
+                    icon={FaCheckCircle}
+                    title="Habilitada"
+                    value={getExtraValue("habilitada") || "No"}
+                  />
 
-      <Feature
-        icon={FaBuilding}
-        title="Tipo Edificio"
-        value={getExtraValue("tipo edificio") || "-"}
-      />
+                  <Feature
+                    icon={FaBuilding}
+                    title="Tipo Edificio"
+                    value={getExtraValue("tipo edificio") || "-"}
+                  />
 
-      <Feature
-        icon={FaDoorClosed}
-        title="Privados"
-        value={getExtraValue("privados") || "0"}
-      />
-    </>
-  )}
+                  <Feature
+                    icon={FaDoorClosed}
+                    title="Privados"
+                    value={getExtraValue("privados") || "0"}
+                  />
+                </>
+              )}
 
-  {/* LOCALES */}
-  {tipo.includes("local") && (
-    <>
-      <Feature
-        icon={FaRulerCombined}
-        title="Superficie"
-        value={`${property.detalles?.superficie || 0} m²`}
-      />
+              {/* LOCALES */}
+              {tipo.includes("local") && (
+                <>
+                  <Feature
+                    icon={FaRulerCombined}
+                    title="Superficie"
+                    value={`${property.detalles?.superficie || 0} m²`}
+                  />
 
-      <Feature
-        icon={FaCheckCircle}
-        title="Habilitado"
-        value={getExtraValue("habilitado") || "No"}
-      />
+                  <Feature
+                    icon={FaCheckCircle}
+                    title="Habilitado"
+                    value={getExtraValue("habilitado") || "No"}
+                  />
 
-      <Feature
-        icon={FaBath}
-        title="Baños"
-        value={`${property.detalles?.banos || 0}`}
-      />
+                  <Feature
+                    icon={FaBath}
+                    title="Baños"
+                    value={`${property.detalles?.banos || 0}`}
+                  />
 
-      <Feature
-        icon={FaCar}
-        title="Estacionamientos"
-        value={`${property.detalles?.estacionamientos || 0}`}
-      />
-    </>
-  )}
+                  <Feature
+                    icon={FaCar}
+                    title="Estacionamientos"
+                    value={`${property.detalles?.estacionamientos || 0}`}
+                  />
+                </>
+              )}
 
-  {/* GALPONES */}
-  {(tipo.includes("galpon") || tipo.includes("galpón")) && (
-    <>
-      <Feature
-        icon={FaRulerCombined}
-        title="Construidos"
-        value={`${getExtraValue("construidos") || 0} m²`}
-      />
+              {/* GALPONES */}
+              {(tipo.includes("galpon") || tipo.includes("galpón")) && (
+                <>
+                  <Feature
+                    icon={FaRulerCombined}
+                    title="Construidos"
+                    value={`${getExtraValue("construidos") || 0} m²`}
+                  />
 
-      <Feature
-        icon={FaRulerCombined}
-        title="Terreno"
-        value={`${getExtraValue("terreno") || 0} m²`}
-      />
+                  <Feature
+                    icon={FaRulerCombined}
+                    title="Terreno"
+                    value={`${getExtraValue("terreno") || 0} m²`}
+                  />
 
-      <Feature
-        icon={FaCheckCircle}
-        title="Trifásica"
-        value={getExtraValue("trifasica") || "No"}
-      />
+                  <Feature
+                    icon={FaCheckCircle}
+                    title="Trifásica"
+                    value={getExtraValue("trifasica") || "No"}
+                  />
 
-      <Feature
-        icon={FaRulerCombined}
-        title="Altura"
-        value={getExtraValue("altura") || "-"}
-      />
-    </>
-  )}
+                  <Feature
+                    icon={FaRulerCombined}
+                    title="Altura"
+                    value={getExtraValue("altura") || "-"}
+                  />
+                </>
+              )}
 
-  {/* TERRENOS INDUSTRIALES */}
-  {tipo.includes("industrial") && (
-    <>
-      <Feature
-        icon={FaRulerCombined}
-        title="Superficie"
-        value={`${property.detalles?.superficie || 0} m²`}
-      />
+              {/* TERRENOS INDUSTRIALES */}
+              {tipo.includes("industrial") && (
+                <>
+                  <Feature
+                    icon={FaRulerCombined}
+                    title="Superficie"
+                    value={`${property.detalles?.superficie || 0} m²`}
+                  />
 
-      <Feature
-        icon={FaRulerCombined}
-        title="Frente"
-        value={`${getExtraValue("frente") || 0} mts`}
-      />
+                  <Feature
+                    icon={FaRulerCombined}
+                    title="Frente"
+                    value={`${getExtraValue("frente") || 0} mts`}
+                  />
 
-      <Feature
-        icon={FaRulerCombined}
-        title="Fondo"
-        value={`${getExtraValue("fondo") || 0} mts`}
-      />
-    </>
-  )}
+                  <Feature
+                    icon={FaRulerCombined}
+                    title="Fondo"
+                    value={`${getExtraValue("fondo") || 0} mts`}
+                  />
+                </>
+              )}
 
-  {/* TERRENOS */}
-  {tipo.includes("terreno") &&
-    !tipo.includes("industrial") && (
-    <>
-      <Feature
-  icon={FaRulerCombined}
-  title="Superficie"
-  value={`${getExtraValue("terreno")} m²`}
-/>
+              {/* TERRENOS */}
+              {tipo.includes("terreno") && !tipo.includes("industrial") && (
+                <>
+                  <Feature
+                    icon={FaRulerCombined}
+                    title="Superficie"
+                    value={`${getExtraValue("terreno")} m²`}
+                  />
 
-<Feature
-  icon={FaInfoCircle}
-  title="Uso"
-  value={getExtraValue("uso")}
-/>
+                  <Feature
+                    icon={FaInfoCircle}
+                    title="Uso"
+                    value={getExtraValue("uso")}
+                  />
 
-<Feature
-  icon={FaInfoCircle}
-  title="Densidad"
-  value={getExtraValue("densidad")}
-/>
+                  <Feature
+                    icon={FaInfoCircle}
+                    title="Densidad"
+                    value={getExtraValue("densidad")}
+                  />
 
-<Feature
-  icon={FaInfoCircle}
-  title="Altura"
-  value={getExtraValue("altura")}
-/>
-    </>
-  )}
-</section>
+                  <Feature
+                    icon={FaInfoCircle}
+                    title="Altura"
+                    value={getExtraValue("altura")}
+                  />
+                </>
+              )}
+            </section>
 
             {/* Descripción */}
             <section className="space-y-3">
               <h3 className="text-xl md:text-2xl font-bold uppercase italic tracking-tighter">Descripción de la propiedad</h3>
               <p className="text-gray-600 leading-relaxed whitespace-pre-line text-sm md:text-lg">
-                {
-  property.caracteristicas_internet ||
-  property.detalles?.descripcion ||
-  "Contáctanos para obtener más detalles."
-}
+                {property.caracteristicas_internet || property.detalles?.descripcion || "Contáctanos para obtener más detalles."}
               </p>
             </section>
 
@@ -523,7 +526,7 @@ const Feature = ({ icon: Icon, title, value }) => (
           </div>
         </div>
 
-        {/* COLUMNA DERECHA: SIDEBAR (Se acopla abajo en celular/tablet, se queda fijo a la derecha en escritorio) */}
+        {/* COLUMNA DERECHA: SIDEBAR */}
         <div className="col-span-1 lg:col-span-4">
           <div className="lg:sticky lg:top-24 space-y-6 md:space-y-8">
             
@@ -678,22 +681,21 @@ const Feature = ({ icon: Icon, title, value }) => (
 
             {/* Formulario de Contacto Modular */}
             <ContactForm 
-  className="..."
-  propiedadId={String(property.codigo)}
-  comunaId={property.ubicacion?.comuna_id || 0}
-  objetivoLlamada={property.precios?.venta?.valor ? 1 : 2}
-  tipoPropiedadNombre={property.titulo || ""}
-  onSubmitSuccess={handleContactSubmit}
-/>
+              className="..."
+              propiedadId={String(property.codigo)}
+              comunaId={property.ubicacion?.comuna_id || 0}
+              objetivoLlamada={property.precios?.venta?.valor ? 1 : 2}
+              tipoPropiedadNombre={property.titulo || ""}
+              onSubmitSuccess={handleContactSubmit}
+            />
           </div>
         </div>
 
       </div>
 
-      {/* MODAL LIGHTBOX FULL-SCREEN CON CONTROL TOTALMENTE RESPONSIVO */}
+      {/* MODAL LIGHTBOX FULL-SCREEN */}
       {isLightboxOpen && (
         <div className="fixed inset-0 bg-black/95 z-[9999] flex flex-col items-center justify-center p-4 shadow-xl">
-          {/* Botón Cerrar */}
           <button 
             onClick={() => setIsLightboxOpen(false)} 
             className="absolute right-4 top-4 text-white/70 hover:text-white p-2.5 bg-white/10 rounded-full transition backdrop-blur-md z-20"
@@ -702,14 +704,12 @@ const Feature = ({ icon: Icon, title, value }) => (
           </button>
 
           <div className="relative max-w-5xl max-h-[80vh] w-full flex items-center justify-center px-2">
-            {/* Imagen */}
             <img 
               src={imagenes[activeImage]} 
               className="max-w-full max-h-[80vh] object-contain rounded-lg select-none shadow-2xl" 
               alt={`Zoom imagen ${activeImage + 1}`} 
             />
 
-            {/* Flechas de navegación adaptativas (Se mueven levemente hacia adentro en móviles) */}
             {imagenes.length > 1 && (
               <>
                 <button 

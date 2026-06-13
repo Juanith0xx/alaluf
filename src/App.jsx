@@ -27,7 +27,7 @@ import MortgageCalculator from './pages/MortgageCalculator';
 import TerrenoProyecto from './pages/TerrenosProyecto';
 
 // 🌟 NUEVA IMPORTACIÓN: FORMULARIO DE PUBLICACIÓN DE VENTA
-import Vender from './pages/PublishPropertyForm'; // Ajusta la ruta o nombre del archivo según corresponda (ej: './components/PublishPropertyForm')
+import Vender from './pages/PublishPropertyForm';
 
 function App() {
   return (
@@ -35,7 +35,6 @@ function App() {
       <ScrollToTop />
       <Navbar />
       <Routes>
-        {/* PAGINA PRINCIPAL */}
         <Route path="/" element={
           <>
             <Hero />            
@@ -46,18 +45,11 @@ function App() {
           </>
         } />
 
-        {/* VISTA DE RESULTADOS DE BÚSQUEDA */}
         <Route path="/buscar" element={<SearchView />} />
-
-        {/* FICHA DE DETALLE DE PROPIEDAD */}
         <Route path="/propiedad/:id" element={<PropertyPage />} />
-
-        {/* 🌟 NUEVA RUTA: SIMULADOR HIPOTECARIO ALALUF */}
         <Route path="/simulador-hipotecario" element={<MortgageCalculator />} />
-
-        {/* 🌟 NUEVA RUTA: FORMULARIO DE VENTA */}
         <Route path="/vender" element={<div className="pt-16"> <Vender /> </div> }/>
-        {/* RESTO DE PAGINAS */}
+        
         <Route path="/licitaciones" element={<Licitaciones />} />
         <Route path="/industrial" element={<Industrial />} />
         <Route path="/terrenos_proyectos" element={<TerrenoProyecto />} />
@@ -67,7 +59,6 @@ function App() {
         <Route path="/tasacion-activo" element={<TasacionActivos />} />
         <Route path="/club_deals_inversiones" element={<ClubDealsInversiones/>} />
         <Route path="/nosotros" element={<Nosotros/>} />
-
       </Routes>
       <Footer />
       <WhatsAppBubble />

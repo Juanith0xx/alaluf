@@ -35,14 +35,22 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
     return campo && campo.value !== null ? campo.value : null;
   };
 
+  // Función para añadir separador de miles en formato chileno
+  const formatearPrecio = (valor) => {
+    if (!valor) return "";
+    const numero = parseFloat(valor);
+    if (isNaN(numero)) return valor;
+    return numero.toLocaleString("es-CL");
+  };
+
   const renderizarDetalles = () => {
     const tipo = (
-  item.tipoPropiedad ||
-  item.tipo ||
-  item.categoria ||
-  item.titulo ||
-  ""
-).toLowerCase();
+      item.tipoPropiedad ||
+      item.tipo ||
+      item.categoria ||
+      item.titulo ||
+      ""
+    ).toLowerCase();
     
     const dorms = item.detalles?.dormitorios || 0;
     const banos = item.detalles?.banos || 0;
@@ -62,7 +70,7 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
     // Lógica para CASAS
     if (tipo.includes("casa") && !tipo.includes("comercial")) {
       return (
-        <div className="flex flex-wrap gap-2 mt-3">
+        <div className="flex flex-wrap gap-2 mt-3 font-[Outfit]">
           <InfoItem icon={FaRulerCombined} text={`${m2Construidos} m² Const.`} />
           <InfoItem icon={FaRulerCombined} text={`${m2Terreno} m² Terr.`} />
           {dorms > 0 && <InfoItem icon={FaBed} text={`${dorms} Dorm`} />}
@@ -74,7 +82,7 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
     // Lógica para DEPARTAMENTOS
     if (tipo.includes("departamento")) {
       return (
-        <div className="flex flex-wrap gap-2 mt-3">
+        <div className="flex flex-wrap gap-2 mt-3 font-[Outfit]">
           <InfoItem icon={FaRulerCombined} text={`${m2Totales} m² Totales`} />
           <InfoItem icon={FaRulerCombined} text={`${m2Utiles} m² Útiles`} />
           {dorms > 0 && <InfoItem icon={FaBed} text={`${dorms} Dorm`} />}
@@ -83,14 +91,14 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
       );
     }
 
-    // 🌟 LÓGICA PARA OFICINAS (Actualizada con los nuevos campos solicitados)
+    // LÓGICA PARA OFICINAS
     if (tipo.includes("oficina")) {
       const tipoEdificio = obtenerCampoExtra("tipo edificio");
       const habilitada = obtenerCampoExtra("habilitada");
       const privados = obtenerCampoExtra("privados");
 
       return (
-        <div className="flex flex-wrap gap-2 mt-3">
+        <div className="flex flex-wrap gap-2 mt-3 font-[Outfit]">
           <InfoItem icon={FaRulerCombined} text={`${m2Construidos} m²`} />
           {habilitada && <InfoItem icon={FaCheckCircle} text={`Habitada: ${habilitada}`} />}
           {tipoEdificio && <InfoItem icon={FaBuilding} text={`Edificio ${tipoEdificio}`} />}
@@ -103,156 +111,76 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
 
     // Lógica para LOCALES
     if (tipo.includes("local")) {
-  const habilitado = obtenerCampoExtra("habilitado");
-  const banosLocal = item.detalles?.banos || 0;
+      const habilitado = obtenerCampoExtra("habilitado");
+      const banosLocal = item.detalles?.banos || 0;
 
-  return (
-    <div className="flex flex-wrap gap-2 mt-3">
-      <InfoItem
-        icon={FaRulerCombined}
-        text={`${m2Construidos} m²`}
-      />
-
-      {habilitado && (
-        <InfoItem
-          icon={FaCheckCircle}
-          text={`Habilitado: ${habilitado}`}
-        />
-      )}
-
-      {estac > 0 && (
-        <InfoItem
-          icon={FaCar}
-          text={`${estac} Estac.`}
-        />
-      )}
-
-      {banosLocal > 0 && (
-        <InfoItem
-          icon={FaBath}
-          text={`${banosLocal} Baños`}
-        />
-      )}
-    </div>
+      return (
+        <div className="flex flex-wrap gap-2 mt-3 font-[Outfit]">
+          <InfoItem icon={FaRulerCombined} text={`${m2Construidos} m²`} />
+          {habilitado && <InfoItem icon={FaCheckCircle} text={`Habilitado: ${habilitado}`} />}
+          {estac > 0 && <InfoItem icon={FaCar} text={`${estac} Estac.`} />}
+          {banosLocal > 0 && <InfoItem icon={FaBath} text={`${banosLocal} Baños`} />}
+        </div>
       );
     }
 
     // Lógica para COMERCIAL
     if (tipo.includes("comercial")) {
       return (
-        <div className="flex flex-wrap gap-2 mt-3">
+        <div className="flex flex-wrap gap-2 mt-3 font-[Outfit]">
           <InfoItem icon={FaRulerCombined} text={`${m2Construidos} m² Const.`} />
           <InfoItem icon={FaRulerCombined} text={`${m2Terreno} m² Terr.`} />
           {estac > 0 && <InfoItem icon={FaCar} text={`${estac} Estac.`} />}
         </div>
       );
     }
-    if (
-  tipo.includes("terreno industrial") ||
-  tipo.includes("industrial")
-) {
-  const frente = obtenerCampoExtra("frente");
-  const fondo = obtenerCampoExtra("fondo");
 
-  return (
-    <div className="flex flex-wrap gap-2 mt-3">
-      <InfoItem
-        icon={FaRulerCombined}
-        text={`${m2Terreno} m²`}
-      />
+    if (tipo.includes("terreno industrial") || tipo.includes("industrial")) {
+      const frente = obtenerCampoExtra("frente");
+      const fondo = obtenerCampoExtra("fondo");
 
-      {frente && (
-        <InfoItem
-          icon={FaRulerVertical}
-          text={`Frente: ${frente} mts`}
-        />
-      )}
-
-      {fondo && (
-        <InfoItem
-          icon={FaRulerVertical}
-          text={`Fondo: ${fondo} mts`}
-        />
-      )}
-    </div>
-  );
-}
+      return (
+        <div className="flex flex-wrap gap-2 mt-3 font-[Outfit]">
+          <InfoItem icon={FaRulerCombined} text={`${m2Terreno} m²`} />
+          {frente && <InfoItem icon={FaRulerVertical} text={`Frente: ${frente} mts`} />}
+          {fondo && <InfoItem icon={FaRulerVertical} text={`Fondo: ${fondo} mts`} />}
+        </div>
+      );
+    }
 
     // Lógica para TERRENOS
     if (tipo.includes("terreno")) {
-  const uso = obtenerCampoExtra("uso") || obtenerCampoExtra("destino");
-  const densidad = obtenerCampoExtra("densidad");
-  const altura = obtenerCampoExtra("altura");
+      const uso = obtenerCampoExtra("uso") || obtenerCampoExtra("destino");
+      const densidad = obtenerCampoExtra("densidad");
+      const altura = obtenerCampoExtra("altura");
 
-  return (
-    <div className="flex flex-wrap gap-2 mt-3">
-      <InfoItem
-        icon={FaRulerCombined}
-        text={`${m2Terreno} m²`}
-      />
-
-      {uso && (
-        <InfoItem
-          icon={FaTag}
-          text={uso}
-        />
-      )}
-
-      {densidad && (
-        <InfoItem
-          icon={FaBuilding}
-          text={`Densidad: ${densidad}`}
-        />
-      )}
-
-      {altura && (
-        <InfoItem
-          icon={FaRulerVertical}
-          text={`Altura: ${altura}`}
-        />
-      )}
-    </div>
+      return (
+        <div className="flex flex-wrap gap-2 mt-3 font-[Outfit]">
+          <InfoItem icon={FaRulerCombined} text={`${m2Terreno} m²`} />
+          {uso && <InfoItem icon={FaTag} text={uso} />}
+          {densidad && <InfoItem icon={FaBuilding} text={`Densidad: ${densidad}`} />}
+          {altura && <InfoItem icon={FaRulerVertical} text={`Altura: ${altura}`} />}
+        </div>
       );
     }
 
     // Lógica para GALPONES
     if (tipo.includes("galpón") || tipo.includes("galpon")) {
-  const trifasica = obtenerCampoExtra("trifásica") ||
-                    obtenerCampoExtra("trifasica");
+      const trifasica = obtenerCampoExtra("trifásica") || obtenerCampoExtra("trifasica");
+      const alturaGalpon = obtenerCampoExtra("altura");
 
-  const alturaGalpon = obtenerCampoExtra("altura");
-
-  return (
-    <div className="flex flex-wrap gap-2 mt-3">
-      <InfoItem
-        icon={FaRulerCombined}
-        text={`${m2Construidos} m² Const.`}
-      />
-
-      <InfoItem
-        icon={FaRulerCombined}
-        text={`${m2Terreno} m² Terr.`}
-      />
-
-      {trifasica && (
-        <InfoItem
-          icon={FaCheckCircle}
-          text={`Trifásica: ${trifasica}`}
-        />
-      )}
-
-      {alturaGalpon && (
-        <InfoItem
-          icon={FaRulerVertical}
-          text={`Altura: ${alturaGalpon}`}
-        />
-      )}
-    </div>
+      return (
+        <div className="flex flex-wrap gap-2 mt-3 font-[Outfit]">
+          <InfoItem icon={FaRulerCombined} text={`${m2Construidos} m² Const.`} />
+          <InfoItem icon={FaRulerCombined} text={`${m2Terreno} m² Terr.`} />
+          {trifasica && <InfoItem icon={FaCheckCircle} text={`Trifásica: ${trifasica}`} />}
+          {alturaGalpon && <InfoItem icon={FaRulerVertical} text={`Altura: ${alturaGalpon}`} />}
+        </div>
       );
     }
 
     return (
-      <div className="flex flex-wrap gap-2 mt-3">
+      <div className="flex flex-wrap gap-2 mt-3 font-[Outfit]">
         <InfoItem icon={FaRulerCombined} text={`${item.detalles?.superficie || "0"} m²`} />
       </div>
     );
@@ -261,7 +189,7 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
   return (
     <div 
       onClick={onSelect} 
-      className={`bg-white rounded-2xl overflow-hidden shadow-xl group cursor-pointer transition-all duration-300 ${
+      className={`bg-white rounded-2xl overflow-hidden shadow-xl group cursor-pointer transition-all duration-300 font-[Outfit] ${
         isActive ? 'ring-4 ring-[#24B6C1] scale-[1.02]' : 'hover:shadow-2xl'
       }`}
     >
@@ -281,7 +209,7 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
         )}
       </div>
 
-      <div className="p-6 text-black">
+      <div className="p-6 text-black font-[Outfit]">
         <h3 className="text-xl font-bold mb-3 leading-tight uppercase line-clamp-1">{item.ubicacion?.sector || "Sector No Especificado"}</h3>
         <div className="mb-6">
           <div className="flex items-center gap-2 text-gray-500 text-sm">
@@ -291,21 +219,26 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
           {renderizarDetalles()}
         </div>
 
-        <div className="border-t border-gray-100 pt-4 flex items-center justify-between">
-          <div className="flex flex-col">
-            {tieneArriendo && (
-              <span className="text-gray-900 font-black text-lg">{item.precios.arriendo.valor} <span className="text-xs text-gray-500">{item.precios.arriendo.moneda}</span></span>
-            )}
-            {tieneVenta && (
-              <span className="text-gray-900 font-black text-lg">{item.precios.venta.valor} <span className="text-xs text-gray-500">{item.precios.venta.moneda}</span></span>
-            )}
+        {/* Sección de precios con tipografía Outfit y separador de miles */}
+        <div className="border-t border-gray-100 pt-4 flex flex-col gap-2 font-[Outfit]">
+          {tieneVenta && (
+            <span className="text-gray-900 font-bold text-lg">
+              Venta: {formatearPrecio(item.precios.venta.valor)} <span className="text-xs text-gray-500">{item.precios.venta.moneda}</span>
+            </span>
+          )}
+          {tieneArriendo && (
+            <span className="text-gray-900 font-bold text-lg">
+              Arriendo: {formatearPrecio(item.precios.arriendo.valor)} <span className="text-xs text-gray-500">{item.precios.arriendo.moneda}</span>
+            </span>
+          )}
+          <div className="flex justify-end mt-2">
+            <button 
+              className="px-5 py-3 bg-[#24B6C1] text-white rounded-xl font-bold text-xs uppercase shadow-md hover:bg-cyan-600 transition"
+              onClick={(e) => { e.stopPropagation(); navigate(`/propiedad/${item.codigo || item.id}`); }} 
+            >
+              Ver Ficha
+            </button>
           </div>
-          <button 
-            className="px-5 py-3 bg-[#24B6C1] text-white rounded-xl font-bold text-xs uppercase shadow-md hover:bg-cyan-600 transition"
-            onClick={(e) => { e.stopPropagation(); navigate(`/propiedad/${item.codigo || item.id}`); }} 
-          >
-            Ver Ficha
-          </button>
         </div>
       </div>
     </div>
