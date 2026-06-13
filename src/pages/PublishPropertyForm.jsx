@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { UploadCloud, ArrowRight, ArrowLeft } from 'lucide-react';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowRight, ArrowLeft } from "lucide-react";
+// import { UploadCloud } from "lucide-react"; // Descomentar si se vuelve a usar el Paso 3
 import bgMarmol from '../assets/Marmol.jpg';
 
 // 🌟 FUNCIÓN DE VALIDACIÓN DE RUT CHILENO
@@ -40,6 +42,8 @@ const formatRut = (rut) => {
 const PublishPropertyForm = () => {
   const [step, setStep] = useState(1);
   const [rutError, setRutError] = useState(false);
+  const navigate = useNavigate();
+  
   const [formData, setFormData] = useState({
     nombre: '',
     rut: '',
@@ -50,8 +54,8 @@ const PublishPropertyForm = () => {
     ciudad: '',
     tipoPropiedad: '',
     superficie: '',
-    precio: '', 
-    fotos: []
+    precio: ''
+    // fotos: [] // Descomentar si se usa el Paso 3
   });
 
   const handleInputChange = (e) => {
@@ -77,6 +81,7 @@ const PublishPropertyForm = () => {
     }
   };
 
+  /* // 🌟 FUNCIONES PARA EL PASO 3 (COMENTADAS HASTA QUE SE DESCOMENTE EL PASO)
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
     setFormData(prev => ({ ...prev, fotos: [...prev.fotos, ...files] }));
@@ -87,7 +92,7 @@ const PublishPropertyForm = () => {
       ...prev,
       fotos: prev.fotos.filter((_, i) => i !== index)
     }));
-  };
+  }; */
 
   const nextStep = () => {
     if (step === 1) {
@@ -118,7 +123,8 @@ const PublishPropertyForm = () => {
       }
     }
     
-    setStep(prev => Math.min(prev + 1, 3));
+    // NOTA: Si descomentas el paso 3, cambia el Math.min(prev + 1, 2) a Math.min(prev + 1, 3)
+    setStep(prev => Math.min(prev + 1, 2));
   };
 
   const prevStep = () => setStep(prev => Math.max(prev - 1, 1));
@@ -127,7 +133,8 @@ const PublishPropertyForm = () => {
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') {
       e.preventDefault();
-      if (step < 3) {
+      // Cambiar a step < 3 si descomentas el paso de fotos
+      if (step < 2) {
         nextStep();
       }
     }
@@ -136,16 +143,38 @@ const PublishPropertyForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // 🌟 SEGURO: Evita el envío si no está en el paso de fotos
-    if (step !== 3) return;
+    // Cambiar a step !== 3 si descomentas el paso de fotos
+    if (step !== 2) return;
 
     try {
-      alert("¡Propiedad publicada con éxito!");
-      setStep(1);
-      setFormData({ nombre: '', rut: '', email: '', telefono: '', comentarios: '', direccion: '', ciudad: '', tipoPropiedad: '', superficie: '', precio: '', fotos: [] });
+      // 🌟 INTEGRACIÓN HACIA TU BACKEND / CRM
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      
+      const response = await fetch(`${API_URL}/api/propiedades/publicar`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      });
+
+      if (response.ok) {
+        alert("¡Propiedad enviada al CRM con éxito!");
+        setStep(1);
+        setFormData({ 
+          nombre: '', rut: '', email: '', telefono: '', 
+          comentarios: '', direccion: '', ciudad: '', 
+          tipoPropiedad: '', superficie: '', precio: '' 
+          // fotos: [] // Descomentar si se usa el Paso 3
+        });
+      } else {
+        const errorData = await response.json();
+        alert("Ocurrió un error al subir la propiedad: " + (errorData.mensaje || errorData.error));
+      }
+
     } catch (error) {
       console.error("Error al enviar el formulario:", error);
-      alert("Ocurrió un error al enviar el formulario. Inténtalo de nuevo.");
+      alert("Error de conexión con el servidor. Inténtalo de nuevo más tarde.");
     }
   };
 
@@ -170,13 +199,13 @@ const PublishPropertyForm = () => {
             Publica hoy tu propiedad en Alaluf
           </p>
           <p className="text-gray-400 font-medium text-xs sm:text-sm md:text-base mt-3 sm:mt-4 max-w-2xl mx-auto leading-relaxed">
-            Es simple y seguro, completa tus datos y los de tu propiedad, sube las mejores fotos buscando buena luz, orden y privilegia lo más destacado del espacio.
+            Es simple y seguro, completa tus datos y los de tu propiedad. Nos pondremos en contacto contigo a la brevedad.
           </p>
         </div>
 
-        {/* NAVEGACIÓN DE PASOS (TABS) */}
+        {/* NAVEGACIÓN DE PASOS (TABS) - INCLUYE EL PASO 3 PERO ESTÁ VISUALMENTE PINTADO DE GRIS OMITIENDO LA CONDICIÓN */}
         <div className="flex flex-col sm:flex-row w-full mb-6 sm:mb-10 border border-gray-300 rounded-3xl sm:rounded-full overflow-hidden bg-white">
-          {['1. DATOS CLIENTE', '2. DATOS PROPIEDAD', '3. FOTOS'].map((label, index) => {
+          {['1. DATOS CLIENTE', '2. DATOS PROPIEDAD'].map((label, index) => {
             const stepIndex = index + 1;
             const isActive = step === stepIndex;
             return (
@@ -321,8 +350,8 @@ const PublishPropertyForm = () => {
               </motion.div>
             )}
 
-            {/* PASO 3 */}
-            {step === 3 && (
+            {/* 🌟 PASO 3 (FOTOS) - COMENTADO PARA DESHABILITARLO VISUAL Y FUNCIONALMENTE */}
+            {/* {step === 3 && (
               <motion.div
                 key="step3"
                 initial={{ opacity: 0, x: -20 }}
@@ -365,7 +394,8 @@ const PublishPropertyForm = () => {
                   </p>
                 </div>
               </motion.div>
-            )}
+            )} 
+            */}
           </AnimatePresence>
 
           {/* BOTONES DE NAVEGACIÓN */}
@@ -382,7 +412,8 @@ const PublishPropertyForm = () => {
               <div></div> 
             )}
 
-            {step < 3 && (
+            {/* Cambiar a step < 3 si descomentas el paso 3 */}
+            {step < 2 && (
               <button 
                 type="button" 
                 onClick={(e) => { e.preventDefault(); nextStep(); }}
@@ -392,12 +423,13 @@ const PublishPropertyForm = () => {
               </button>
             )}
 
-            {step === 3 && (
+            {/* Cambiar a step === 3 si descomentas el paso 3 */}
+            {step === 2 && (
               <button 
                 type="submit" 
-                className="flex items-center justify-center gap-2 bg-gray-800 hover:bg-gray-900 text-white w-full sm:w-auto px-6 sm:px-10 py-3 sm:py-3.5 rounded-lg font-bold text-xs sm:text-[15px] transition shadow-md sm:w-auto"
+                className="flex items-center justify-center gap-2 bg-gray-800 hover:bg-gray-900 text-white w-full sm:w-auto px-6 sm:px-10 py-3 sm:py-3.5 rounded-lg font-bold text-xs sm:text-[15px] transition shadow-md"
               >
-                ENVIAR
+                PUBLICAR PROPIEDAD
               </button>
             )}
           </div>
