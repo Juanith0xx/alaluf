@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async'; // <-- Importación de Helmet añadida
 
 // Importación de imágenes
 import fondoComercial from '../assets/comercial.jpeg'; 
@@ -17,6 +18,22 @@ const Comercial = () => {
     const tipo_prop = tipo === "Locales" ? "4A" : "3A";
     
     navigate(`/buscar?tipo_prop=${tipo_prop}&obj=${obj}`);
+  };
+
+  // Datos Estructurados (Schema Markup) adaptados para sector Comercial y Oficinas
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "RealEstateAgent",
+    "name": "Estrategia Comercial Inmobiliaria",
+    "description": "Asesoría experta en venta y arriendo de locales comerciales y oficinas en el sector oriente de Santiago. Estudiamos flujo peatonal, competencia y vacancia.",
+    "url": "https://alaluf.vercel.app/comercial",
+    //"image": "https://www.tudominio.cl/assets/comercial.jpeg", // 
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Santiago",
+      "addressRegion": "Región Metropolitana",
+      "addressCountry": "CL"
+    }
   };
 
   const ToggleSwitch = ({ activo, setActivo }) => (
@@ -41,98 +58,132 @@ const Comercial = () => {
   );
 
   return (
-    <main 
-      className="w-full min-h-screen bg-cover bg-center bg-fixed font-[Outfit] pt-28 sm:pt-32 md:pt-40"
-      style={{ backgroundImage: `url(${fondoMarmol})` }}
-    >
-      
-      {/* SECCIÓN HERO */}
-      <section className="relative w-full h-[200px] sm:h-[250px] md:h-[350px] lg:h-[400px] overflow-hidden border-b border-white/10">
-        <img src={fondoComercial} alt="Fondo Comercial" className="absolute inset-0 w-full h-full object-cover z-0" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10"></div>
-        <div className="absolute z-20 w-[90%] sm:w-auto" style={{ left: '8%', bottom: '35%' }}>
-          <h1 className="text-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight uppercase drop-shadow-lg leading-none">
-            COMERCIAL
-          </h1>
-        </div>
-      </section>
+    <>
+      <Helmet>
+        {/* Título y Descripción Básica */}
+        <title>Arriendo y Venta de Locales y Oficinas | Propiedades Comerciales</title>
+        <meta name="description" content="Encuentra locales comerciales y oficinas en el sector oriente de Santiago. Analizamos flujo peatonal, competencia y rentabilidad para que tu negocio crezca." />
+        <meta name="keywords" content="locales comerciales, arriendo de oficinas, venta de locales, propiedades comerciales, sector oriente, Santiago, bienes raíces comerciales, retail" />
 
-      {/* SECCIÓN TEXTO INTRODUCTORIO */}
-      <section className="container mx-auto px-4 sm:px-6 py-10 md:py-16 max-w-7xl text-center relative z-10">
-        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-3 drop-shadow-md">
-          Estrategia Comercial Inmobiliaria
-        </h2>
-        <p className="text-[#0091A4] text-base sm:text-lg md:text-xl font-semibold mb-8 max-w-3xl mx-auto px-2">
-          Estudiamos dónde crece tu negocio antes de mostrarte solo un espacio.
-        </p>
-      </section>
+        {/* URL Canónica */}
+        <link rel="canonical" href="https://alaluf.vercel.app/comercial" />
 
-      {/* SECCIÓN TARJETAS */}
-      <section className="py-4 px-4 sm:px-6 md:px-20 relative z-10">
-        <div className="container mx-auto max-w-7xl">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 max-w-6xl mx-auto items-stretch">
-            
-            {/* Tarjeta LOCALES */}
-            <div className="bg-white text-gray-800 rounded-3xl p-6 sm:p-8 md:p-10 shadow-2xl flex flex-col justify-between border border-gray-100">
-              <div>
-                <div className="bg-[#404040] text-center text-white rounded-xl py-3 px-6 mb-6 font-bold tracking-wider uppercase text-sm shadow-sm">Locales</div>
-                <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 mb-4 leading-snug">
-                  El local correcto no es el más barato. Es el que más vende.
-                </h3>
-                <p className="text-gray-700 text-xs sm:text-sm md:text-base leading-relaxed mb-6 font-normal">
-                  Locales comerciales, casas comerciales y retail en el sector oriente de Santiago. 
-                  Estudiamos flujo peatonal, perfil del barrio, competencia y proyección.
-                </p>
-                <ToggleSwitch activo={localesAccion} setActivo={setLocalesAccion} />
-              </div>
-              <button 
-                onClick={() => handleNavegacion("Locales", localesAccion)}
-                className="w-full sm:w-fit text-center bg-[#0091A4] hover:bg-[#007a8a] text-white font-bold py-3.5 px-6 rounded-xl transition duration-300 active:scale-95 text-sm md:text-base shadow-md mt-4"
-              >
-                Explorar locales en {localesAccion.toLowerCase()}
-              </button>
-            </div>
+        {/* Open Graph (Para vistas previas en Facebook, LinkedIn, WhatsApp) */}
+        <meta property="og:title" content="Propiedades Comerciales: Locales y Oficinas" />
+        <meta property="og:description" content="El local correcto no es el más barato, es el que más vende. Encuentra tu próxima propiedad comercial u oficina en Santiago." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://alaluf.vercel.app/comercial" />
+        {/* <meta property="og:image" content="https://www.tudominio.cl/assets/comercial.jpeg" /> */}
 
-            {/* Tarjeta OFICINAS */}
-            <div className="bg-white text-gray-800 rounded-3xl p-6 sm:p-8 md:p-10 shadow-2xl flex flex-col justify-between border border-gray-100">
-              <div>
-                <div className="bg-[#404040] text-center text-white rounded-xl py-3 px-6 mb-6 font-bold tracking-wider uppercase text-sm shadow-sm">Oficinas</div>
-                <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 mb-4 leading-snug">
-                  El mercado de oficinas en Santiago vive su mejor momento. ¿Sabes cómo aprovecharlo?
-                </h3>
-                <p className="text-gray-700 text-xs sm:text-sm md:text-base leading-relaxed mb-3 font-normal">
-                  La vacancia de oficinas Clase A en Santiago está en mínimos históricos. Analizamos contigo la 
-                  opción correcta antes de que desaparezca del mercado.
-                </p>
-                <ToggleSwitch activo={oficinasAccion} setActivo={setOficinasAccion} />
-              </div>
-              <button 
-                onClick={() => handleNavegacion("Oficinas", oficinasAccion)}
-                className="w-full sm:w-fit text-center bg-[#0091A4] hover:bg-[#007a8a] text-white font-bold py-3.5 px-6 rounded-xl transition duration-300 active:scale-95 text-sm md:text-base shadow-md mt-4"
-              >
-                Encontrar oficinas en {oficinasAccion.toLowerCase()}
-              </button>
-            </div>
+        {/* Twitter Cards (Para X / Twitter) */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Estrategia Comercial Inmobiliaria | Santiago" />
+        <meta name="twitter:description" content="Estudiamos dónde crece tu negocio antes de mostrarte solo un espacio. Locales y oficinas exclusivas." />
+        {/* <meta name="twitter:image" content="http://localhost:5173/comercial" /> */}
 
+        {/* Inserción de Datos Estructurados JSON-LD */}
+        <script type="application/ld+json">
+          {JSON.stringify(structuredData)}
+        </script>
+      </Helmet>
+
+      <main 
+        className="w-full min-h-screen bg-cover bg-center bg-fixed font-[Outfit] pt-28 sm:pt-32 md:pt-40"
+        style={{ backgroundImage: `url(${fondoMarmol})` }}
+      >
+        
+        {/* SECCIÓN HERO */}
+        <section className="relative w-full h-[200px] sm:h-[250px] md:h-[350px] lg:h-[400px] overflow-hidden border-b border-white/10">
+          <img 
+            src={fondoComercial} 
+            alt="Locales comerciales y oficinas en arriendo y venta en Santiago" // <-- Alt optimizado
+            className="absolute inset-0 w-full h-full object-cover z-0" 
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10"></div>
+          <div className="absolute z-20 w-[90%] sm:w-auto" style={{ left: '8%', bottom: '35%' }}>
+            <h1 className="text-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight uppercase drop-shadow-lg leading-none">
+              COMERCIAL
+            </h1>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* BANNER CTA */}
-      <section className="py-12 md:py-16 px-4 sm:px-6 md:px-20 relative z-10">
-        <div className="container mx-auto max-w-7xl">
-          <div className="bg-[#0091A4] text-center text-white rounded-2xl p-6 sm:p-10 md:p-14 shadow-2xl">
-            <h4 className="text-2xl sm:text-3xl md:text-4xl font-extrabold mb-4 leading-snug">Accede antes que el mercado</h4>
-            <p className="text-sm sm:text-base md:text-xl font-medium max-w-4xl mb-8 mx-auto leading-relaxed">
-              Recibe oportunidades comerciales que no se publican abiertamente.
-            </p>
-            <a href="#" className="w-full sm:w-fit inline-block bg-white text-[#0091A4] hover:bg-gray-100 font-bold text-base md:text-lg px-8 sm:px-12 py-3.5 md:py-4 rounded-xl shadow-md transition duration-300 active:scale-95">
-              Quiero acceder
-            </a>
+        {/* SECCIÓN TEXTO INTRODUCTORIO */}
+        <section className="container mx-auto px-4 sm:px-6 py-10 md:py-16 max-w-7xl text-center relative z-10">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-3 drop-shadow-md">
+            Estrategia Comercial Inmobiliaria
+          </h2>
+          <p className="text-[#0091A4] text-base sm:text-lg md:text-xl font-semibold mb-8 max-w-3xl mx-auto px-2">
+            Estudiamos dónde crece tu negocio antes de mostrarte solo un espacio.
+          </p>
+        </section>
+
+        {/* SECCIÓN TARJETAS */}
+        <section className="py-4 px-4 sm:px-6 md:px-20 relative z-10">
+          <div className="container mx-auto max-w-7xl">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 max-w-6xl mx-auto items-stretch">
+              
+              {/* Tarjeta LOCALES */}
+              <div className="bg-white text-gray-800 rounded-3xl p-6 sm:p-8 md:p-10 shadow-2xl flex flex-col justify-between border border-gray-100">
+                <div>
+                  <div className="bg-[#404040] text-center text-white rounded-xl py-3 px-6 mb-6 font-bold tracking-wider uppercase text-sm shadow-sm">Locales</div>
+                  <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 mb-4 leading-snug">
+                    El local correcto no es el más barato. Es el que más vende.
+                  </h3>
+                  <p className="text-gray-700 text-xs sm:text-sm md:text-base leading-relaxed mb-6 font-normal">
+                    Locales comerciales, casas comerciales y retail en el sector oriente de Santiago. 
+                    Estudiamos flujo peatonal, perfil del barrio, competencia y proyección.
+                  </p>
+                  <ToggleSwitch activo={localesAccion} setActivo={setLocalesAccion} />
+                </div>
+                <button 
+                  onClick={() => handleNavegacion("Locales", localesAccion)}
+                  className="w-full sm:w-fit text-center bg-[#0091A4] hover:bg-[#007a8a] text-white font-bold py-3.5 px-6 rounded-xl transition duration-300 active:scale-95 text-sm md:text-base shadow-md mt-4"
+                >
+                  Explorar locales en {localesAccion.toLowerCase()}
+                </button>
+              </div>
+
+              {/* Tarjeta OFICINAS */}
+              <div className="bg-white text-gray-800 rounded-3xl p-6 sm:p-8 md:p-10 shadow-2xl flex flex-col justify-between border border-gray-100">
+                <div>
+                  <div className="bg-[#404040] text-center text-white rounded-xl py-3 px-6 mb-6 font-bold tracking-wider uppercase text-sm shadow-sm">Oficinas</div>
+                  <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 mb-4 leading-snug">
+                    El mercado de oficinas en Santiago vive su mejor momento. ¿Sabes cómo aprovecharlo?
+                  </h3>
+                  <p className="text-gray-700 text-xs sm:text-sm md:text-base leading-relaxed mb-3 font-normal">
+                    La vacancia de oficinas Clase A en Santiago está en mínimos históricos. Analizamos contigo la 
+                    opción correcta antes de que desaparezca del mercado.
+                  </p>
+                  <ToggleSwitch activo={oficinasAccion} setActivo={setOficinasAccion} />
+                </div>
+                <button 
+                  onClick={() => handleNavegacion("Oficinas", oficinasAccion)}
+                  className="w-full sm:w-fit text-center bg-[#0091A4] hover:bg-[#007a8a] text-white font-bold py-3.5 px-6 rounded-xl transition duration-300 active:scale-95 text-sm md:text-base shadow-md mt-4"
+                >
+                  Encontrar oficinas en {oficinasAccion.toLowerCase()}
+                </button>
+              </div>
+
+            </div>
           </div>
-        </div>
-      </section>
-    </main>
+        </section>
+
+        {/* BANNER CTA */}
+        <section className="py-12 md:py-16 px-4 sm:px-6 md:px-20 relative z-10">
+          <div className="container mx-auto max-w-7xl">
+            <div className="bg-[#0091A4] text-center text-white rounded-2xl p-6 sm:p-10 md:p-14 shadow-2xl">
+              <h4 className="text-2xl sm:text-3xl md:text-4xl font-extrabold mb-4 leading-snug">Accede antes que el mercado</h4>
+              <p className="text-sm sm:text-base md:text-xl font-medium max-w-4xl mb-8 mx-auto leading-relaxed">
+                Recibe oportunidades comerciales que no se publican abiertamente.
+              </p>
+              <a href="#" className="w-full sm:w-fit inline-block bg-white text-[#0091A4] hover:bg-gray-100 font-bold text-base md:text-lg px-8 sm:px-12 py-3.5 md:py-4 rounded-xl shadow-md transition duration-300 active:scale-95">
+                Quiero acceder
+              </a>
+            </div>
+          </div>
+        </section>
+      </main>
+    </>
   );
 };
 
