@@ -154,7 +154,7 @@ const ContactForm = ({
           nombre: "", rut: "", email: "", telefono: "", mensaje: "", 
           id_tipo_propiedad: mapearTipoPropiedad(tipoPropiedadNombre) 
         });
-        if (onSubmitSuccess) onSubmitSuccess();
+        if (onSubmitSuccess) onSubmitSuccess(formData);
       } else {
         alert(`Hubo un problema al procesar el envío: ${result.message}`);
       }

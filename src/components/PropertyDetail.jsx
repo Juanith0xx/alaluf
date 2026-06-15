@@ -41,6 +41,10 @@ const PropertyDetail = ({ property }) => {
   const [bloqueHorario, setBloqueHorario] = useState(null); 
   const [horaSeleccionada, setHoraSeleccionada] = useState(null); 
 
+  // ESTADOS PARA EL FLUJO DE AGENDA ADJUNTO AL FORMULARIO
+  const [visitaAgendada, setVisitaAgendada] = useState(null);
+  const [enviandoLead, setEnviandoLead] = useState(false);
+
   if (!property) return null;
   console.log("PROPERTY DETAIL:", property);
 
@@ -48,11 +52,20 @@ const PropertyDetail = ({ property }) => {
   const precioPrincipal = property.precios?.venta?.valor || property.precios?.arriendo?.valor;
   const moneda = property.precios?.venta?.moneda || property.precios?.arriendo?.moneda;
 
+  const tipo = (
+    property.desc_tipo ||
+    property.tipoPropiedad ||
+    property.tipo ||
+    property.categoria ||
+    property.titulo ||
+    ""
+  ).toLowerCase();
+
   // DEFINICIÓN DE RANGOS HORARIOS DISPONIBLES (Intervalos de 30 minutos)
   const rangoManana = ["09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00"];
   const rangoTarde = ["14:30", "15:00", "15:30", "16:00", "16:30", "17:00", "17:30", "18:00"];
 
-  // 🌟 FUNCIÓN PARA AÑADIR SEPARADOR DE MILES EN FORMATO CHILENO
+  // FUNCIÓN PARA AÑADIR SEPARADOR DE MILES EN FORMATO CHILENO
   const formatearPrecio = (valor) => {
     if (!valor) return "";
     const numero = parseFloat(valor);
@@ -82,8 +95,80 @@ const PropertyDetail = ({ property }) => {
   return campo.value;
 };
 
-  const handleContactSubmit = (data) => {
-    console.log("Contacto para propiedad:", property.codigo, data);
+  // 🌟 GESTOR DE ENVÍO DE FORMULARIO DE CONTACTO Y VISITA (Estructura Alaluf CRM)
+  const handleContactSubmit = async (formData) => {
+    console.log("Contacto para propiedad:", property.codigo, formData);
+    
+    // Mapeo y saneamiento de campos para el CRM de Alaluf
+    const nombreContacto = formData?.nombre || formData?.razon_social || "";
+    const email = formData?.email || formData?.correo || "";
+    const fono = formData?.fono || formData?.telefono || "";
+    const requerimiento = formData?.requerimiento || formData?.mensaje || "";
+
+    if (!nombreContacto.trim()) {
+      alert("Por favor, completa tu Nombre Completo en el formulario de contacto.");
+      return;
+    }
+
+    if (!email.trim() && !fono.trim()) {
+      alert("Por favor, ingresa al menos un Correo Electrónico o un Teléfono de contacto.");
+      return;
+    }
+
+    // 🌟 ADJUNTA EL TEXTO DE LA VISITA AL REQUERIMIENTO / MENSAJE
+    let requerimientoFinal = requerimiento.trim();
+    if (visitaAgendada) {
+      const detalleVisita = `--- ASUNTO: Solicitud de Visita Agendada ---\nDía: ${visitaAgendada.fechaFormateada}\nHora: ${visitaAgendada.hora} hrs.`;
+      requerimientoFinal = requerimientoFinal 
+        ? `${requerimientoFinal}\n\n${detalleVisita}` 
+        : detalleVisita;
+    }
+
+    setEnviandoLead(true);
+
+    try {
+      const leadData = {
+        razon_social: nombreContacto.trim(),
+        rut: formData?.rut || "12345678-9", 
+        email: email.trim(),
+        fono: fono.trim(),
+        requerimiento: requerimientoFinal, // 🌟 Usamos el requerimiento enriquecido con el agendamiento
+        id_objetivo_llamada: property.precios?.venta?.valor ? 1 : 2, // 1 = Venta, 2 = Arriendo
+        id_tipo_propiedad: property.idtipo || null, 
+        fk_comuna: property.ubicacion?.comuna_id || null,
+        id_prop_pw: String(property.codigo) || "0",
+        agendamiento: !!visitaAgendada,
+        fecha_visita_meli: visitaAgendada ? visitaAgendada.fechaId : "",
+        hora_visita_meli: visitaAgendada ? visitaAgendada.hora : ""
+      };
+
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
+      const response = await fetch(`${API_URL}/api/save_lead`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(leadData)
+      });
+
+      if (response.ok) {
+        alert("¡Solicitud y agendamiento enviados con éxito! Un asesor se pondrá en contacto contigo a la brevedad.");
+        
+        // Resetear controles, campos y agendamiento tras éxito
+        setDiaSeleccionado(diasDisponibles[0] || null);
+        setBloqueHorario(null);
+        setHoraSeleccionada(null);
+        setVisitaAgendada(null);
+      } else {
+        alert("Hubo un error al registrar tu solicitud en el servidor.");
+      }
+    } catch (error) {
+      console.error("Error enviando lead:", error);
+      alert("Error de red. Revisa tu conexión con el servidor e inténtalo más tarde.");
+    } finally {
+      setEnviandoLead(false);
+    }
   };
 
   const openLightbox = (index) => {
@@ -137,15 +222,6 @@ const PropertyDetail = ({ property }) => {
   if (!diaSeleccionado && diasDisponibles.length > 0) {
     setDiaSeleccionado(diasDisponibles[0]);
   }
-
-const tipo = (
-  property.desc_tipo ||
-  property.tipoPropiedad ||
-  property.tipo ||
-  property.categoria ||
-  property.titulo ||
-  ""
-).toLowerCase();
 
 const getExtraValue = (texto) => {
   const campo = property.detalles?.caracteristicasExtra?.find(
@@ -276,7 +352,6 @@ const Feature = ({ icon: Icon, title, value }) => (
                 <span className="line-clamp-2">{property.ubicacion?.direccion}, {property.ubicacion?.comuna}</span>
               </div>
               <div className="pt-2 flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-4">
-                {/* 🌟 PRECIO FORMATEADO CON SEPARADOR DE MILES */}
                 <span className="text-3xl md:text-5xl font-black text-[#24B6C1]">
                   {formatearPrecio(precioPrincipal)} {moneda}
                 </span>
@@ -547,7 +622,11 @@ const Feature = ({ icon: Icon, title, value }) => (
                       <button
                         key={dia.id}
                         type="button"
-                        onClick={() => setDiaSeleccionado(dia)}
+                        onClick={() => {
+                          setDiaSeleccionado(dia);
+                          setBloqueHorario(null); 
+                          setHoraSeleccionada(null);
+                        }}
                         className={`flex flex-col items-center justify-center min-w-[52px] h-[60px] rounded-xl border transition-all snap-center ${
                           isSelected
                             ? "bg-[#24B6C1] text-white border-[#24B6C1] shadow-md scale-105"
@@ -663,20 +742,41 @@ const Feature = ({ icon: Icon, title, value }) => (
                 </div>
               </div>
 
-              {/* Botón de Confirmación */}
+              {/* COMPONENTE VISUAL DE AGENDAMIENTO ADJUNTO */}
+              {visitaAgendada && (
+                <div className="bg-[#24B6C1]/80 border border-[#24B6C1]/30 p-4 rounded-2xl text-xs text-white space-y-2 mb-4 animate-fadeIn">
+                  <span className="font-bold block">✓ Agendamiento cargado:</span>
+                  <p>{visitaAgendada.fechaFormateada} a las {visitaAgendada.hora} hrs.</p>
+                  <button 
+                    type="button"
+                    onClick={() => setVisitaAgendada(null)}
+                    className="text-[10px] text-red-400 font-bold underline hover:text-red-300 block"
+                  >
+                    Quitar agendamiento
+                  </button>
+                </div>
+              )}
+
+              {/* Botón de Agregar Agendamiento */}
               <button 
                 type="button"
                 onClick={() => {
                   if (!diaSeleccionado || !bloqueHorario || !horaSeleccionada) {
-                    alert("Por favor, selecciona un día, un bloque y la hora exacta de tu visita.");
+                    alert("Por favor, selecciona un día, un bloque y la hora exacta de tu visita antes de agregarla.");
                     return;
                   }
-                  alert(`¡Solicitud enviada!\nPropiedad: ${property.codigo}\nFecha: ${diaSeleccionado.fechaCompleta}\nHora: ${horaSeleccionada} hrs.`);
+                  setVisitaAgendada({
+                    fechaId: diaSeleccionado.id,
+                    fechaFormateada: diaSeleccionado.fechaCompleta,
+                    hora: horaSeleccionada
+                  });
+                  alert(`¡Visita agregada correctamente al formulario!\nAhora completa tus datos de contacto abajo para finalizar.`);
                 }}
-                className="w-full py-3.5 bg-[#24B6C1] hover:bg-[#1da0ab] text-white rounded-xl font-bold uppercase text-xs tracking-widest shadow-lg shadow-[#24B6C1]/20 active:scale-[0.98] transition-all duration-200"
+                className="w-full py-3.5 bg-[#24B6C1] hover:bg-[#1da0ab] text-white rounded-xl font-bold uppercase text-xs tracking-widest shadow-lg shadow-[#24B6C1]/20 active:scale-[0.98] transition-all duration-300 mb-4"
               >
-                Confirmar Visita
+                ➕ Agregar Agendamiento
               </button>
+
             </div>
 
             {/* Formulario de Contacto Modular */}
