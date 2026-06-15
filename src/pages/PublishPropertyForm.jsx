@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, ArrowLeft } from "lucide-react";
-// import { UploadCloud } from "lucide-react"; // Descomentar si se vuelve a usar el Paso 3
+import { ArrowRight, ArrowLeft, Loader2 } from "lucide-react";
 import bgMarmol from '../assets/Marmol.jpg';
+import comunasDataset from '../data/comunas.json'; // 🌟 Importado desde el archivo JSON externo
 
 // 🌟 FUNCIÓN DE VALIDACIÓN DE RUT CHILENO
 const validateRut = (rut) => {
@@ -39,9 +39,25 @@ const formatRut = (rut) => {
   return `${body}-${dv}`;
 };
 
+// 🌟 MAPEO DE TIPOS DE PROPIEDAD A CÓDIGOS NUMÉRICOS DE ALALUF
+const mapTipoPropiedad = (tipo) => {
+  const mapping = {
+    'Oficina': 3,
+    'Local Comercial': 4,
+    'Casa Comercial': 5,
+    'Galpon / Bodega': 8,
+    'Terrenos Industriales': 7,
+    'Terrenos Proyecto': 6,
+    'Departamento': 2,
+    'Casa': 1
+  };
+  return mapping[tipo] || 0;
+};
+
 const PublishPropertyForm = () => {
   const [step, setStep] = useState(1);
   const [rutError, setRutError] = useState(false);
+  const [autoDetecting, setAutoDetecting] = useState(false);
   const navigate = useNavigate();
   
   const [formData, setFormData] = useState({
@@ -51,11 +67,10 @@ const PublishPropertyForm = () => {
     telefono: '',
     comentarios: '',
     direccion: '',
-    ciudad: '',
+    comunaId: '', 
     tipoPropiedad: '',
     superficie: '',
     precio: ''
-    // fotos: [] // Descomentar si se usa el Paso 3
   });
 
   const handleInputChange = (e) => {
@@ -81,18 +96,44 @@ const PublishPropertyForm = () => {
     }
   };
 
-  /* // 🌟 FUNCIONES PARA EL PASO 3 (COMENTADAS HASTA QUE SE DESCOMENTE EL PASO)
-  const handleFileChange = (e) => {
-    const files = Array.from(e.target.files);
-    setFormData(prev => ({ ...prev, fotos: [...prev.fotos, ...files] }));
-  };
+  // 🌟 FUNCIÓN PARA DETECTAR LA COMUNA MEDIANTE LA DIRECCIÓN ESCRITA
+  const handleAddressBlur = async () => {
+    const direccion = formData.direccion.trim();
+    if (!direccion || direccion.length < 5) return;
 
-  const removePhoto = (index) => {
-    setFormData(prev => ({
-      ...prev,
-      fotos: prev.fotos.filter((_, i) => i !== index)
-    }));
-  }; */
+    setAutoDetecting(true);
+    try {
+      // Consultamos la API pública de OpenStreetMap (Nominatim) buscando la dirección en Chile
+      const url = `https://nominatim.openstreetmap.org/search?format=json&countrycodes=CL&q=${encodeURIComponent(direccion + ", Chile")}`;
+      const response = await fetch(url);
+      const data = await response.json();
+
+      if (data && data.length > 0) {
+        const resultado = data[0]; // Tomamos el primer resultado devuelto
+        const displayName = resultado.display_name.toLowerCase();
+
+        // Buscamos cuál de nuestras comunas coincide en el texto de la dirección devuelta
+        const comunaEncontrada = comunasDataset.find(comuna => 
+          displayName.includes(comuna.label.toLowerCase())
+        );
+
+        if (comunaEncontrada) {
+          setFormData(prev => ({ ...prev, comunaId: comunaEncontrada.id }));
+        } else {
+          // Si no la encuentra dentro del dataset pero trajo ciudad, intentamos un fallback
+          const ciudadLimpia = resultado.address?.state || resultado.address?.county || "";
+          const fallbackComuna = comunasDataset.find(c => ciudadLimpia.toLowerCase().includes(c.label.toLowerCase()));
+          if (fallbackComuna) {
+            setFormData(prev => ({ ...prev, comunaId: fallbackComuna.id }));
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error autodetectando comuna:", error);
+    } finally {
+      setAutoDetecting(false);
+    }
+  };
 
   const nextStep = () => {
     if (step === 1) {
@@ -108,32 +149,29 @@ const PublishPropertyForm = () => {
     }
 
     if (step === 2) {
-      const { direccion, ciudad, tipoPropiedad, superficie, precio } = formData;
+      const { direccion, comunaId, tipoPropiedad, superficie, precio } = formData;
       const superficieValida = String(superficie).trim() !== '' && Number(superficie) > 0;
 
       if (
         !direccion.trim() ||
-        !ciudad.trim() ||
+        !comunaId ||
         !tipoPropiedad ||
         !superficieValida ||
         !precio.trim()
       ) {
-        alert("Por favor, completa todos los datos de la propiedad.");
+        alert("Por favor, completa todos los datos obligatorios de la propiedad seleccionando su comuna y tipo.");
         return;
       }
     }
     
-    // NOTA: Si descomentas el paso 3, cambia el Math.min(prev + 1, 2) a Math.min(prev + 1, 3)
     setStep(prev => Math.min(prev + 1, 2));
   };
 
   const prevStep = () => setStep(prev => Math.max(prev - 1, 1));
 
-  // 🌟 BLOQUEO DEL ENTER PREMATURO
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') {
       e.preventDefault();
-      // Cambiar a step < 3 si descomentas el paso de fotos
       if (step < 2) {
         nextStep();
       }
@@ -142,20 +180,29 @@ const PublishPropertyForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Cambiar a step !== 3 si descomentas el paso de fotos
     if (step !== 2) return;
 
     try {
-      // 🌟 INTEGRACIÓN HACIA TU BACKEND / CRM
       const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
+      // 🌟 EMPAQUETADO DE DATOS BAJO EL CONTRATO DE ALALUF (save_ep.php)
+      const payloadAlaluf = {
+        prop: formData.direccion,
+        comuna: parseInt(formData.comunaId, 10),
+        tipoProp: mapTipoPropiedad(formData.tipoPropiedad),
+        sup: parseFloat(formData.superficie),
+        rz: formData.nombre,
+        rut: formData.rut.replace(/\./g, ''), // 🌟 Se remueven puntos pero se mantiene el guion separador (Ej: 12345678-9)
+        tel: formData.telefono,
+        email: formData.email,
+        valor: parseFloat(formData.precio.replace(/[^0-9.]/g, '')) || 0,
+        rec: formData.comentarios
+      };
       
       const response = await fetch(`${API_URL}/api/propiedades/publicar`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(formData)
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payloadAlaluf)
       });
 
       if (response.ok) {
@@ -163,13 +210,12 @@ const PublishPropertyForm = () => {
         setStep(1);
         setFormData({ 
           nombre: '', rut: '', email: '', telefono: '', 
-          comentarios: '', direccion: '', ciudad: '', 
+          comentarios: '', direccion: '', comunaId: '', 
           tipoPropiedad: '', superficie: '', precio: '' 
-          // fotos: [] // Descomentar si se usa el Paso 3
         });
       } else {
         const errorData = await response.json();
-        alert("Ocurrió un error al subir la propiedad: " + (errorData.mensaje || errorData.error));
+        alert("Ocurrió un error al subir la propiedad: " + (errorData.mensaje || errorData.error || JSON.stringify(errorData)));
       }
 
     } catch (error) {
@@ -203,7 +249,7 @@ const PublishPropertyForm = () => {
           </p>
         </div>
 
-        {/* NAVEGACIÓN DE PASOS (TABS) - INCLUYE EL PASO 3 PERO ESTÁ VISUALMENTE PINTADO DE GRIS OMITIENDO LA CONDICIÓN */}
+        {/* NAVEGACIÓN DE PASOS (TABS) */}
         <div className="flex flex-col sm:flex-row w-full mb-6 sm:mb-10 border border-gray-300 rounded-3xl sm:rounded-full overflow-hidden bg-white">
           {['1. DATOS CLIENTE', '2. DATOS PROPIEDAD'].map((label, index) => {
             const stepIndex = index + 1;
@@ -295,20 +341,32 @@ const PublishPropertyForm = () => {
                 className="space-y-4 sm:space-y-6"
               >
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-                  <div className="sm:col-span-2">
+                  <div className="sm:col-span-2 relative">
                     <label className="text-sm sm:text-[15px] font-bold text-black block mb-1 sm:mb-2">Dirección de la Propiedad *</label>
-                    <input 
-                      type="text" name="direccion" value={formData.direccion} onChange={handleInputChange} placeholder="Calle, número, depto..." 
-                      className="w-full bg-white border border-gray-200 rounded-lg p-3 sm:p-3.5 text-sm sm:text-[15px] text-gray-800 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300 transition"
-                    />
+                    <div className="relative">
+                      <input 
+                        type="text" name="direccion" value={formData.direccion} onChange={handleInputChange} onBlur={handleAddressBlur} placeholder="Calle, número, depto..." 
+                        className="w-full bg-white border border-gray-200 rounded-lg p-3 sm:p-3.5 pe-10 text-sm sm:text-[15px] text-gray-800 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300 transition"
+                      />
+                      {autoDetecting && (
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2 text-[#24B6C1] animate-spin">
+                          <Loader2 size={18} />
+                        </div>
+                      )}
+                    </div>
                   </div>
 
                   <div>
-                    <label className="text-sm sm:text-[15px] font-bold text-black block mb-1 sm:mb-2">Ciudad *</label>
-                    <input 
-                      type="text" name="ciudad" value={formData.ciudad} onChange={handleInputChange} placeholder="Ej. Santiago, La Serena..." 
-                      className="w-full bg-white border border-gray-200 rounded-lg p-3 sm:p-3.5 text-sm sm:text-[15px] text-gray-800 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300 transition"
-                    />
+                    <label className="text-sm sm:text-[15px] font-bold text-black block mb-1 sm:mb-2">Comuna de Ubicación *</label>
+                    <select 
+                      name="comunaId" value={formData.comunaId} onChange={handleInputChange}
+                      className="w-full bg-white border border-gray-200 rounded-lg p-3 sm:p-3.5 text-sm sm:text-[15px] text-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-300 transition cursor-pointer"
+                    >
+                      <option value="">Seleccionar comuna</option>
+                      {comunasDataset.map(com => (
+                        <option key={com.id} value={com.id}>{com.label}</option>
+                      ))}
+                    </select>
                   </div>
 
                   <div>
@@ -340,7 +398,7 @@ const PublishPropertyForm = () => {
                   </div>
 
                   <div>
-                    <label className="text-sm sm:text-[15px] font-bold text-black block mb-1 sm:mb-2">Precio *</label>
+                    <label className="text-sm sm:text-[15px] font-bold text-black block mb-1 sm:mb-2">Precio de Referencia *</label>
                     <input 
                       type="text" name="precio" value={formData.precio} onChange={handleInputChange} placeholder="Ej: 5000 UF / $150.000.000" 
                       className="w-full bg-white border border-gray-200 rounded-lg p-3 sm:p-3.5 text-sm sm:text-[15px] text-gray-800 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300 transition"
@@ -349,53 +407,6 @@ const PublishPropertyForm = () => {
                 </div>
               </motion.div>
             )}
-
-            {/* 🌟 PASO 3 (FOTOS) - COMENTADO PARA DESHABILITARLO VISUAL Y FUNCIONALMENTE */}
-            {/* {step === 3 && (
-              <motion.div
-                key="step3"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
-                transition={{ duration: 0.3 }}
-                className="space-y-4 sm:space-y-6 text-center"
-              >
-                <div className="border-2 border-dashed border-gray-300 rounded-2xl p-6 sm:p-10 bg-gray-50 hover:border-gray-400 transition-colors cursor-pointer relative group">
-                  <input 
-                    type="file" multiple onChange={handleFileChange} 
-                    className="absolute inset-0 opacity-0 cursor-pointer z-20" 
-                  />
-                  <UploadCloud className="mx-auto text-gray-400 mb-2 sm:mb-4 group-hover:scale-110 transition-transform" size={40} />
-                  <p className="text-sm sm:text-base font-bold text-gray-700 mb-1">Seleccionar archivo</p>
-                  <p className="text-xs sm:text-sm text-gray-400">o arrastra y suelta fotos/videos aquí</p>
-                </div>
-
-                {formData.fotos.length > 0 && (
-                  <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 sm:gap-4 mt-4 sm:mt-6 max-h-40 overflow-y-auto pr-2">
-                    {formData.fotos.map((file, index) => (
-                      <div key={index} className="relative aspect-square rounded-lg overflow-hidden border border-gray-200 bg-white shadow-sm">
-                        <img src={URL.createObjectURL(file)} alt="Preview" className="w-full h-full object-cover" />
-                        <button 
-                          type="button" onClick={() => removePhoto(index)}
-                          className="absolute top-1 right-1 bg-red-500/90 hover:bg-red-500 text-white p-1 rounded-md text-xs font-bold transition-opacity shadow-sm"
-                        >
-                          X
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                <div className="mt-6 sm:mt-8 bg-gray-50 border border-gray-200 rounded-xl p-4 sm:p-5 text-start">
-                  <p className="text-xs sm:text-sm font-bold text-gray-800 uppercase tracking-wide mb-2">Consejos para destacar tu propiedad</p>
-                  <p className="text-xs sm:text-sm text-gray-500 leading-relaxed">
-                    Fotografías luminosas, espacios ordenados y videos verticales pueden marcar la diferencia en tu publicación. 
-                    <a href="#" className="text-[#24B6C1] font-bold underline ms-1">Ver recomendaciones</a>
-                  </p>
-                </div>
-              </motion.div>
-            )} 
-            */}
           </AnimatePresence>
 
           {/* BOTONES DE NAVEGACIÓN */}
@@ -412,8 +423,7 @@ const PublishPropertyForm = () => {
               <div></div> 
             )}
 
-            {/* Cambiar a step < 3 si descomentas el paso 3 */}
-            {step < 2 && (
+            {step < 2 ? (
               <button 
                 type="button" 
                 onClick={(e) => { e.preventDefault(); nextStep(); }}
@@ -421,17 +431,16 @@ const PublishPropertyForm = () => {
               >
                 Siguiente <ArrowRight size={18} />
               </button>
-            )}
+            ) : null}
 
-            {/* Cambiar a step === 3 si descomentas el paso 3 */}
-            {step === 2 && (
+            {step === 2 ? (
               <button 
                 type="submit" 
                 className="flex items-center justify-center gap-2 bg-gray-800 hover:bg-gray-900 text-white w-full sm:w-auto px-6 sm:px-10 py-3 sm:py-3.5 rounded-lg font-bold text-xs sm:text-[15px] transition shadow-md"
               >
                 PUBLICAR PROPIEDAD
               </button>
-            )}
+            ) : null}
           </div>
 
         </form>

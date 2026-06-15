@@ -744,7 +744,7 @@ const Feature = ({ icon: Icon, title, value }) => (
 
               {/* COMPONENTE VISUAL DE AGENDAMIENTO ADJUNTO */}
               {visitaAgendada && (
-                <div className="bg-[#24B6C1]/80 border border-[#24B6C1]/30 p-4 rounded-2xl text-xs text-white space-y-2 mb-4 animate-fadeIn">
+                <div className="bg-[#24B6C1] border border-[#24B6C1]/30 p-4 rounded-2xl text-xs text-white space-y-2 mb-4 animate-fadeIn">
                   <span className="font-bold block">✓ Agendamiento cargado:</span>
                   <p>{visitaAgendada.fechaFormateada} a las {visitaAgendada.hora} hrs.</p>
                   <button 
