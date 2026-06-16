@@ -145,9 +145,18 @@ const SearchBar = () => {
       obj: objID
     };
 
-    if (selectedComuna?.id) queryParams.comuna = selectedComuna.id;
+    if (selectedComuna?.id) queryParams.comuna = selectedComuna.label;
+
+     console.log("TIPO PROPIEDAD:", tipoPropID);
+  console.log("COMUNA:", selectedComuna);
+  console.log("SEARCH QUERY:", searchQuery);
+  console.log("PARAMS:", queryParams);
 
     const params = new URLSearchParams(queryParams); 
+    console.log(
+  "URL FINAL:",
+  `/buscar?${params.toString()}`
+);
     navigate(`/buscar?${params.toString()}`); 
   };
 

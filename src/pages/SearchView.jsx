@@ -26,7 +26,9 @@ const SearchView = () => {
   const [selectedProperty, setSelectedProperty] = useState(null);
 
   // 🌟 LÓGICA CONDICIONAL: ¿Falta la comuna?
-  const faltaComuna = searchParams.has("tipo_prop") && !searchParams.has("comuna");
+  const faltaComuna = !tieneComunaValida;
+
+  
 
   // Estado para el conteo total
   const [totalPropiedades, setTotalPropiedades] = useState(0);
@@ -167,6 +169,7 @@ const SearchView = () => {
           
           // 🌟 URL ENRIQUECIDA CON FILTROS HORIZONTALES
           url = `${API_URL}/api/propiedades/buscar?tipo_prop=${safeTipoProp}&obj=${safeObj}&comuna=${safeComuna}&sup_desde=${supDesde}&sup_hasta=${supHasta}&precio_desde=${precioDesde}&precio_hasta=${precioHasta}&moneda=${moneda}&orden=${orden}&page=${paginaActual}&limit=10`;
+          console.log("URL FETCH:", url);
         }
         
         const response = await fetch(url);
@@ -217,6 +220,16 @@ const SearchView = () => {
     backgroundPosition: 'center',
     backgroundAttachment: 'fixed' 
   };
+
+  const faltaComuna = !searchParams.has("comuna");
+
+  const tieneComunaValida =
+  comunaParam !== null &&
+  comunaParam !== undefined &&
+  comunaParam.trim() !== "";
+
+
+
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white font-[Outfit]">
@@ -335,7 +348,9 @@ const SearchView = () => {
 
             {/* 🌟 FILTROS AVANZADOS HORIZONTALES (SIEMPRE VISIBLE) */}
             <div className="relative z-30 mb-8">
-               <FiltrosAvanzados />
+               {faltaComuna && (
+  <FiltrosAvanzados />
+)}
             </div>
 
             {/* 🌟 MAPA VERSIÓN MÓVIL */}
