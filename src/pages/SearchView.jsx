@@ -21,13 +21,22 @@ console.log("API_URL:", API_URL);
 const SearchView = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
+
+  const comunaParam = searchParams.get("comuna");
+
+const tieneComunaValida =
+  comunaParam !== null &&
+  comunaParam !== undefined &&
+  comunaParam.trim() !== "";
+
+const faltaComuna = !tieneComunaValida;
+
   const [propiedadesData, setPropiedadesData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedProperty, setSelectedProperty] = useState(null);
 
   // 🌟 LÓGICA CONDICIONAL: ¿Falta la comuna?
-  const faltaComuna = !tieneComunaValida;
-
+  // (Declaración duplicada de faltaComuna eliminada)
   
 
   // Estado para el conteo total
@@ -220,16 +229,6 @@ const SearchView = () => {
     backgroundPosition: 'center',
     backgroundAttachment: 'fixed' 
   };
-
-  const faltaComuna = !searchParams.has("comuna");
-
-  const tieneComunaValida =
-  comunaParam !== null &&
-  comunaParam !== undefined &&
-  comunaParam.trim() !== "";
-
-
-
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white font-[Outfit]">
