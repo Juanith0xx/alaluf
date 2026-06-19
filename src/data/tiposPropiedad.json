@@ -1,0 +1,9 @@
+[
+  { "id": 1, "label": "Casa" },
+  { "id": 2, "label": "Departamento" },
+  { "id": 3, "label": "Oficina" },
+  { "id": 4, "label": "Local" },
+  { "id": 5, "label": "Casa Comercial" },
+  { "id": 10, "label": "Parcela / Sitio" },
+  { "id": 17, "label": "Bodega Industrial" }
+]

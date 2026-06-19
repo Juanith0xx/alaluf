@@ -1,0 +1,5 @@
+[
+  { "id": 1, "label": "Venta" },
+  { "id": 2, "label": "Arriendo" },
+  { "id": 3, "label": "Venta o Arriendo" }
+]

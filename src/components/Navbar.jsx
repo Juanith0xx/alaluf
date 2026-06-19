@@ -137,9 +137,14 @@ const NavbarDesktop = ({
                     transition={{ duration: 0.25 }}
                     className="absolute top-12 -left-6 bg-black/50 backdrop-blur-2xl p-6 shadow-2xl w-60 border border-white/10"
                   >
-                    <ul className="space-y-4 text-base font-medium">
+                    <ul className="space-y-4 text-base font-medium pb-4">
                       <li className="relative cursor-pointer transition hover:text-teal-400 before:content-['>'] before:absolute before:-left-4 before:opacity-0 hover:before:opacity-100">
                         <Link to="/simulador-hipotecario" className="block w-full">Simulador Hipotecario</Link>
+                      </li>
+                    </ul>
+                    <ul className="space-y-4 text-base font-medium">
+                      <li className="relative cursor-pointer transition hover:text-teal-400 before:content-['>'] before:absolute before:-left-4 before:opacity-0 hover:before:opacity-100">
+                        <Link to="/tasa-propiedad" className="block w-full">Valoriza tu Propiedad</Link>
                       </li>
                     </ul>
                   </motion.div>
