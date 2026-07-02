@@ -146,7 +146,7 @@ const Footer = () => {
                 </div>
                 <div>
                   <p className="text-white/50 text-[10px] uppercase">Oficina</p>
-                  <p className="text-white/90">Av. Apoquindo 4775,<br />Las Condes, Santiago</p>
+                  <p className="text-white/90">Av. Apoquindo 4499 - Piso 4,<br />Las Condes, Santiago</p>
                 </div>
               </div>
 

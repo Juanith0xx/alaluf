@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, lazy, Suspense } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
@@ -9,7 +9,11 @@ import {
 // Componentes del proyecto
 import Navbar from "../components/Navbar"; 
 import PropertyCard from "../components/PropertyCard"; 
-import MapView from "../components/MapView"; 
+
+// 🌟 LAZY LOADING: MapView (incluye mapbox-gl, ~1.78MB) ahora se descarga
+// solo cuando el mapa entra en pantalla, no en la carga inicial del sitio.
+const MapView = lazy(() => import("../components/MapView"));
+
 import FiltrosAvanzados from "../components/FiltrosAvanzados"; 
 
 // IMPORTACIÓN DEL ASSET LOCAL
@@ -17,6 +21,16 @@ import fondoMarmol from '../assets/Marmol.jpg';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 console.log("API_URL:", API_URL);
+
+// 🌟 Fallback compartido para ambas instancias del mapa (móvil y desktop)
+const MapaFallback = () => (
+  <div className="w-full h-full bg-black flex items-center justify-center text-white text-sm">
+    <div className="flex items-center gap-2">
+      <div className="w-4 h-4 border-2 border-[#24B6C1] border-t-transparent rounded-full animate-spin"></div>
+      Cargando mapa...
+    </div>
+  </div>
+);
 
 const SearchView = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -354,11 +368,13 @@ const faltaComuna = !tieneComunaValida;
 
             {/* 🌟 MAPA VERSIÓN MÓVIL */}
             <div className="block lg:hidden h-[350px] md:h-[400px] relative overflow-hidden shadow-2xl rounded-[30px] border border-white/20 bg-black z-20">
-              <MapView 
-                propiedades={propiedadesData} 
-                selectedProperty={selectedProperty}
-                setSelectedProperty={setSelectedProperty} 
-              />
+              <Suspense fallback={<MapaFallback />}>
+                <MapView 
+                  propiedades={propiedadesData} 
+                  selectedProperty={selectedProperty}
+                  setSelectedProperty={setSelectedProperty} 
+                />
+              </Suspense>
             </div>
 
             {/* GRILLA DE RESULTADOS */}
@@ -428,11 +444,13 @@ const faltaComuna = !tieneComunaValida;
               
               {/* 🌟 MAPA VERSIÓN DESKTOP */}
               <div className="hidden lg:block h-[480px] relative overflow-hidden shadow-2xl rounded-[40px] border border-white/20 bg-black">
-                <MapView 
-                  propiedades={propiedadesData} 
-                  selectedProperty={selectedProperty}
-                  setSelectedProperty={setSelectedProperty} 
-                />
+                <Suspense fallback={<MapaFallback />}>
+                  <MapView 
+                    propiedades={propiedadesData} 
+                    selectedProperty={selectedProperty}
+                    setSelectedProperty={setSelectedProperty} 
+                  />
+                </Suspense>
               </div>
 
               {/* FORMULARIO DE CONTACTO */}

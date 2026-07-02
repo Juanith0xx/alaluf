@@ -26,8 +26,7 @@ const TerrenoProyecto = () => {
     "@type": "RealEstateAgent",
     "name": "Inteligencia en Terrenos",
     "description": "Asesoría especializada en venta y arriendo de terrenos para proyectos inmobiliarios. Analizamos normativas, CIP y constructibilidad.",
-    "url": "https://www.tudominio.cl/terrenos", // ⚠️ CAMBIA ESTO por tu URL real
-    "image": "https://www.tudominio.cl/assets/terreno_proyecto.png", // ⚠️ CAMBIA ESTO por la URL absoluta
+    "url": "https://alaluf.cl/terrenos", // ⚠️ CAMBIA ESTO por tu URL real
     "address": {
       "@type": "PostalAddress",
       "addressCountry": "CL" 
@@ -43,20 +42,20 @@ const TerrenoProyecto = () => {
         <meta name="keywords" content="terrenos para proyectos, venta de terrenos, arriendo de terrenos, desarrollo inmobiliario, constructibilidad, normativas urbanísticas, CIP, inversión inmobiliaria" />
 
         {/* URL Canónica */}
-        <link rel="canonical" href="http://localhost:5173/terrenos_proyectos" />
+        <link rel="canonical" href="https://alaluf.cl/terrenos_proyectos" />
 
         {/* Open Graph (Para vistas previas en Facebook, LinkedIn, WhatsApp) */}
         <meta property="og:title" content="Terrenos para Proyectos: Potencial de Desarrollo" />
         <meta property="og:description" content="No busques solo metros cuadrados. Analizamos normativas y constructibilidad para que tu terreno sea la base de un gran proyecto." />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="http://localhost:5173/terrenos_proyectos" />
+        <meta property="og:url" content="https://alaluf.cl/terrenos_proyectos" />
         {/* <meta property="og:image" content="https://www.tudominio.cl/assets/terreno_proyecto.png" /> /*}
 
         {/* Twitter Cards (Para X / Twitter) */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Inteligencia en Terrenos | Arriendo y Venta" />
         <meta name="twitter:description" content="Te ayudamos a ver el potencial y las restricciones urbanísticas de un terreno antes de invertir." />
-        <meta name="twitter:image" content="http://localhost:5173/terrenos_proyectos" />
+        <meta name="twitter:image" content="https://alaluf.cl/terrenos_proyectos" />
 
         {/* Inserción de Datos Estructurados JSON-LD */}
         <script type="application/ld+json">

@@ -30,7 +30,7 @@ const ClubDealsInversiones = () => {
     "@type": "FinancialService", // Cambiamos a FinancialService para darle más peso a la "Inversión"
     "name": "Club Deals e Inversión Inmobiliaria - Alaluf",
     "description": "Accede a activos inmobiliarios de alto valor en Chile mediante Club Deals estructurados. Oportunidades pre-market y off-market para inversionistas.",
-    "url": "https://alaluf.vercel.app/club_deals_inversiones", // ⚠️ CAMBIA ESTO por tu URL real
+    "url": "https://alaluf.cl/club_deals_inversiones", // ⚠️ CAMBIA ESTO por tu URL real
     //"image": "https://www.tudominio.cl/assets/clud_inversiones.png", // ⚠️ CAMBIA ESTO por tu URL absoluta
     "address": {
       "@type": "PostalAddress",
@@ -51,13 +51,13 @@ const ClubDealsInversiones = () => {
         <meta name="keywords" content="club deals inmobiliarios, inversión inmobiliaria Chile, oportunidades off-market, family office inmobiliario, inversión multifamily, activos de alto valor, Alaluf" />
 
         {/* URL Canónica */}
-        <link rel="canonical" href="https://alaluf.vercel.app/club_deals_inversiones" />
+        <link rel="canonical" href="https://alaluf.cl/club_deals_inversiones" />
 
         {/* Open Graph (Para LinkedIn, WhatsApp y otras redes) */}
         <meta property="og:title" content="Club Deals e Inversiones | Alaluf Inmobiliaria" />
         <meta property="og:description" content="Los grandes activos no se compran solos, se estructuran. Únete a nuestro grupo selecto de inversionistas." />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://alaluf.vercel.app/club_deals_inversiones" />
+        <meta property="og:url" content="https://alaluf.cl/club_deals_inversiones" />
         {/* <meta property="og:image" content="https://www.tudominio.cl/assets/clud_inversiones.png" /> */}
 
         {/* Twitter Cards */}

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, lazy, Suspense } from "react";
 import {
   FaRulerCombined,
   FaBed,
@@ -24,7 +24,11 @@ import {
   FaDoorClosed
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import MapView from "./MapView"; 
+
+// 🌟 LAZY LOADING: MapView (incluye mapbox-gl, ~1.78MB) ahora se descarga
+// solo cuando esta sección entra en pantalla, no en la carga inicial del sitio.
+const MapView = lazy(() => import("./MapView"));
+
 import ContactForm from "./ContacForm"; 
 
 // Importamos el asset del fondo de mármol
@@ -590,11 +594,21 @@ const Feature = ({ icon: Icon, title, value }) => (
               </div>
               
               <div className="w-full h-[280px] sm:h-[350px] md:h-[400px] rounded-[24px] md:rounded-[30px] overflow-hidden border border-gray-100 shadow-lg">
-                <MapView 
-                  propiedades={[property]} 
-                  selectedProperty={property} 
-                  activeFilter={activeFilter} 
-                />
+                {/* 🌟 Suspense: muestra un fallback mientras se descarga el chunk de mapbox-gl */}
+                <Suspense fallback={
+                  <div className="w-full h-full bg-[#1a1a1a] flex items-center justify-center text-white text-sm">
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 border-2 border-[#24B6C1] border-t-transparent rounded-full animate-spin"></div>
+                      Cargando mapa...
+                    </div>
+                  </div>
+                }>
+                  <MapView 
+                    propiedades={[property]} 
+                    selectedProperty={property} 
+                    activeFilter={activeFilter} 
+                  />
+                </Suspense>
               </div>
             </section>
 

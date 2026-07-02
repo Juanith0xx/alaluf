@@ -21,7 +21,7 @@ const AdministracionActivo = () => {
     "@type": "RealEstateAgent",
     "name": "Administración de Arriendos y Activos",
     "description": "Administramos tu propiedad. Selección de arrendatario correcto, contrato blindado, cobros a tiempo y reporte mensual sin vacancia innecesaria.",
-    "url": "https://alaluf.vercel.app/administracion", // ⚠️ CAMBIA ESTO por tu URL real
+    "url": "https://alaluf.cl/administracion", // ⚠️ CAMBIA ESTO por tu URL real
     //"image": "https://www.tudominio.cl/assets/admin_activos.png", // ⚠️ CAMBIA ESTO
     "address": {
       "@type": "PostalAddress",
@@ -38,13 +38,13 @@ const AdministracionActivo = () => {
         <meta name="keywords" content="administración de arriendos, administración de propiedades, corredora de propiedades, gestión de activos inmobiliarios, rentabilidad, arrendamiento" />
 
         {/* URL Canónica */}
-        <link rel="canonical" href="https://alaluf.vercel.app/administracion" />
+        <link rel="canonical" href="https://alaluf.cl/administracion" />
 
         {/* Open Graph */}
         <meta property="og:title" content="Administración de Propiedades: Tú descansas" />
         <meta property="og:description" content="Rentabilidad asegurada con tranquilidad incluida. Administramos tu propiedad sin fricción." />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://alaluf.vercel.app/administracion" />
+        <meta property="og:url" content="https://alaluf.cl/administracion" />
         {/* <meta property="og:image" content="https://www.tudominio.cl/assets/admin_activos.png" /> */}
 
         {/* Twitter Cards */}

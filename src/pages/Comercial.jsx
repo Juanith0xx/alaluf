@@ -66,13 +66,13 @@ const Comercial = () => {
         <meta name="keywords" content="locales comerciales, arriendo de oficinas, venta de locales, propiedades comerciales, sector oriente, Santiago, bienes raíces comerciales, retail" />
 
         {/* URL Canónica */}
-        <link rel="canonical" href="https://alaluf.vercel.app/comercial" />
+        <link rel="canonical" href="https://alaluf.cl/comercial" />
 
         {/* Open Graph (Para vistas previas en Facebook, LinkedIn, WhatsApp) */}
         <meta property="og:title" content="Propiedades Comerciales: Locales y Oficinas" />
         <meta property="og:description" content="El local correcto no es el más barato, es el que más vende. Encuentra tu próxima propiedad comercial u oficina en Santiago." />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://alaluf.vercel.app/comercial" />
+        <meta property="og:url" content="https://alaluf.cl/comercial" />
         {/* <meta property="og:image" content="https://www.tudominio.cl/assets/comercial.jpeg" /> */}
 
         {/* Twitter Cards (Para X / Twitter) */}

@@ -29,7 +29,7 @@ const Licitaciones = () => {
     "@type": "RealEstateAgent",
     "name": "Licitaciones Inmobiliarias de Alto Valor - Alaluf",
     "description": "Estructuramos y gestionamos licitaciones inmobiliarias en Chile para maximizar el valor de terrenos, edificios y activos de gran escala.",
-    "url": "https://alaluf.vercel.app/licitaciones", 
+    "url": "https://alaluf.cl/licitaciones", 
     //"image": "https://www.tudominio.cl/assets/licitaciones.png", // ⚠️ CAMBIA ESTO por tu URL absoluta
     "address": {
       "@type": "PostalAddress",
@@ -46,13 +46,13 @@ const Licitaciones = () => {
         <meta name="keywords" content="licitaciones inmobiliarias, venta por licitación, activos de alto valor, licitar terreno, licitación de edificios, oportunidades exclusivas, mercado off-market" />
 
         {/* URL Canónica */}
-        <link rel="canonical" href="https://alaluf.vercel.app/licitaciones" />
+        <link rel="canonical" href="https://alaluf.cl/licitaciones" />
 
         {/* Open Graph (Para redes sociales y WhatsApp) */}
         <meta property="og:title" content="Licitaciones Inmobiliarias: Maximiza el valor de tu activo" />
         <meta property="og:description" content="La forma más inteligente de vender. Un proceso transparente, con plazo definido y un objetivo claro." />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://alaluf.vercel.app/licitaciones" />
+        <meta property="og:url" content="https://alaluf.cl/licitaciones" />
         {/* <meta property="og:image" content="https://www.tudominio.cl/assets/licitaciones.png" /> */}
 
         {/* Twitter Cards */}

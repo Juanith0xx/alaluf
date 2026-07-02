@@ -23,7 +23,7 @@ const Industrial = () => {
     "@type": "RealEstateAgent",
     "name": "Inteligencia Industrial",
     "description": "Especialistas en venta y arriendo de bodegas, galpones y centros logísticos analizados desde la operación.",
-    "url": "https://alaluf.vercel.app/industrial",
+    "url": "https://alaluf.cl/industrial",
     //"image": "https://www.tudominio.cl/assets/industria.png", 
     "address": {
       "@type": "PostalAddress",
@@ -40,13 +40,13 @@ const Industrial = () => {
         <meta name="keywords" content="propiedades industriales, venta de bodegas, arriendo de galpones, centros logísticos, bienes raíces industriales, inversión inmobiliaria" />
 
         {/* URL Canónica (Obligatorio para buen SEO) */}
-        <link rel="canonical" href="https://alaluf.vercel.app/industrial" />
+        <link rel="canonical" href="https://alaluf.cl/industrial" />
 
         {/* Open Graph (Para vistas previas en Facebook, LinkedIn, WhatsApp) */}
         <meta property="og:title" content="Propiedades Industriales: Bodegas y Galpones" />
         <meta property="og:description" content="Analizamos accesos, flujos y normativa para que tu próxima bodega sea una ventaja competitiva." />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://alaluf.vercel.app/industrial" />
+        <meta property="og:url" content="https://alaluf.cl/industrial" />
         {/*<meta property="og:image" content="https://www.tudominio.cl/assets/industria.png" /> */}
 
         {/* Twitter Cards (Para X / Twitter) */}

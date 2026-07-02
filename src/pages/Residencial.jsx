@@ -51,7 +51,7 @@ const Residencial = () => {
     "@type": "RealEstateAgent",
     "name": "Asesoría Residencial",
     "description": "Expertos en compra, venta y arriendo de casas y departamentos en Santiago. Buscamos el equilibrio perfecto entre la emoción de vivir y la inteligencia de invertir.",
-    "url": "https://alaluf.vercel.app/residencial", 
+    "url": "https://alaluf.cl/residencial", 
     //"image": "https://www.tudominio.cl/assets/residencia.jpeg",
     "address": {
       "@type": "PostalAddress",
@@ -70,13 +70,13 @@ const Residencial = () => {
         <meta name="keywords" content="venta de casas, arriendo de departamentos, comprar propiedad Santiago, vender casa, corredor de propiedades residencial, bienes raíces, inmobiliaria" />
 
         {/* URL Canónica */}
-        <link rel="canonical" href="https://alaluf.vercel.app/residencial" />
+        <link rel="canonical" href="https://alaluf.cl/residencial" />
 
         {/* Open Graph (Para vistas previas en Facebook, LinkedIn, WhatsApp) */}
         <meta property="og:title" content="Asesoría Residencial | Venta y Arriendo de Casas y Deptos" />
         <meta property="og:description" content="Buscamos el equilibrio perfecto entre la emoción de vivir y la inteligencia de invertir. Encuentra tu próxima propiedad." />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://alaluf.vercel.app/residencial" />
+        <meta property="og:url" content="https://alaluf.cl/residencial" />
         {/* <meta property="og:image" content="https://www.tudominio.cl/assets/residencia.jpeg" /> */}
 
         {/* Twitter Cards (Para X / Twitter) */}

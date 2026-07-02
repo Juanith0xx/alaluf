@@ -27,7 +27,7 @@ const TasacionActivos = () => {
     "@type": "RealEstateAgent",
     "name": "Tasación de Activos Inmobiliarios - Alaluf",
     "description": "Tasamos tu activo con criterio de mercado real: ubicación, plusvalía y comparables. Conoce el precio justo antes de vender, comprar o invertir.",
-    "url": "https://alaluf.vercel.app//tasacion", // ⚠️ CAMBIA ESTO por tu URL real
+    "url": "https://alaluf.cl/tasacion", // ⚠️ CAMBIA ESTO por tu URL real
     //"image": "https://www.tudominio.cl/assets/tasacion.png", // ⚠️ CAMBIA ESTO por tu URL absoluta
     "address": {
       "@type": "PostalAddress",
@@ -44,13 +44,13 @@ const TasacionActivos = () => {
         <meta name="keywords" content="tasación de activos, tasación inmobiliaria, tasar propiedad, calcular valor de casa, tasar departamento, precio de mercado inmobiliario, tasadores" />
 
         {/* URL Canónica */}
-        <link rel="canonical" href="https://alaluf.vercel.app/tasacion" />
+        <link rel="canonical" href="https://alaluf.cl/tasacion" />
 
         {/* Open Graph (Para redes sociales y WhatsApp) */}
         <meta property="og:title" content="Tasación de Activos: No decidas sin saber cuánto vale" />
         <meta property="og:description" content="Para que vendas, arriendes o inviertas desde una posición informada. Tasamos tu activo con criterio profesional." />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://alaluf.vercel.app/tasacion" />
+        <meta property="og:url" content="https://alaluf.cl/tasacion" />
         {/* <meta property="og:image" content="https://www.tudominio.cl/assets/tasacion.png" /> */}
 
         {/* Twitter Cards */}
