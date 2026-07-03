@@ -24,7 +24,10 @@ import {
   FaDoorClosed
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion"; // 🌟 Importante para el swipe
+import { motion, AnimatePresence } from "framer-motion";
+
+// 🌟 Importación del componente de Toast personalizado
+import AlalufToast from "./AlalufToast";
 
 // 🌟 LAZY LOADING: MapView
 const MapView = lazy(() => import("./MapView"));
@@ -42,12 +45,21 @@ const PropertyDetail = ({ property }) => {
 
   // ESTADOS PARA EL AGENDAMIENTO DE VISITAS
   const [diaSeleccionado, setDiaSeleccionado] = useState(null);
-  const [bloqueHorario, setBloqueHorario] = useState(null); 
-  const [horaSeleccionada, setHoraSeleccionada] = useState(null); 
+  const [bloqueHorario, setBloqueHorario] = useState(null); // 'manana' o 'tarde'
+
+  // 🌟 ESTADO PARA EL CONTROL DEL TOAST
+  const [toast, setToast] = useState({ visible: false, message: "", type: "success" });
 
   // ESTADOS PARA EL FLUJO DE AGENDA ADJUNTO AL FORMULARIO
   const [visitaAgendada, setVisitaAgendada] = useState(null);
   const [enviandoLead, setEnviandoLead] = useState(false);
+
+  // 🌟 FUNCIÓN PARA MOSTRAR EL TOAST (Reemplaza al alert nativo)
+  const showToast = (message, type = "success") => {
+    setToast({ visible: true, message, type });
+    // Auto-ocultar después de 4 segundos
+    setTimeout(() => setToast(prev => ({ ...prev, visible: false })), 4000);
+  };
 
   if (!property) return null;
 
@@ -63,10 +75,6 @@ const PropertyDetail = ({ property }) => {
     property.titulo ||
     ""
   ).toLowerCase();
-
-  // DEFINICIÓN DE RANGOS HORARIOS DISPONIBLES
-  const rangoManana = ["09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00"];
-  const rangoTarde = ["14:30", "15:00", "15:30", "16:00", "16:30", "17:00", "17:30", "18:00"];
 
   const formatearPrecio = (valor) => {
     if (!valor) return "";
@@ -98,18 +106,18 @@ const PropertyDetail = ({ property }) => {
     const requerimiento = formData?.requerimiento || formData?.mensaje || "";
 
     if (!nombreContacto.trim()) {
-      alert("Por favor, completa tu Nombre Completo.");
+      showToast("Por favor, completa tu Nombre Completo.", "error");
       return;
     }
 
     if (!email.trim() && !fono.trim()) {
-      alert("Por favor, ingresa correo o teléfono.");
+      showToast("Por favor, ingresa al menos un Correo o Teléfono.", "error");
       return;
     }
 
     let requerimientoFinal = requerimiento.trim();
     if (visitaAgendada) {
-      const detalleVisita = `--- ASUNTO: Solicitud de Visita Agendada ---\nDía: ${visitaAgendada.fechaFormateada}\nHora: ${visitaAgendada.hora} hrs.`;
+      const detalleVisita = `--- ASUNTO: Solicitud de Visita Agendada ---\nDía: ${visitaAgendada.fechaFormateada}\nBloque: ${visitaAgendada.hora}`;
       requerimientoFinal = requerimientoFinal ? `${requerimientoFinal}\n\n${detalleVisita}` : detalleVisita;
     }
 
@@ -139,14 +147,14 @@ const PropertyDetail = ({ property }) => {
       });
 
       if (response.ok) {
-        alert("¡Solicitud enviada con éxito!");
+        showToast("¡Solicitud enviada con éxito! Un asesor te contactará pronto.", "success");
         setVisitaAgendada(null);
       } else {
-        alert("Error al registrar solicitud.");
+        showToast("Hubo un error al registrar tu solicitud.", "error");
       }
     } catch (error) {
       console.error(error);
-      alert("Error de conexión.");
+      showToast("Error de conexión con el servidor.", "error");
     } finally {
       setEnviandoLead(false);
     }
@@ -169,7 +177,7 @@ const PropertyDetail = ({ property }) => {
 
   const copiarEnlace = () => {
     navigator.clipboard.writeText(window.location.href);
-    alert("¡Enlace copiado!");
+    showToast("¡Enlace copiado al portapapeles!", "success");
   };
 
   const handleFilterClick = (tag) => {
@@ -219,50 +227,62 @@ const PropertyDetail = ({ property }) => {
   return (
     <div className="min-h-screen bg-cover bg-center bg-fixed font-[Outfit] pb-20 text-gray-900" style={{ backgroundImage: `url(${fondoMarmol})` }}>
       
+      {/* 🌟 COMPONENTE TOAST DE ALALUF */}
+      <AlalufToast 
+        visible={toast.visible} 
+        message={toast.message} 
+        type={toast.type} 
+        onClose={() => setToast(prev => ({ ...prev, visible: false }))} 
+      />
+
       <div className="max-w-[1400px] mx-auto px-4 md:px-6 pt-24 sm:pt-28 lg:pt-32 pb-10 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12">
         
-        {/* COLUMNA IZQUIERDA */}
+        {/* COLUMNA IZQUIERDA: CONTENIDO PRINCIPAL */}
         <div className="col-span-1 lg:col-span-8 space-y-6">
           
-          {/* GALERÍA */}
+          {/* 1. GALERÍA DE FOTOS */}
           <section className="grid grid-cols-1 md:grid-cols-4 gap-2 md:gap-3 rounded-[24px] md:rounded-[40px] overflow-hidden shadow-2xl bg-black/5 h-64 sm:h-80 md:h-[400px] lg:h-[480px]">
             <div className="col-span-1 md:col-span-2 md:row-span-2 relative overflow-hidden group cursor-pointer h-full" onClick={() => openLightbox(0)}>
-              <img src={imagenes[0] || "/placeholder.jpg"} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+              <img src={imagenes[0] || "/placeholder.jpg"} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" alt="Principal" />
             </div>
             {[1, 2, 3].map((idx) => (
               <div key={idx} className="hidden md:block md:col-span-1 relative overflow-hidden group cursor-pointer h-full" onClick={() => openLightbox(idx)}>
-                <img src={imagenes[idx] || imagenes[0]} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+                <img src={imagenes[idx] || imagenes[0]} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" alt="Interior" />
               </div>
             ))}
             <div className="hidden md:block md:col-span-1 relative overflow-hidden group cursor-pointer h-full" onClick={() => openLightbox(4)}>
-              <img src={imagenes[4] || imagenes[0]} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+              <img src={imagenes[4] || imagenes[0]} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" alt="Mas" />
               <div className="absolute inset-0 bg-black/30 backdrop-blur-[1px] flex items-end justify-end p-4">
-                <span className="bg-white text-[#24B6C1] px-4 py-2 rounded-full text-xs font-bold">Ver más</span>
+                <span className="bg-white text-[#24B6C1] px-4 py-2 rounded-full text-xs font-bold shadow-lg">Ver más</span>
               </div>
             </div>
           </section>
 
-          {/* BARRA CONTROL */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-black/30 px-4 md:px-6 py-4 rounded-[20px] md:rounded-[24px] backdrop-blur-md border border-white/10 text-white">
+          {/* 2. BARRA DE CONTROL */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-black/30 px-4 md:px-6 py-4 rounded-[20px] md:rounded-[24px] backdrop-blur-md border border-white/10 text-white shadow-lg">
             <div className="flex flex-row items-center gap-4">
               <button onClick={() => navigate(-1)} className="flex items-center gap-2 hover:text-[#24B6C1] transition font-semibold bg-white/10 px-4 py-2 rounded-full text-xs">
                 <FaArrowLeft size={12} /> Volver
               </button>
-              <div className="text-[10px] font-bold tracking-widest uppercase bg-white/5 px-4 py-2 rounded-full">
-                Código: {property.codigo}
+              <div className="text-[10px] font-bold tracking-widest uppercase bg-white/5 px-4 py-2 rounded-full border border-white/5">
+                Código Alaluf: {property.codigo}
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <a href={`https://api.whatsapp.com/send?text=${currentUrl}`} target="_blank" rel="noreferrer" className="p-2.5 bg-white/10 hover:bg-[#25D366] rounded-full text-white"><FaWhatsapp size={13} /></a>
-              <a href={`https://www.facebook.com/sharer/sharer.php?u=${currentUrl}`} target="_blank" rel="noreferrer" className="p-2.5 bg-white/10 hover:bg-[#1877F2] rounded-full text-white"><FaFacebookF size={13} /></a>
-              <button onClick={copiarEnlace} className="p-2.5 bg-white/10 hover:bg-[#E1306C] rounded-full text-white"><FaInstagram size={13} /></button>
+              <a href={`https://api.whatsapp.com/send?text=Mira%20esta%20propiedad:%20${currentUrl}`} target="_blank" rel="noreferrer" className="p-2.5 bg-white/10 hover:bg-[#25D366] rounded-full text-white transition-colors"><FaWhatsapp size={13} /></a>
+              <a href={`https://www.facebook.com/sharer/sharer.php?u=${currentUrl}`} target="_blank" rel="noreferrer" className="p-2.5 bg-white/10 hover:bg-[#1877F2] rounded-full text-white transition-colors"><FaFacebookF size={13} /></a>
+              <button onClick={copiarEnlace} className="p-2.5 bg-white/10 hover:bg-[#24B6C1] rounded-full text-white transition-colors"><FaInstagram size={13} /></button>
             </div>
           </div>
 
-          {/* BLOQUE DETALLES */}
+          {/* 3. BLOQUE DE DETALLES */}
           <div className="bg-white/95 backdrop-blur-sm rounded-[24px] md:rounded-[40px] p-5 md:p-8 lg:p-10 shadow-xl border border-gray-100 space-y-8">
             <section className="space-y-4">
-              <h1 className="text-2xl md:text-5xl font-bold tracking-tighter">{property.ubicacion?.sector || "Ubicación"}</h1>
+              <div className="flex flex-wrap gap-2">
+                <span className="bg-[#24B6C1] text-white px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest">{property.titulo}</span>
+                <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest">{property.operacion}</span>
+              </div>
+              <h1 className="text-2xl md:text-5xl font-bold tracking-tighter leading-tight text-gray-900">{property.ubicacion?.sector || "Ubicación Privilegiada"}</h1>
               <div className="flex items-center gap-2 text-gray-500 text-sm md:text-lg">
                 <FaMapMarkerAlt className="text-[#24B6C1]" /> {property.ubicacion?.direccion}, {property.ubicacion?.comuna}
               </div>
@@ -271,7 +291,7 @@ const PropertyDetail = ({ property }) => {
               </div>
             </section>
 
-            {/* CARACTERÍSTICAS DINÁMICAS POR TIPO */}
+            {/* Características por Tipo */}
             <section className="grid grid-cols-2 sm:grid-cols-4 gap-4 py-6 border-y border-gray-100">
               {tipo.includes("casa") && !tipo.includes("comercial") && (
                 <>
@@ -297,18 +317,26 @@ const PropertyDetail = ({ property }) => {
                   <Feature icon={FaBath} title="Baños" value={property.detalles?.banos || 0} />
                 </>
               )}
+              {tipo.includes("local") && (
+                <>
+                  <Feature icon={FaRulerCombined} title="Superficie" value={`${property.detalles?.superficie || 0} m²`} />
+                  <Feature icon={FaCheckCircle} title="Habilitado" value={getExtraValue("habilitado")} />
+                  <Feature icon={FaCar} title="Estacionamientos" value={property.detalles?.estacionamientos || 0} />
+                  <Feature icon={FaBath} title="Baños" value={property.detalles?.banos || 0} />
+                </>
+              )}
             </section>
 
             <section className="space-y-3">
-              <h3 className="text-xl font-bold uppercase italic">Descripción</h3>
+              <h3 className="text-xl font-bold uppercase italic tracking-tighter">Descripción de la propiedad</h3>
               <p className="text-gray-600 leading-relaxed whitespace-pre-line text-sm md:text-lg">
                 {property.caracteristicas_internet || property.detalles?.descripcion}
               </p>
             </section>
 
             <section className="space-y-4">
-              <h3 className="text-xl font-bold uppercase italic">Ubicación</h3>
-              <div className="w-full h-[300px] md:h-[400px] rounded-[24px] overflow-hidden shadow-lg">
+              <h3 className="text-xl font-bold uppercase italic tracking-tighter">Ubicación aproximada</h3>
+              <div className="w-full h-[300px] md:h-[400px] rounded-[24px] overflow-hidden shadow-lg border border-gray-100">
                 <Suspense fallback={<div className="w-full h-full bg-gray-100 animate-pulse" />}>
                   <MapView propiedades={[property]} selectedProperty={property} />
                 </Suspense>
@@ -317,52 +345,74 @@ const PropertyDetail = ({ property }) => {
           </div>
         </div>
 
-        {/* COLUMNA DERECHA: AGENDA Y CONTACTO */}
+        {/* COLUMNA DERECHA: SIDEBAR DE AGENDA */}
         <div className="col-span-1 lg:col-span-4">
           <div className="lg:sticky lg:top-24 space-y-6">
             <div className="bg-white/95 backdrop-blur-sm rounded-[24px] md:rounded-[40px] p-5 md:p-8 border border-gray-100 shadow-sm">
-              <h3 className="text-lg md:text-xl font-bold mb-1">Agenda tu visita</h3>
-              <p className="text-gray-400 text-xs mb-6">Selecciona fecha y hora.</p>
+              <h3 className="text-lg md:text-xl font-bold mb-1 text-gray-900">Agenda tu visita</h3>
+              <p className="text-gray-400 text-xs mb-6">Elige el bloque horario que más te acomode.</p>
               
-              <div className="flex gap-2 overflow-x-auto pb-4">
+              <div className="flex gap-2 overflow-x-auto pb-4 scrollbar-hide">
                 {diasDisponibles.map((dia) => (
-                  <button key={dia.id} onClick={() => setDiaSeleccionado(dia)} className={`flex flex-col items-center justify-center min-w-[52px] h-[60px] rounded-xl border transition-all ${diaSeleccionado?.id === dia.id ? "bg-[#24B6C1] text-white border-[#24B6C1]" : "bg-gray-50 text-gray-700 border-gray-100"}`}>
-                    <span className="text-[9px] font-bold">{dia.nombre}</span>
-                    <span className="text-base font-black">{dia.numero}</span>
+                  <button key={dia.id} onClick={() => setDiaSeleccionado(dia)} className={`flex flex-col items-center justify-center min-w-[52px] h-[60px] rounded-xl border transition-all ${diaSeleccionado?.id === dia.id ? "bg-[#24B6C1] text-white border-[#24B6C1] shadow-md scale-105" : "bg-gray-50 text-gray-700 border-gray-100 hover:bg-gray-100"}`}>
+                    <span className="text-[9px] font-bold uppercase opacity-80">{dia.nombre}</span>
+                    <span className="text-base font-black mt-0.5">{dia.numero}</span>
                   </button>
                 ))}
               </div>
 
+              {/* BLOQUES DE HORARIO SIMPLIFICADOS (MAÑANA / TARDE) */}
               <div className="space-y-3 mb-6">
-                <button onClick={() => setBloqueHorario("manana")} className={`w-full flex items-center justify-between p-3 rounded-xl border ${bloqueHorario === "manana" ? "border-[#24B6C1] bg-[#24B6C1]/5" : "border-gray-100"}`}>
-                   <div className="flex items-center gap-2"><FaSun size={12} /><span className="text-sm font-bold">Mañana</span></div>
-                   <span className="text-[10px] text-gray-400">09:00 - 13:00</span>
+                <button 
+                  onClick={() => setBloqueHorario("manana")} 
+                  className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all ${
+                    bloqueHorario === "manana" 
+                    ? "border-[#24B6C1] bg-[#24B6C1]/5 ring-1 ring-[#24B6C1]" 
+                    : "border-gray-100 bg-gray-50/50 hover:bg-gray-50"
+                  }`}
+                >
+                   <div className="flex items-center gap-3">
+                      <FaSun className={bloqueHorario === "manana" ? "text-[#24B6C1]" : "text-gray-400"} size={16} />
+                      <span className={`text-sm font-bold ${bloqueHorario === "manana" ? "text-gray-900" : "text-gray-600"}`}>Mañana</span>
+                   </div>
+                   <span className="text-[11px] text-gray-400 font-medium tracking-tight">09:30 a 12:30 hrs</span>
                 </button>
-                {bloqueHorario === "manana" && (
-                  <div className="grid grid-cols-3 gap-2 p-2 bg-gray-50 rounded-lg">
-                    {rangoManana.map(h => <button key={h} onClick={() => setHoraSeleccionada(h)} className={`py-1 text-[10px] rounded border ${horaSeleccionada === h ? "bg-[#24B6C1] text-white" : "bg-white"}`}>{h}</button>)}
-                  </div>
-                )}
-                <button onClick={() => setBloqueHorario("tarde")} className={`w-full flex items-center justify-between p-3 rounded-xl border ${bloqueHorario === "tarde" ? "border-[#24B6C1] bg-[#24B6C1]/5" : "border-gray-100"}`}>
-                   <div className="flex items-center gap-2"><FaMoon size={12} /><span className="text-sm font-bold">Tarde</span></div>
-                   <span className="text-[10px] text-gray-400">14:30 - 18:00</span>
+
+                <button 
+                  onClick={() => setBloqueHorario("tarde")} 
+                  className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all ${
+                    bloqueHorario === "tarde" 
+                    ? "border-[#24B6C1] bg-[#24B6C1]/5 ring-1 ring-[#24B6C1]" 
+                    : "border-gray-100 bg-gray-50/50 hover:bg-gray-50"
+                  }`}
+                >
+                   <div className="flex items-center gap-3">
+                      <FaMoon className={bloqueHorario === "tarde" ? "text-[#24B6C1]" : "text-gray-400"} size={16} />
+                      <span className={`text-sm font-bold ${bloqueHorario === "tarde" ? "text-gray-900" : "text-gray-600"}`}>Tarde</span>
+                   </div>
+                   <span className="text-[11px] text-gray-400 font-medium tracking-tight">15:00 a 17:30 hrs</span>
                 </button>
-                {bloqueHorario === "tarde" && (
-                  <div className="grid grid-cols-3 gap-2 p-2 bg-gray-50 rounded-lg">
-                    {rangoTarde.map(h => <button key={h} onClick={() => setHoraSeleccionada(h)} className={`py-1 text-[10px] rounded border ${horaSeleccionada === h ? "bg-[#24B6C1] text-white" : "bg-white"}`}>{h}</button>)}
-                  </div>
-                )}
               </div>
 
               <button 
                 onClick={() => {
-                  if (!diaSeleccionado || !horaSeleccionada) return alert("Selecciona fecha y hora.");
-                  setVisitaAgendada({ fechaFormateada: diaSeleccionado.fechaCompleta, hora: horaSeleccionada, fechaId: diaSeleccionado.id });
-                  alert("Visita agregada. Ahora envía el formulario de contacto.");
+                  if (!diaSeleccionado || !bloqueHorario) {
+                    showToast("Por favor, selecciona un día y un bloque horario.", "error");
+                    return;
+                  }
+                  
+                  const rango = bloqueHorario === "manana" ? "09:30 a 12:30 hrs" : "15:00 a 17:30 hrs";
+                  
+                  setVisitaAgendada({ 
+                    fechaFormateada: diaSeleccionado.fechaCompleta, 
+                    hora: rango, 
+                    fechaId: diaSeleccionado.id 
+                  });
+                  showToast(`¡Bloque ${bloqueHorario === "manana" ? "Mañana" : "Tarde"} cargado correctamente!`, "success");
                 }}
-                className="w-full py-3 bg-[#24B6C1] text-white rounded-xl font-bold text-xs uppercase"
+                className="w-full py-4 bg-[#24B6C1] hover:bg-[#1da0ab] text-white rounded-xl font-bold text-xs uppercase tracking-widest shadow-lg transition-all active:scale-[0.98]"
               >
-                ➕ Agregar Agendamiento
+                + Agregar Agendamiento
               </button>
             </div>
 
@@ -377,27 +427,24 @@ const PropertyDetail = ({ property }) => {
         </div>
       </div>
 
-      {/* 🌟 MODAL LIGHTBOX CON SWIPE PARA MÓVIL */}
+      {/* 4. MODAL LIGHTBOX CON SWIPE PARA MÓVIL */}
       {isLightboxOpen && (
         <div className="fixed inset-0 bg-black/95 z-[9999] flex flex-col items-center justify-center p-4">
-          <button onClick={() => setIsLightboxOpen(false)} className="absolute right-4 top-4 text-white/70 hover:text-white p-2.5 bg-white/10 rounded-full z-20">
+          <button onClick={() => setIsLightboxOpen(false)} className="absolute right-4 top-4 text-white/70 hover:text-white p-2.5 bg-white/10 rounded-full z-20 backdrop-blur-md transition-all">
             <FaTimes size={20} />
           </button>
 
           <div className="relative w-full max-w-5xl h-full flex items-center justify-center">
-            {/* Contenedor con DRAG de Framer Motion */}
+            {/* 🌟 Contenedor de Framer Motion para deslizar */}
             <motion.div
               key={activeImage}
-              drag="x" // Permite arrastrar solo horizontalmente
+              drag="x"
               dragConstraints={{ left: 0, right: 0 }}
-              dragElastic={0.4} // Resistencia al estirar
-              onDragEnd={(e, { offset, velocity }) => {
-                const swipeThreshold = 50; // Sensibilidad: cuántos píxeles debe deslizar
-                if (offset.x < -swipeThreshold) {
-                  nextImage(); // Desliza a la izquierda -> Siguiente
-                } else if (offset.x > swipeThreshold) {
-                  prevImage(); // Desliza a la derecha -> Anterior
-                }
+              dragElastic={0.4}
+              onDragEnd={(e, { offset }) => {
+                const swipeThreshold = 50;
+                if (offset.x < -swipeThreshold) nextImage();
+                else if (offset.x > swipeThreshold) prevImage();
               }}
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -406,13 +453,13 @@ const PropertyDetail = ({ property }) => {
             >
               <img 
                 src={imagenes[activeImage]} 
-                className="max-w-full max-h-[85vh] object-contain rounded-lg select-none" 
-                draggable="false" // Evita el arrastre nativo del navegador
-                alt={`Imagen ${activeImage + 1}`}
+                className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl select-none" 
+                draggable="false"
+                alt={`Slide ${activeImage + 1}`}
               />
             </motion.div>
 
-            {/* Botones de navegación (visibles en desktop) */}
+            {/* Flechas Navegación (Desktop) */}
             <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 flex justify-between px-4 pointer-events-none">
               <button onClick={prevImage} className="pointer-events-auto p-3 bg-black/40 hover:bg-[#24B6C1] rounded-full text-white transition-colors hidden md:block">
                 <FaChevronLeft size={24} />
@@ -423,7 +470,7 @@ const PropertyDetail = ({ property }) => {
             </div>
           </div>
           
-          <div className="mt-4 text-white/60 text-xs font-bold tracking-widest bg-white/5 px-4 py-1.5 rounded-full">
+          <div className="mt-4 text-white/60 text-xs font-bold tracking-widest bg-white/5 px-4 py-1.5 rounded-full border border-white/5">
             {activeImage + 1} / {imagenes.length}
           </div>
         </div>
