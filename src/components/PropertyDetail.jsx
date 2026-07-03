@@ -408,7 +408,7 @@ const PropertyDetail = ({ property }) => {
                     hora: rango, 
                     fechaId: diaSeleccionado.id 
                   });
-                  showToast(`¡Bloque ${bloqueHorario === "manana" ? "Mañana" : "Tarde"} cargado correctamente!`, "success");
+                  showToast(`¡Bloque ${bloqueHorario === "manana" ? "Mañana" : "Tarde"} cargado correctamente! , Ahora completa los datos del formulario para finalizar`, "success");
                 }}
                 className="w-full py-4 bg-[#24B6C1] hover:bg-[#1da0ab] text-white rounded-xl font-bold text-xs uppercase tracking-widest shadow-lg transition-all active:scale-[0.98]"
               >
