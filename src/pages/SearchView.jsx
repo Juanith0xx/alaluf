@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, lazy, Suspense } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { motion, AnimatePresence, animate } from "framer-motion"; // 🌟 Importación corregida
+import { motion, AnimatePresence, animate } from "framer-motion"; 
 import { 
   FaSearch, FaArrowLeft, FaChevronDown, 
   FaChevronRight, FaCheck 
@@ -38,12 +38,12 @@ const SearchView = () => {
 
   const comunaParam = searchParams.get("comuna");
 
-const tieneComunaValida =
-  comunaParam !== null &&
-  comunaParam !== undefined &&
-  comunaParam.trim() !== "";
+  const tieneComunaValida =
+    comunaParam !== null &&
+    comunaParam !== undefined &&
+    comunaParam.trim() !== "";
 
-const faltaComuna = !tieneComunaValida;
+  const faltaComuna = !tieneComunaValida;
 
   const [propiedadesData, setPropiedadesData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -154,10 +154,8 @@ const faltaComuna = !tieneComunaValida;
     });
   };
 
-  // --- 🌟 MEJORA: LÓGICA DE NAVEGACIÓN MÓVIL ---
   const handlePropertyClick = (prop) => {
     if (window.innerWidth < 1024) {
-      // Usamos codigo preferentemente para que la ficha lo encuentre
       const idParaNavegar = prop.codigo || prop.id;
       navigate(`/propiedad/${idParaNavegar}`);
     } else {
@@ -179,6 +177,7 @@ const faltaComuna = !tieneComunaValida;
     }
   };
 
+  // 🌟 MEJORA: FETCH + FILTRADO + ORDENAMIENTO (MÁS RECIENTES PRIMERO)
   useEffect(() => {
     const fetchResultados = async () => {
       setLoading(true);
@@ -188,7 +187,6 @@ const faltaComuna = !tieneComunaValida;
         const obj = searchParams.get("obj");
         const comuna = searchParams.get("comuna");
 
-        // EXTRACCIÓN DE PARÁMETROS DE FILTROS AVANZADOS
         const supDesde = searchParams.get("sup_desde") || "";
         const supHasta = searchParams.get("sup_hasta") || "";
         const precioDesde = searchParams.get("precio_desde") || "";
@@ -208,42 +206,66 @@ const faltaComuna = !tieneComunaValida;
           const safeObj = obj || "1"; 
           const safeComuna = comuna || ""; 
           
-          url = `${API_URL}/api/propiedades/buscar?tipo_prop=${safeTipoProp}&obj=${safeObj}&comuna=${safeComuna}&sup_desde=${supDesde}&sup_hasta=${supHasta}&precio_desde=${precioDesde}&precio_hasta=${precioHasta}&moneda=${moneda}&orden=${orden}&page=${paginaActual}&limit=10`;
-          console.log("URL FETCH:", url);
+          url = `${API_URL}/api/propiedades/buscar?tipo_prop=${safeTipoProp}&obj=${safeObj}&comuna=${safeComuna}&sup_desde=${supDesde}&sup_hasta=${supHasta}&precio_desde=${precioDesde}&precio_hasta=${precioHasta}&moneda=${moneda}&orden=${orden}&page=1&limit=2000`;
         }
         
         const response = await fetch(url);
         const data = await response.json();
         
-        let finalArray = [];
+        let arrayGigante = [];
 
-        if (query) {
-          const exists = (data && (data.id || data.codigo));
-          finalArray = exists ? [data] : [];
-          setTotalPaginas(1);
-          setTotalPropiedades(exists ? 1 : 0);
-        } else if (data.data && data.paginacion) {
-          finalArray = data.data;
-          setTotalPaginas(data.paginacion.totalPaginas);
-          setTotalPropiedades(data.paginacion.totalPropiedades || 0);
+        if (data.data) {
+          arrayGigante = data.data; 
         } else {
-          finalArray = Array.isArray(data) ? data : [];
-          setTotalPaginas(1);
-          setTotalPropiedades(finalArray.length);
+          arrayGigante = Array.isArray(data) ? data : (data && (data.id || data.codigo) ? [data] : []);
         }
 
-        setPropiedadesData(finalArray);
-        if (finalArray.length > 0) setSelectedProperty(finalArray[0]);
+        // LÓGICA DE FILTRADO ESTRICTO LOCAL
+        const safeObjStr = obj || "1";
+        const arrayFiltradoPorPrecios = arrayGigante.filter(prop => {
+          const valArriendo = prop.precios?.arriendo?.valor;
+          const valVenta = prop.precios?.venta?.valor;
+          
+          const tieneArriendo = valArriendo && valArriendo !== "0" && valArriendo !== 0;
+          const tieneVenta = valVenta && valVenta !== "0" && valVenta !== 0;
+          
+          if (safeObjStr === "1") return tieneVenta;
+          if (safeObjStr === "2") return tieneArriendo;
+          return true; 
+        });
+
+        // 🌟 NUEVO ORDENAMIENTO: MÁS RECIENTES PRIMERO
+        const arrayOrdenado = [...arrayFiltradoPorPrecios].sort((a, b) => {
+          // Ajustar campo según la propiedad de fecha en tu API (ej: createdAt, fecha, fechaPublicacion)
+          const fechaA = new Date(a.fechaPublicacion || a.createdAt || a.fecha || 0);
+          const fechaB = new Date(b.fechaPublicacion || b.createdAt || b.fecha || 0);
+          return fechaB - fechaA; 
+        });
+
+        // RECALCULAMOS TOTALES Y PÁGINAS REALES
+        const totalElementosReales = arrayOrdenado.length;
+        setTotalPropiedades(totalElementosReales); 
+        setTotalPaginas(Math.ceil(totalElementosReales / 10) || 1); 
+        setPropiedadesData(arrayOrdenado);
+
+        if (arrayOrdenado.length > 0) {
+          setSelectedProperty(arrayOrdenado[0]);
+        } else {
+          setSelectedProperty(null);
+        }
+
       } catch (error) {
         console.error("Error fetching properties:", error);
         setPropiedadesData([]);
         setTotalPropiedades(0);
+        setTotalPaginas(1);
       } finally {
         setLoading(false);
       }
     };
+    
     fetchResultados();
-  }, [searchParams, paginaActual]);
+  }, [searchParams]);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -260,6 +282,12 @@ const faltaComuna = !tieneComunaValida;
     backgroundPosition: 'center',
     backgroundAttachment: 'fixed' 
   };
+
+  const propiedadesPorPagina = 10;
+  const startIndex = (paginaActual - 1) * propiedadesPorPagina;
+  const propiedadesRender = propiedadesData.length > propiedadesPorPagina
+    ? propiedadesData.slice(startIndex, startIndex + propiedadesPorPagina)
+    : propiedadesData;
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white font-[Outfit]">
@@ -287,7 +315,17 @@ const faltaComuna = !tieneComunaValida;
               
               <div className="flex w-full lg:w-auto bg-white/5 p-1 rounded-xl">
                 {["Comprar", "Vender", "Arrendar"].map((accion) => (
-                  <button key={accion} onClick={() => setAccionActiva(accion)}
+                  <button key={accion} onClick={() => {
+                    setAccionActiva(accion);
+                    if (accion === "Vender") {
+                      navigate('/vender');
+                    } else {
+                      const params = new URLSearchParams(searchParams);
+                      params.set("obj", accion === "Comprar" ? "1" : "2");
+                      params.set("page", "1");
+                      navigate(`/buscar?${params.toString()}`);
+                    }
+                  }}
                     className={`flex-1 lg:flex-none px-2 sm:px-6 py-2.5 rounded-lg text-[11px] sm:text-xs font-bold transition-all ${accionActiva === accion ? "bg-[#24B6C1] text-white shadow-lg" : "text-white/40 hover:text-white"}`}
                   >
                     {accion}
@@ -383,12 +421,12 @@ const faltaComuna = !tieneComunaValida;
                 )}
             </div>
 
-            {/* GRILLA DE RESULTADOS */}
+            {/* GRILLA DE RESULTADOS (Renderizado con slice local) */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 relative z-10">
               {loading ? (
                 <div className="col-span-1 md:col-span-2 py-40 text-center"><div className="w-12 h-12 border-4 border-[#24B6C1] border-t-transparent rounded-full animate-spin inline-block"></div></div>
-              ) : propiedadesData.length > 0 ? (
-                propiedadesData.map((prop) => {
+              ) : propiedadesRender.length > 0 ? (
+                propiedadesRender.map((prop) => {
                   const esActiva = selectedProperty && (
                     selectedProperty.id == prop.id || 
                     selectedProperty.codigo == prop.codigo
@@ -410,44 +448,60 @@ const faltaComuna = !tieneComunaValida;
               )}
             </div>
 
-            {/* CONTROLES DE PAGINACIÓN */}
+            {/* PAGINACIÓN CON BOTONES NUMERADOS */}
             {!loading && totalPaginas > 1 && !searchParams.get("q") && (
-              <div className="flex justify-center items-center gap-3 sm:gap-6 mt-12 bg-black/40 p-3 lg:p-4 rounded-3xl border border-white/10 backdrop-blur-md w-full sm:w-fit mx-auto shadow-2xl">
+              <div className="flex justify-center items-center gap-2 mt-12 bg-black/40 p-3 lg:p-4 rounded-3xl border border-white/10 backdrop-blur-md w-full sm:w-fit mx-auto shadow-2xl">
+                
                 <button
                   onClick={irPaginaAnterior}
                   disabled={paginaActual === 1}
-                  className={`flex items-center justify-center gap-2 px-4 lg:px-5 py-3 rounded-xl font-bold uppercase tracking-widest text-[10px] lg:text-xs transition-all w-1/3 sm:w-auto ${
+                  className={`flex items-center justify-center gap-1 px-3 sm:px-4 py-2.5 rounded-xl font-bold uppercase tracking-widest text-[10px] lg:text-xs transition-all ${
                     paginaActual === 1 
                       ? 'bg-white/5 text-white/20 cursor-not-allowed' 
                       : 'bg-[#24B6C1] text-white hover:bg-[#1e9aa3] shadow-lg shadow-[#24B6C1]/20'
                   }`}
                 >
-                  <FaArrowLeft size={12} className="hidden sm:block" /> Ant
+                  <FaArrowLeft size={10} className="hidden sm:block" /> Ant
                 </button>
                 
-                <span className="text-white/60 font-medium text-xs sm:text-sm text-center flex-1">
-                  Página <span className="text-white font-bold">{paginaActual}</span> de <span className="text-white font-bold">{totalPaginas}</span>
-                </span>
+                <div className="flex gap-1 overflow-x-auto max-w-[150px] sm:max-w-[250px] scrollbar-hide px-2">
+                  {Array.from({ length: totalPaginas }, (_, index) => (
+                    <button
+                      key={index + 1}
+                      onClick={() => {
+                        const currentParams = Object.fromEntries([...searchParams]);
+                        setSearchParams({ ...currentParams, page: index + 1 });
+                      }}
+                      className={`min-w-[32px] h-8 lg:min-w-[36px] lg:h-9 rounded-lg font-bold transition-all text-xs flex items-center justify-center shrink-0 ${
+                        paginaActual === index + 1 
+                        ? 'bg-[#24B6C1] text-white shadow-md' 
+                        : 'bg-white/5 text-gray-300 hover:bg-white/10'
+                      }`}
+                    >
+                      {index + 1}
+                    </button>
+                  ))}
+                </div>
                 
                 <button
                   onClick={irPaginaSiguiente}
                   disabled={paginaActual === totalPaginas}
-                  className={`flex items-center justify-center gap-2 px-4 lg:px-5 py-3 rounded-xl font-bold uppercase tracking-widest text-[10px] lg:text-xs transition-all w-1/3 sm:w-auto ${
+                  className={`flex items-center justify-center gap-1 px-3 sm:px-4 py-2.5 rounded-xl font-bold uppercase tracking-widest text-[10px] lg:text-xs transition-all ${
                     paginaActual === totalPaginas 
                       ? 'bg-white/5 text-white/20 cursor-not-allowed' 
                       : 'bg-[#24B6C1] text-white hover:bg-[#1e9aa3] shadow-lg shadow-[#24B6C1]/20'
                   }`}
                 >
-                  Sig <span className="rotate-180 inline-block hidden sm:block"><FaArrowLeft size={12} /></span>
+                  Sig <span className="rotate-180 inline-block hidden sm:block"><FaArrowLeft size={10} /></span>
                 </button>
               </div>
             )}
 
-            {/* 🌟 MEJORA: MAPA MÓVIL AL FINAL DE LOS RESULTADOS */}
+            {/* MAPA MÓVIL AL FINAL */}
             <div className="block lg:hidden h-[350px] md:h-[400px] mt-10 relative overflow-hidden shadow-2xl rounded-[30px] border border-white/20 bg-black z-20">
               <Suspense fallback={<MapaFallback />}>
                 <MapView 
-                  propiedades={propiedadesData} 
+                  propiedades={propiedadesRender} 
                   selectedProperty={selectedProperty}
                   setSelectedProperty={setSelectedProperty} 
                 />
@@ -463,7 +517,7 @@ const faltaComuna = !tieneComunaValida;
               <div className="hidden lg:block h-[480px] relative overflow-hidden shadow-2xl rounded-[40px] border border-white/20 bg-black">
                 <Suspense fallback={<MapaFallback />}>
                   <MapView 
-                    propiedades={propiedadesData} 
+                    propiedades={propiedadesRender} 
                     selectedProperty={selectedProperty}
                     setSelectedProperty={setSelectedProperty} 
                   />
