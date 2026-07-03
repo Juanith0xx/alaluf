@@ -9,7 +9,10 @@ const SearchBar = () => {
   const [selectedComuna, setSelectedComuna] = useState(null); 
   const [showSuggestions, setShowSuggestions] = useState(false); 
   const [openDropdown, setOpenDropdown] = useState(false); 
-  const [accionActiva, setAccionActiva] = useState("Arrendar"); 
+  
+  // Sincronizar estado inicial con la URL si existe (1 = Comprar, 2 = Arrendar)
+  const [searchParams] = useSearchParams();
+  const [accionActiva, setAccionActiva] = useState(searchParams.get("obj") === "1" ? "Comprar" : "Arrendar"); 
    
   // Estado para subcategorías en móvil
   const [activeCategory, setActiveCategory] = useState(null); 
@@ -26,7 +29,6 @@ const SearchBar = () => {
   
   const navigate = useNavigate(); 
   const location = useLocation();
-  const [searchParams] = useSearchParams();
 
   // --- LÓGICA AUTOMÁTICA PARA FILTROS AVANZADOS ---
   useEffect(() => {
@@ -47,6 +49,11 @@ const SearchBar = () => {
     setSupHasta(searchParams.get("sup_hasta") || "");
     setPrecioDesde(searchParams.get("precio_desde") || "");
     setPrecioHasta(searchParams.get("precio_hasta") || "");
+
+    // Sincronizar accion activa con URL (Por si el usuario recarga la página)
+    if (searchParams.has("obj")) {
+      setAccionActiva(searchParams.get("obj") === "1" ? "Comprar" : "Arrendar");
+    }
   }, [location.pathname, searchParams]);
 
 
@@ -110,7 +117,7 @@ const SearchBar = () => {
   const propiedades = [ 
     { nombre: "Residencial", sub: [{ label: "Casas", id: 1 }, { label: "Departamentos", id: 2 }] }, 
     { nombre: "Comercial / Oficinas", sub: [{ label: "Oficinas", id: 3 }, { label: "Locales", id: 4 }, { label: "Casa Comercial", id: 5 }, { label: "Hotelería", id: 13 }, { label: "Edificios Corporativos", id: 12 }] }, 
-    { nombre: "Terreno para proyecto", sub: [{ label: "Terrenos para Proyectos", id: 6 }, { label: "Parcela / Sitio", id: 10 }, { label: "Campos", id: 15 }] }, 
+    { nombre: "Terrenos para proyectos", sub: [{ label: "Terrenos para Proyectos", id: 6 }, { label: "Parcela / Sitio", id: 10 }, { label: "Campos", id: 15 }] }, 
     { nombre: "Industrial", sub: [{ label: "Galpones", id: 8 }, { label: "Bodega Industrial", id: 17 }, { label: "Terreno Industrial", id: 7 }] }, 
   ]; 
 
@@ -126,7 +133,7 @@ const SearchBar = () => {
 
     const textInput = searchQuery.trim(); 
     const numericCode = textInput.replace(/\D/g, ""); 
-     
+      
     if (numericCode !== "" && (textInput.toLowerCase().startsWith("id") || !isNaN(textInput))) { 
       navigate(`/buscar?q=${numericCode}`); 
       return; 
@@ -137,26 +144,23 @@ const SearchBar = () => {
       return; 
     } 
 
+    // Lógica principal: 1 = Comprar (Venta), 2 = Arrendar (Arriendo)
     const objID = accionActiva === "Comprar" ? 1 : 2; 
     const tipoPropID = tipoPropiedad?.id || searchParams.get('tipo_prop');
 
     const queryParams = {
       tipo_prop: tipoPropID,
-      obj: objID
+      obj: objID // Aplicamos el filtro de Venta(1) o Arriendo(2)
     };
 
-    if (selectedComuna?.id) queryParams.comuna = selectedComuna.label;
-
-     console.log("TIPO PROPIEDAD:", tipoPropID);
-  console.log("COMUNA:", selectedComuna);
-  console.log("SEARCH QUERY:", searchQuery);
-  console.log("PARAMS:", queryParams);
+    // Tomar la comuna seleccionada o escrita
+    if (selectedComuna?.id) {
+      queryParams.comuna = selectedComuna.label;
+    } else if (textInput.length > 2 && isNaN(textInput)) {
+      queryParams.comuna = textInput;
+    }
 
     const params = new URLSearchParams(queryParams); 
-    console.log(
-  "URL FINAL:",
-  `/buscar?${params.toString()}`
-);
     navigate(`/buscar?${params.toString()}`); 
   };
 
@@ -197,7 +201,15 @@ const SearchBar = () => {
               key={accion} 
               onClick={() => { 
                 setAccionActiva(accion); 
-                if (accion === "Vender") navigate('/vender'); 
+                
+                if (accion === "Vender") {
+                  navigate('/vender'); 
+                } else if (location.pathname.includes('/buscar')) {
+                  // NUEVA LÓGICA: Si ya está en la vista de búsqueda, actualizamos el parámetro 'obj' en la URL automáticamente.
+                  const params = new URLSearchParams(searchParams);
+                  params.set("obj", accion === "Comprar" ? "1" : "2");
+                  navigate(`/buscar?${params.toString()}`);
+                }
               }} 
               className={`px-4 sm:px-6 py-3 rounded-lg text-xs sm:text-sm font-medium transition-all duration-300 whitespace-nowrap ${ 
                 accionActiva === accion ? "bg-[#24B6C1] text-white shadow-lg" : "text-white/60 hover:text-white" 
@@ -294,7 +306,7 @@ const SearchBar = () => {
             }} 
             onFocus={() => setShowSuggestions(true)} 
             onKeyDown={(e) => e.key === "Enter" && handleSearch()} 
-            placeholder={searchParams.get('comuna') ? comunasDataset.find(c => c.id === searchParams.get('comuna'))?.label : "Comuna, ciudad o código..."} 
+            placeholder={searchParams.get('comuna') ? comunasDataset.find(c => c.label.toLowerCase() === searchParams.get('comuna')?.toLowerCase())?.label || searchParams.get('comuna') : "Comuna, ciudad o código..."} 
             className="w-full px-6 py-4 bg-gray-400/90 text-white rounded-xl placeholder-white/90 focus:outline-none focus:ring-1 focus:ring-[#24B6C1] text-sm" 
           /> 
 
@@ -321,10 +333,10 @@ const SearchBar = () => {
           {/* Botón opcional para ocultar/mostrar filtros manualmente si el usuario ya está en /buscar */}
           {location.pathname.includes('/buscar') && (
              <button 
-                onClick={() => setMostrarAvanzado(!mostrarAvanzado)}
-                className={`px-4 py-4 rounded-xl flex items-center justify-center transition-all shadow-lg ${mostrarAvanzado ? 'bg-[#1a1a1a] text-[#24B6C1] border border-white/10' : 'bg-gray-600/60 text-white hover:bg-gray-500'}`}
+               onClick={() => setMostrarAvanzado(!mostrarAvanzado)}
+               className={`px-4 py-4 rounded-xl flex items-center justify-center transition-all shadow-lg ${mostrarAvanzado ? 'bg-[#1a1a1a] text-[#24B6C1] border border-white/10' : 'bg-gray-600/60 text-white hover:bg-gray-500'}`}
              >
-                <SlidersHorizontal size={18} />
+               <SlidersHorizontal size={18} />
              </button>
           )}
         </div>

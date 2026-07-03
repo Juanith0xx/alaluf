@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom"; // 🌟 Agregado useSearchParams
 import { 
   FaRulerCombined, FaMapMarkerAlt, FaPhoneAlt, 
   FaChevronLeft, FaChevronRight, FaBed, FaBath, 
@@ -9,6 +9,7 @@ import {
 
 const PropertyCard = ({ item, onSelect, isActive }) => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams(); // 🌟 Instanciamos los parámetros de la URL
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   if (!item) return null;
@@ -16,6 +17,11 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
   const imagenes = item.imagenes || [];
   const tieneArriendo = item.precios?.arriendo?.valor && item.precios.arriendo.valor !== "0";
   const tieneVenta = item.precios?.venta?.valor && item.precios.venta.valor !== "0";
+
+  // 🌟 LÓGICA DE FILTRADO ESTRICTO SEGÚN LA URL 🌟
+  const objParam = searchParams.get("obj");
+  if (objParam === "1" && !tieneVenta) return null;    // Si buscan comprar y no tiene venta, no se muestra
+  if (objParam === "2" && !tieneArriendo) return null; // Si buscan arrendar y no tiene arriendo, no se muestra
 
   const nextImage = (e) => {
     e.stopPropagation(); 
@@ -37,7 +43,7 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
 
   // Función para añadir separador de miles en formato chileno
   const formatearPrecio = (valor) => {
-    if (!valor) return "";
+    if (!valor) return "0";
     const numero = parseFloat(valor);
     if (isNaN(numero)) return valor;
     return numero.toLocaleString("es-CL");
@@ -55,6 +61,8 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
     const dorms = item.detalles?.dormitorios || 0;
     const banos = item.detalles?.banos || 0;
     const estac = item.detalles?.estacionamientos || 0;
+    
+    // Obtenemos valores sin formato primero
     const m2Construidos = obtenerCampoExtra("construidos") || item.detalles?.superficie || "0";
     const m2Terreno = obtenerCampoExtra("terreno") || item.detalles?.superficie || "0";
     const m2Utiles = obtenerCampoExtra("útiles") || item.detalles?.superficie || "0";
@@ -71,8 +79,8 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
     if (tipo.includes("casa") && !tipo.includes("comercial")) {
       return (
         <div className="flex flex-wrap gap-2 mt-3 font-[Outfit]">
-          <InfoItem icon={FaRulerCombined} text={`${m2Construidos} m² Const.`} />
-          <InfoItem icon={FaRulerCombined} text={`${m2Terreno} m² Terr.`} />
+          <InfoItem icon={FaRulerCombined} text={`${formatearPrecio(m2Construidos)} m² Const.`} />
+          <InfoItem icon={FaRulerCombined} text={`${formatearPrecio(m2Terreno)} m² Terr.`} />
           {dorms > 0 && <InfoItem icon={FaBed} text={`${dorms} Dorm`} />}
           {banos > 0 && <InfoItem icon={FaBath} text={`${banos} Baños`} />}
         </div>
@@ -83,8 +91,8 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
     if (tipo.includes("departamento")) {
       return (
         <div className="flex flex-wrap gap-2 mt-3 font-[Outfit]">
-          <InfoItem icon={FaRulerCombined} text={`${m2Totales} m² Totales`} />
-          <InfoItem icon={FaRulerCombined} text={`${m2Utiles} m² Útiles`} />
+          <InfoItem icon={FaRulerCombined} text={`${formatearPrecio(m2Totales)} m² Totales`} />
+          <InfoItem icon={FaRulerCombined} text={`${formatearPrecio(m2Utiles)} m² Útiles`} />
           {dorms > 0 && <InfoItem icon={FaBed} text={`${dorms} Dorm`} />}
           {banos > 0 && <InfoItem icon={FaBath} text={`${banos} Baños`} />}
         </div>
@@ -99,7 +107,7 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
 
       return (
         <div className="flex flex-wrap gap-2 mt-3 font-[Outfit]">
-          <InfoItem icon={FaRulerCombined} text={`${m2Construidos} m²`} />
+          <InfoItem icon={FaRulerCombined} text={`${formatearPrecio(m2Construidos)} m²`} />
           {habilitada && <InfoItem icon={FaCheckCircle} text={`Habitada: ${habilitada}`} />}
           {tipoEdificio && <InfoItem icon={FaBuilding} text={`Edificio ${tipoEdificio}`} />}
           {privados !== null && parseInt(privados) > 0 && (
@@ -116,7 +124,7 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
 
       return (
         <div className="flex flex-wrap gap-2 mt-3 font-[Outfit]">
-          <InfoItem icon={FaRulerCombined} text={`${m2Construidos} m²`} />
+          <InfoItem icon={FaRulerCombined} text={`${formatearPrecio(m2Construidos)} m²`} />
           {habilitado && <InfoItem icon={FaCheckCircle} text={`Habilitado: ${habilitado}`} />}
           {estac > 0 && <InfoItem icon={FaCar} text={`${estac} Estac.`} />}
           {banosLocal > 0 && <InfoItem icon={FaBath} text={`${banosLocal} Baños`} />}
@@ -128,8 +136,8 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
     if (tipo.includes("comercial")) {
       return (
         <div className="flex flex-wrap gap-2 mt-3 font-[Outfit]">
-          <InfoItem icon={FaRulerCombined} text={`${m2Construidos} m² Const.`} />
-          <InfoItem icon={FaRulerCombined} text={`${m2Terreno} m² Terr.`} />
+          <InfoItem icon={FaRulerCombined} text={`${formatearPrecio(m2Construidos)} m² Const.`} />
+          <InfoItem icon={FaRulerCombined} text={`${formatearPrecio(m2Terreno)} m² Terr.`} />
           {estac > 0 && <InfoItem icon={FaCar} text={`${estac} Estac.`} />}
         </div>
       );
@@ -141,7 +149,7 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
 
       return (
         <div className="flex flex-wrap gap-2 mt-3 font-[Outfit]">
-          <InfoItem icon={FaRulerCombined} text={`${m2Terreno} m²`} />
+          <InfoItem icon={FaRulerCombined} text={`${formatearPrecio(m2Terreno)} m²`} />
           {frente && <InfoItem icon={FaRulerVertical} text={`Frente: ${frente} mts`} />}
           {fondo && <InfoItem icon={FaRulerVertical} text={`Fondo: ${fondo} mts`} />}
         </div>
@@ -156,7 +164,7 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
 
       return (
         <div className="flex flex-wrap gap-2 mt-3 font-[Outfit]">
-          <InfoItem icon={FaRulerCombined} text={`${m2Terreno} m²`} />
+          <InfoItem icon={FaRulerCombined} text={`${formatearPrecio(m2Terreno)} m²`} />
           {uso && <InfoItem icon={FaTag} text={uso} />}
           {densidad && <InfoItem icon={FaBuilding} text={`Densidad: ${densidad}`} />}
           {altura && <InfoItem icon={FaRulerVertical} text={`Altura: ${altura}`} />}
@@ -171,8 +179,8 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
 
       return (
         <div className="flex flex-wrap gap-2 mt-3 font-[Outfit]">
-          <InfoItem icon={FaRulerCombined} text={`${m2Construidos} m² Const.`} />
-          <InfoItem icon={FaRulerCombined} text={`${m2Terreno} m² Terr.`} />
+          <InfoItem icon={FaRulerCombined} text={`${formatearPrecio(m2Construidos)} m² Const.`} />
+          <InfoItem icon={FaRulerCombined} text={`${formatearPrecio(m2Terreno)} m² Terr.`} />
           {trifasica && <InfoItem icon={FaCheckCircle} text={`Trifásica: ${trifasica}`} />}
           {alturaGalpon && <InfoItem icon={FaRulerVertical} text={`Altura: ${alturaGalpon}`} />}
         </div>
@@ -181,7 +189,7 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
 
     return (
       <div className="flex flex-wrap gap-2 mt-3 font-[Outfit]">
-        <InfoItem icon={FaRulerCombined} text={`${item.detalles?.superficie || "0"} m²`} />
+        <InfoItem icon={FaRulerCombined} text={`${formatearPrecio(item.detalles?.superficie || "0")} m²`} />
       </div>
     );
   };
@@ -219,7 +227,6 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
           {renderizarDetalles()}
         </div>
 
-        {/* Sección de precios con tipografía Outfit y separador de miles */}
         <div className="border-t border-gray-100 pt-4 flex flex-col gap-2 font-[Outfit]">
           {tieneVenta && (
             <span className="text-gray-900 font-bold text-lg">

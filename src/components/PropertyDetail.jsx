@@ -76,11 +76,18 @@ const PropertyDetail = ({ property }) => {
     ""
   ).toLowerCase();
 
-  const formatearPrecio = (valor) => {
+  const formatearPrecio = (valor, moneda) => {
     if (!valor) return "";
     const numero = parseFloat(valor);
     if (isNaN(numero)) return valor;
-    return numero.toLocaleString("es-CL");
+    
+    // Verificamos si es UF para forzar 2 decimales
+    const esUF = moneda?.toUpperCase().includes("UF");
+    
+    return numero.toLocaleString("es-CL", {
+      minimumFractionDigits: esUF ? 2 : 0,
+      maximumFractionDigits: esUF ? 2 : 0,
+    });
   };
 
   const getExtra = (label) => {
@@ -287,7 +294,7 @@ const PropertyDetail = ({ property }) => {
                 <FaMapMarkerAlt className="text-[#24B6C1]" /> {property.ubicacion?.direccion}, {property.ubicacion?.comuna}
               </div>
               <div className="text-3xl md:text-5xl font-black text-[#24B6C1]">
-                {formatearPrecio(precioPrincipal)} {moneda}
+                {formatearPrecio(precioPrincipal, moneda)} {moneda}
               </div>
             </section>
 
