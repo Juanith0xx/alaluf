@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, lazy, Suspense } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, animate } from "framer-motion"; // 🌟 Importación corregida
 import { 
   FaSearch, FaArrowLeft, FaChevronDown, 
   FaChevronRight, FaCheck 
@@ -49,10 +49,6 @@ const faltaComuna = !tieneComunaValida;
   const [loading, setLoading] = useState(true);
   const [selectedProperty, setSelectedProperty] = useState(null);
 
-  // 🌟 LÓGICA CONDICIONAL: ¿Falta la comuna?
-  // (Declaración duplicada de faltaComuna eliminada)
-  
-
   // Estado para el conteo total
   const [totalPropiedades, setTotalPropiedades] = useState(0);
 
@@ -74,6 +70,19 @@ const faltaComuna = !tieneComunaValida;
   
   const dropdownRef = useRef(null);
   const suggestionRef = useRef(null);
+
+  // --- 🌟 MEJORA: EFECTO DE SCROLL AUTOMÁTICO LENTO AL CAMBIAR PÁGINA ---
+  useEffect(() => {
+    const currentScroll = window.scrollY;
+    if (currentScroll > 0) {
+      animate(currentScroll, 0, {
+        type: "tween",
+        duration: 1.8, // 1.5 segundos para que sea suave y no brusco
+        ease: "easeInOut",
+        onUpdate: (latest) => window.scrollTo(0, latest),
+      });
+    }
+  }, [paginaActual]);
 
   // DATASET COMPLETO DE COMUNAS
   const comunasDataset = [
@@ -145,11 +154,21 @@ const faltaComuna = !tieneComunaValida;
     });
   };
 
+  // --- 🌟 MEJORA: LÓGICA DE NAVEGACIÓN MÓVIL ---
+  const handlePropertyClick = (prop) => {
+    if (window.innerWidth < 1024) {
+      // Usamos codigo preferentemente para que la ficha lo encuentre
+      const idParaNavegar = prop.codigo || prop.id;
+      navigate(`/propiedad/${idParaNavegar}`);
+    } else {
+      setSelectedProperty(prop);
+    }
+  };
+
   const irPaginaSiguiente = () => {
     if (paginaActual < totalPaginas) {
       const currentParams = Object.fromEntries([...searchParams]);
       setSearchParams({ ...currentParams, page: paginaActual + 1 });
-      window.scrollTo({ top: 0, behavior: "smooth" }); 
     }
   };
 
@@ -157,7 +176,6 @@ const faltaComuna = !tieneComunaValida;
     if (paginaActual > 1) {
       const currentParams = Object.fromEntries([...searchParams]);
       setSearchParams({ ...currentParams, page: paginaActual - 1 });
-      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
@@ -170,7 +188,7 @@ const faltaComuna = !tieneComunaValida;
         const obj = searchParams.get("obj");
         const comuna = searchParams.get("comuna");
 
-        // 🌟 EXTRACCIÓN DE PARÁMETROS DE FILTROS AVANZADOS
+        // EXTRACCIÓN DE PARÁMETROS DE FILTROS AVANZADOS
         const supDesde = searchParams.get("sup_desde") || "";
         const supHasta = searchParams.get("sup_hasta") || "";
         const precioDesde = searchParams.get("precio_desde") || "";
@@ -190,7 +208,6 @@ const faltaComuna = !tieneComunaValida;
           const safeObj = obj || "1"; 
           const safeComuna = comuna || ""; 
           
-          // 🌟 URL ENRIQUECIDA CON FILTROS HORIZONTALES
           url = `${API_URL}/api/propiedades/buscar?tipo_prop=${safeTipoProp}&obj=${safeObj}&comuna=${safeComuna}&sup_desde=${supDesde}&sup_hasta=${supHasta}&precio_desde=${precioDesde}&precio_hasta=${precioHasta}&moneda=${moneda}&orden=${orden}&page=${paginaActual}&limit=10`;
           console.log("URL FETCH:", url);
         }
@@ -343,7 +360,7 @@ const faltaComuna = !tieneComunaValida;
               </button>
             </div>
 
-            {/* 🌟 AVISO INFORMATIVO CONDICIONAL */}
+            {/* AVISO INFORMATIVO CONDICIONAL */}
             <AnimatePresence>
               {faltaComuna && (
                 <motion.div 
@@ -359,22 +376,11 @@ const faltaComuna = !tieneComunaValida;
               )}
             </AnimatePresence>
 
-            {/* 🌟 FILTROS AVANZADOS HORIZONTALES (SIEMPRE VISIBLE) */}
+            {/* FILTROS AVANZADOS HORIZONTALES */}
             <div className="relative z-30 mb-8">
                {faltaComuna && (
-  <FiltrosAvanzados />
-)}
-            </div>
-
-            {/* 🌟 MAPA VERSIÓN MÓVIL */}
-            <div className="block lg:hidden h-[350px] md:h-[400px] relative overflow-hidden shadow-2xl rounded-[30px] border border-white/20 bg-black z-20">
-              <Suspense fallback={<MapaFallback />}>
-                <MapView 
-                  propiedades={propiedadesData} 
-                  selectedProperty={selectedProperty}
-                  setSelectedProperty={setSelectedProperty} 
-                />
-              </Suspense>
+                  <FiltrosAvanzados />
+                )}
             </div>
 
             {/* GRILLA DE RESULTADOS */}
@@ -392,7 +398,7 @@ const faltaComuna = !tieneComunaValida;
                     <PropertyCard 
                       key={prop.id || prop.codigo} 
                       item={prop} 
-                      onSelect={() => setSelectedProperty(prop)} 
+                      onSelect={() => handlePropertyClick(prop)} 
                       isActive={esActiva} 
                     />
                   );
@@ -437,12 +443,23 @@ const faltaComuna = !tieneComunaValida;
               </div>
             )}
 
+            {/* 🌟 MEJORA: MAPA MÓVIL AL FINAL DE LOS RESULTADOS */}
+            <div className="block lg:hidden h-[350px] md:h-[400px] mt-10 relative overflow-hidden shadow-2xl rounded-[30px] border border-white/20 bg-black z-20">
+              <Suspense fallback={<MapaFallback />}>
+                <MapView 
+                  propiedades={propiedadesData} 
+                  selectedProperty={selectedProperty}
+                  setSelectedProperty={setSelectedProperty} 
+                />
+              </Suspense>
+            </div>
+
           </div>
 
           <div className="lg:col-span-5 mt-10 lg:mt-0">
             <div className="lg:sticky lg:top-28 space-y-8">
               
-              {/* 🌟 MAPA VERSIÓN DESKTOP */}
+              {/* MAPA VERSIÓN DESKTOP */}
               <div className="hidden lg:block h-[480px] relative overflow-hidden shadow-2xl rounded-[40px] border border-white/20 bg-black">
                 <Suspense fallback={<MapaFallback />}>
                   <MapView 
@@ -493,7 +510,7 @@ const faltaComuna = !tieneComunaValida;
                   </div>
 
                   <button type="submit" className="w-full group bg-[#158F9B] hover:bg-[#127C86] text-white px-8 py-4 rounded-xl text-lg font-bold transition-all duration-300 flex items-center justify-center gap-2 mt-4 shadow-lg">
-                     Continuar
+                      Continuar
                   </button>
                 </form>
               </div>

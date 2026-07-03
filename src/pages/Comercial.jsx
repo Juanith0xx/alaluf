@@ -26,7 +26,7 @@ const Comercial = () => {
     "@type": "RealEstateAgent",
     "name": "Estrategia Comercial Inmobiliaria",
     "description": "Asesoría experta en venta y arriendo de locales comerciales y oficinas en el sector oriente de Santiago. Estudiamos flujo peatonal, competencia y vacancia.",
-    "url": "https://alaluf.vercel.app/comercial",
+    "url": "https://alaluf.cl/comercial",
     //"image": "https://www.tudominio.cl/assets/comercial.jpeg", // 
     "address": {
       "@type": "PostalAddress",
