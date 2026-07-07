@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom"; // Importación necesaria para la navegación
 import bg from "../assets/Marmol.jpg";
 import logo from "../assets/Logo_A.png";
 import { 
@@ -10,6 +11,17 @@ import { FaSquareFacebook } from "react-icons/fa6";
 const Footer = () => {
   const [ufValue, setUfValue] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  // Definición de las rutas para el mapa
+  const navLinks = [
+    { name: "Licitaciones", path: "/licitaciones" },
+    { name: "Industrial", path: "/terrenos_proyectos" },
+    { name: "Comercial", path: "/comercial" },
+    { name: "Residencial", path: "/residencial" },
+    { name: "Administracion de Arriendo", path: "/administracion-activo" },
+    { name: "Tasación de Activos", path: "/tasacion-activo" },
+    { name: "Club de Deals e Inversiones", path: "/club_deals_inversiones" },
+  ];
 
   useEffect(() => {
     const fetchUF = async () => {
@@ -45,22 +57,16 @@ const Footer = () => {
       className="w-full bg-cover bg-center text-white font-[Outfit]"
       style={{ backgroundImage: `url(${bg})` }}
     >
-      {/* Ajuste de padding vertical: menor en móvil (py-12), estándar en desktop (py-20) */}
       <div className="max-w-7xl mx-auto px-6 py-12 md:py-16 lg:py-20">
 
-        {/* Rejilla: 1 columna en móvil, 2 en tablet (sm), 3 en desktop (lg) */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 lg:gap-12">
 
           {/* COLUMNA 1: LOGO, REDES Y UF */}
-          {/* En tablet, permitimos que esta columna ocupe el ancho completo arriba si se requiere, 
-              pero con sm:col-span-1 mantendrá 2 columnas. */}
           <div className="flex flex-col items-start sm:col-span-2 lg:col-span-1 mb-4 lg:mb-0">
             <img src={logo} alt="Alaluf" className="h-8 md:h-10 mb-6 lg:mb-8" />
             
-            {/* Contenedor flexible para alinear redes y UF. En móvil/tablet se envuelven (wrap) */}
             <div className="flex flex-wrap items-center lg:items-start gap-6 lg:gap-8">
               
-              {/* Redes sociales: horizontales en móvil/tablet, verticales en escritorio */}
               <div className="flex flex-row lg:flex-col gap-4 lg:gap-5">
                 <a href="https://www.linkedin.com/company/alaluf-propiedades/" target="_blank" rel="noopener noreferrer" className="text-[#05FFEA] hover:text-white transition text-2xl md:text-3xl">
                   <FaLinkedin />
@@ -76,7 +82,6 @@ const Footer = () => {
                 </a>
               </div>
 
-              {/* INDICADOR UF */}
               <div className="flex flex-col gap-2">
                 <div className="bg-[#24B6C1]/10 border border-[#24B6C1]/30 p-3 lg:p-4 rounded-xl backdrop-blur-sm flex flex-col items-center justify-center min-w-[110px]">
                   <FaChartLine className="text-[#05FFEA] text-lg lg:text-xl mb-1 lg:mb-2" />
@@ -98,12 +103,11 @@ const Footer = () => {
               Tipo de propiedades
             </h4>
             <ul className="space-y-2 lg:space-y-3 text-white/60 text-sm">
-              {[
-                "Licitaciones", "Industrial", "Comercial", "Residencial",
-                "Administracion de Arriendo", "Tasación de Activos", "Club de Deals e Inversiones"
-              ].map((item, i) => (
+              {navLinks.map((link, i) => (
                 <li key={i} className="hover:text-[#05FFEA] transition cursor-pointer">
-                  {item}
+                  <Link to={link.path} className="block w-full">
+                    {link.name}
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -116,7 +120,6 @@ const Footer = () => {
             </h4>
             <div className="space-y-5 lg:space-y-6 text-sm text-white/70">
               
-              {/* Teléfono */}
               <div className="flex items-start gap-4">
                 <div className="border border-[#24B6C1] p-2 rounded-lg text-[#24B6C1] shrink-0">
                   <FaPhoneAlt className="w-4 h-4" />
@@ -128,7 +131,6 @@ const Footer = () => {
                 </div>
               </div>
 
-              {/* Email */}
               <div className="flex items-start gap-4">
                 <div className="border border-[#24B6C1] p-2 rounded-lg text-[#24B6C1] shrink-0">
                   <FaEnvelope className="w-4 h-4" />
@@ -139,7 +141,6 @@ const Footer = () => {
                 </div>
               </div>
 
-              {/* Oficina */}
               <div className="flex items-start gap-4">
                 <div className="border border-[#24B6C1] p-2 rounded-lg text-[#24B6C1] shrink-0">
                   <FaMapMarkerAlt className="w-4 h-4" />
@@ -155,7 +156,6 @@ const Footer = () => {
 
         </div>
 
-        {/* Copyright */}
         <div className="border-t border-white/10 mt-12 lg:mt-16 pt-6 lg:pt-8 text-center">
           <p className="text-xs text-white/40 tracking-wide">
             © {new Date().getFullYear()} Alaluf. Todos los derechos reservados.

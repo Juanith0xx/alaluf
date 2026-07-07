@@ -60,9 +60,14 @@ const InfoSection = () => {
               <br className="hidden md:block" /> situación y asesorarte en el camino más inteligente para
               <br className="hidden md:block" /> llegar donde quieres.
             </p>
-            <button className="text-[#24B6C1] font-light text-lg md:text-xl font-[Outfit] flex items-center gap-2 hover:gap-3 transition-all">
-              INICIAR LA CONVERSACIÓN
-            </button>
+            <a
+  href="https://wa.me/56947714977?text=Hola,%20me%20gustaría%20más%20información%20sobre%20una%20propiedad."
+  target="_blank"
+  rel="noopener noreferrer"
+  className="text-[#24B6C1] font-light text-lg md:text-xl font-[Outfit] flex items-center gap-2 hover:gap-3 transition-all cursor-pointer"
+>
+  INICIAR LA CONVERSACIÓN
+</a>
           </div>
 
         </div>

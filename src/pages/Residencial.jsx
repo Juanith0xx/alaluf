@@ -131,9 +131,6 @@ const Residencial = () => {
               El mercado residencial en Santiago creció un 34,4% en ventas en el último trimestre de 2025. El momento de
               moverse con criterio es ahora.
             </p>
-            <p className="text-sm text-gray-400 font-normal">
-              Fuente: NielsenIQ, Informe Inmobiliario Q4 2025.
-            </p>
             <p className="text-[#0091A4] text-base md:text-xl font-bold">
               Buscamos el equilibrio perfecto entre la emoción de vivir y la inteligencia de invertir.
             </p>
