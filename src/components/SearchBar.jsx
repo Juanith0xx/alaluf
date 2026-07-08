@@ -161,8 +161,6 @@ const SearchBar = () => {
     }
 
     const params = new URLSearchParams(queryParams); 
-    // Aseguramos que siempre inicie en la página 1 en una nueva búsqueda
-    params.set("page", "1");
     navigate(`/buscar?${params.toString()}`); 
   };
 
@@ -174,9 +172,6 @@ const SearchBar = () => {
     if (supHasta) params.set("sup_hasta", supHasta); else params.delete("sup_hasta");
     if (precioDesde) params.set("precio_desde", precioDesde); else params.delete("precio_desde");
     if (precioHasta) params.set("precio_hasta", precioHasta); else params.delete("precio_hasta");
-    
-    // 🔥 MEJORA: Reiniciar a la página 1 cuando se aplican nuevos filtros
-    params.set("page", "1");
     
     navigate(`/buscar?${params.toString()}`);
   };
@@ -213,7 +208,6 @@ const SearchBar = () => {
                   // NUEVA LÓGICA: Si ya está en la vista de búsqueda, actualizamos el parámetro 'obj' en la URL automáticamente.
                   const params = new URLSearchParams(searchParams);
                   params.set("obj", accion === "Comprar" ? "1" : "2");
-                  params.set("page", "1"); // Siempre ir a página 1 al cambiar la acción
                   navigate(`/buscar?${params.toString()}`);
                 }
               }} 
