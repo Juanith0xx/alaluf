@@ -177,10 +177,14 @@ const SearchView = () => {
     }
   };
 
-  // 🌟 MEJORA: FETCH + FILTRADO + ORDENAMIENTO (MÁS RECIENTES PRIMERO)
+  // 🌟 MEJORA: FETCH LIGERO, SIN FILTRADO LOCAL
   useEffect(() => {
     const fetchResultados = async () => {
       setLoading(true);
+      
+      // ⏱️ 1. Iniciamos el temporizador justo al empezar la petición
+      const startTime = performance.now();
+
       try {
         const query = searchParams.get("q");
         const tipo_prop = searchParams.get("tipo_prop");
@@ -206,50 +210,30 @@ const SearchView = () => {
           const safeObj = obj || "1"; 
           const safeComuna = comuna || ""; 
           
-          url = `${API_URL}/api/propiedades/buscar?tipo_prop=${safeTipoProp}&obj=${safeObj}&comuna=${safeComuna}&sup_desde=${supDesde}&sup_hasta=${supHasta}&precio_desde=${precioDesde}&precio_hasta=${precioHasta}&moneda=${moneda}&orden=${orden}&page=1&limit=2000`;
+          // 🔥 Límite bajado a 10 y uso dinámico de paginaActual en la URL
+          url = `${API_URL}/api/propiedades/buscar?tipo_prop=${safeTipoProp}&obj=${safeObj}&comuna=${safeComuna}&sup_desde=${supDesde}&sup_hasta=${supHasta}&precio_desde=${precioDesde}&precio_hasta=${precioHasta}&moneda=${moneda}&orden=${orden}&page=${paginaActual}&limit=10`;
         }
         
         const response = await fetch(url);
         const data = await response.json();
         
-        let arrayGigante = [];
+        let resultadosPaginados = [];
 
+        // Tomar los datos procesados y la paginación del backend
         if (data.data) {
-          arrayGigante = data.data; 
+          resultadosPaginados = data.data; 
+          setTotalPropiedades(data.paginacion?.totalPropiedades || 0); 
+          setTotalPaginas(data.paginacion?.totalPaginas || 1); 
         } else {
-          arrayGigante = Array.isArray(data) ? data : (data && (data.id || data.codigo) ? [data] : []);
+          resultadosPaginados = Array.isArray(data) ? data : (data && (data.id || data.codigo) ? [data] : []);
+          setTotalPropiedades(resultadosPaginados.length);
+          setTotalPaginas(1);
         }
 
-        // LÓGICA DE FILTRADO ESTRICTO LOCAL
-        const safeObjStr = obj || "1";
-        const arrayFiltradoPorPrecios = arrayGigante.filter(prop => {
-          const valArriendo = prop.precios?.arriendo?.valor;
-          const valVenta = prop.precios?.venta?.valor;
-          
-          const tieneArriendo = valArriendo && valArriendo !== "0" && valArriendo !== 0;
-          const tieneVenta = valVenta && valVenta !== "0" && valVenta !== 0;
-          
-          if (safeObjStr === "1") return tieneVenta;
-          if (safeObjStr === "2") return tieneArriendo;
-          return true; 
-        });
+        setPropiedadesData(resultadosPaginados);
 
-        // 🌟 NUEVO ORDENAMIENTO: MÁS RECIENTES PRIMERO
-        const arrayOrdenado = [...arrayFiltradoPorPrecios].sort((a, b) => {
-          // Ajustar campo según la propiedad de fecha en tu API (ej: createdAt, fecha, fechaPublicacion)
-          const fechaA = new Date(a.fechaPublicacion || a.createdAt || a.fecha || 0);
-          const fechaB = new Date(b.fechaPublicacion || b.createdAt || b.fecha || 0);
-          return fechaB - fechaA; 
-        });
-
-        // RECALCULAMOS TOTALES Y PÁGINAS REALES
-        const totalElementosReales = arrayOrdenado.length;
-        setTotalPropiedades(totalElementosReales); 
-        setTotalPaginas(Math.ceil(totalElementosReales / 10) || 1); 
-        setPropiedadesData(arrayOrdenado);
-
-        if (arrayOrdenado.length > 0) {
-          setSelectedProperty(arrayOrdenado[0]);
+        if (resultadosPaginados.length > 0) {
+          setSelectedProperty(resultadosPaginados[0]);
         } else {
           setSelectedProperty(null);
         }
@@ -260,12 +244,19 @@ const SearchView = () => {
         setTotalPropiedades(0);
         setTotalPaginas(1);
       } finally {
+        // ⏱️ 2. Detenemos el temporizador
+        const endTime = performance.now();
+        const tiempoEnSegundos = ((endTime - startTime) / 1000).toFixed(2);
+        
+        console.log(`🚀 [PERFORMANCE] Búsqueda de propiedades tardó: ${tiempoEnSegundos} segundos`);
+
         setLoading(false);
       }
     };
     
     fetchResultados();
-  }, [searchParams]);
+  // 🔥 Es crítico que paginaActual esté aquí para que se vuelva a disparar al cambiar de página
+  }, [searchParams, paginaActual]);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -283,11 +274,8 @@ const SearchView = () => {
     backgroundAttachment: 'fixed' 
   };
 
-  const propiedadesPorPagina = 10;
-  const startIndex = (paginaActual - 1) * propiedadesPorPagina;
-  const propiedadesRender = propiedadesData.length > propiedadesPorPagina
-    ? propiedadesData.slice(startIndex, startIndex + propiedadesPorPagina)
-    : propiedadesData;
+  // 🔥 Eliminado el '.slice()' manual. El backend ya nos entrega solo los 10 que necesitamos renderizar.
+  const propiedadesRender = propiedadesData;
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white font-[Outfit]">
@@ -421,7 +409,7 @@ const SearchView = () => {
                 )}
             </div>
 
-            {/* GRILLA DE RESULTADOS (Renderizado con slice local) */}
+            {/* GRILLA DE RESULTADOS */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 relative z-10">
               {loading ? (
                 <div className="col-span-1 md:col-span-2 py-40 text-center"><div className="w-12 h-12 border-4 border-[#24B6C1] border-t-transparent rounded-full animate-spin inline-block"></div></div>
