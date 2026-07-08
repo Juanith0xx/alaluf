@@ -16,7 +16,7 @@ const EspecialPorArea = () => {
   const tabs = ["Residencial", "Terrenos", "Industrial", "Comercial"];
 
   const tabToPropId = {
-    "Residencial": "1",  
+    "Residencial": "1A",  
     "Terrenos": "6",     
     "Industrial": "7",   
     "Comercial": "4",    
@@ -26,6 +26,10 @@ const EspecialPorArea = () => {
   useEffect(() => {
     const fetchDestacadas = async () => {
       setLoading(true);
+      
+      // ⏱️ 1. Iniciamos el temporizador justo antes de la petición
+      const startTime = performance.now();
+
       try {
         const tipoId = tabToPropId[activeTab] || "1";
         
@@ -76,6 +80,12 @@ const EspecialPorArea = () => {
         console.error("Error obteniendo propiedades:", error);
         setCards([]); 
       } finally {
+        // ⏱️ 2. Detenemos el temporizador, lo convertimos a segundos y lo mostramos en consola
+        const endTime = performance.now();
+        const tiempoEnSegundos = ((endTime - startTime) / 1000).toFixed(2);
+        
+        console.log(`🚀 [PERFORMANCE] Búsqueda de '${activeTab}' tardó: ${tiempoEnSegundos} segundos`);
+        
         setLoading(false);
       }
     };
