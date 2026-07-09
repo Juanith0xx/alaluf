@@ -10,8 +10,7 @@ import {
 import Navbar from "../components/Navbar"; 
 import PropertyCard from "../components/PropertyCard"; 
 
-// 🌟 LAZY LOADING: MapView (incluye mapbox-gl, ~1.78MB) ahora se descarga
-// solo cuando el mapa entra en pantalla, no en la carga inicial del sitio.
+// 🌟 LAZY LOADING: MapView (incluye mapbox-gl) 
 const MapView = lazy(() => import("../components/MapView"));
 
 import FiltrosAvanzados from "../components/FiltrosAvanzados"; 
@@ -48,6 +47,9 @@ const SearchView = () => {
   const [propiedadesData, setPropiedadesData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedProperty, setSelectedProperty] = useState(null);
+  
+  // ⏱️ NUEVO ESTADO PARA MEDIR EL TIEMPO
+  const [tiempoBusqueda, setTiempoBusqueda] = useState(null);
 
   // Estado para el conteo total
   const [totalPropiedades, setTotalPropiedades] = useState(0);
@@ -71,13 +73,13 @@ const SearchView = () => {
   const dropdownRef = useRef(null);
   const suggestionRef = useRef(null);
 
-  // --- 🌟 MEJORA: EFECTO DE SCROLL AUTOMÁTICO LENTO AL CAMBIAR PÁGINA ---
+  // EFECTO DE SCROLL AUTOMÁTICO LENTO AL CAMBIAR PÁGINA
   useEffect(() => {
     const currentScroll = window.scrollY;
     if (currentScroll > 0) {
       animate(currentScroll, 0, {
         type: "tween",
-        duration: 1.8, // 1.5 segundos para que sea suave y no brusco
+        duration: 1.8, 
         ease: "easeInOut",
         onUpdate: (latest) => window.scrollTo(0, latest),
       });
@@ -177,10 +179,13 @@ const SearchView = () => {
     }
   };
 
-  // 🌟 MEJORA: FETCH + FILTRADO + ORDENAMIENTO (MÁS RECIENTES PRIMERO)
+  // 🌟 FETCH OPTIMIZADO CON PAGINACIÓN DE SERVIDOR Y CRONÓMETRO
   useEffect(() => {
     const fetchResultados = async () => {
       setLoading(true);
+      // ⏱️ 1. Iniciamos el cronómetro
+      const startTime = performance.now();
+
       try {
         const query = searchParams.get("q");
         const tipo_prop = searchParams.get("tipo_prop");
@@ -192,7 +197,7 @@ const SearchView = () => {
         const precioDesde = searchParams.get("precio_desde") || "";
         const precioHasta = searchParams.get("precio_hasta") || "";
         const moneda = searchParams.get("moneda") || "CLP";
-        const orden = searchParams.get("orden") || "desc";
+        const orden = searchParams.get("orden") || "reciente"; 
 
         if (tipo_prop && (!tipoPropiedad || tipoPropiedad.id != tipo_prop)) {
           setTipoPropiedad({ label: obtenerLabelPorId(tipo_prop), id: tipo_prop });
@@ -206,52 +211,43 @@ const SearchView = () => {
           const safeObj = obj || "1"; 
           const safeComuna = comuna || ""; 
           
-          url = `${API_URL}/api/propiedades/buscar?tipo_prop=${safeTipoProp}&obj=${safeObj}&comuna=${safeComuna}&sup_desde=${supDesde}&sup_hasta=${supHasta}&precio_desde=${precioDesde}&precio_hasta=${precioHasta}&moneda=${moneda}&orden=${orden}&page=1&limit=2000`;
+          // Enviamos paginaActual y limit=10 al backend
+          url = `${API_URL}/api/propiedades/buscar?tipo_prop=${safeTipoProp}&obj=${safeObj}&comuna=${safeComuna}&sup_desde=${supDesde}&sup_hasta=${supHasta}&precio_desde=${precioDesde}&precio_hasta=${precioHasta}&moneda=${moneda}&orden=${orden}&page=${paginaActual}&limit=10`;
         }
         
         const response = await fetch(url);
-        const data = await response.json();
+        const json = await response.json();
         
-        let arrayGigante = [];
+        // ⏱️ 2. Detenemos el cronómetro justo al recibir la data
+        const endTime = performance.now();
+        const tiempoEnSegundos = ((endTime - startTime) / 1000).toFixed(2);
+        
+        // ⏱️ 3. Guardamos el tiempo en el estado y lo mostramos en consola
+        setTiempoBusqueda(tiempoEnSegundos);
+        console.log(`🚀 [PERFORMANCE] La búsqueda tardó: ${tiempoEnSegundos} segundos`);
 
-        if (data.data) {
-          arrayGigante = data.data; 
-        } else {
-          arrayGigante = Array.isArray(data) ? data : (data && (data.id || data.codigo) ? [data] : []);
-        }
-
-        // LÓGICA DE FILTRADO ESTRICTO LOCAL
-        const safeObjStr = obj || "1";
-        const arrayFiltradoPorPrecios = arrayGigante.filter(prop => {
-          const valArriendo = prop.precios?.arriendo?.valor;
-          const valVenta = prop.precios?.venta?.valor;
-          
-          const tieneArriendo = valArriendo && valArriendo !== "0" && valArriendo !== 0;
-          const tieneVenta = valVenta && valVenta !== "0" && valVenta !== 0;
-          
-          if (safeObjStr === "1") return tieneVenta;
-          if (safeObjStr === "2") return tieneArriendo;
-          return true; 
-        });
-
-        // 🌟 NUEVO ORDENAMIENTO: MÁS RECIENTES PRIMERO
-        const arrayOrdenado = [...arrayFiltradoPorPrecios].sort((a, b) => {
-          // Ajustar campo según la propiedad de fecha en tu API (ej: createdAt, fecha, fechaPublicacion)
-          const fechaA = new Date(a.fechaPublicacion || a.createdAt || a.fecha || 0);
-          const fechaB = new Date(b.fechaPublicacion || b.createdAt || b.fecha || 0);
-          return fechaB - fechaA; 
-        });
-
-        // RECALCULAMOS TOTALES Y PÁGINAS REALES
-        const totalElementosReales = arrayOrdenado.length;
-        setTotalPropiedades(totalElementosReales); 
-        setTotalPaginas(Math.ceil(totalElementosReales / 10) || 1); 
-        setPropiedadesData(arrayOrdenado);
-
-        if (arrayOrdenado.length > 0) {
-          setSelectedProperty(arrayOrdenado[0]);
-        } else {
-          setSelectedProperty(null);
+        // Usamos la metadata del backend directo
+        if (json.paginacion && json.data) {
+            setPropiedadesData(json.data);
+            setTotalPropiedades(json.paginacion.totalPropiedades);
+            setTotalPaginas(json.paginacion.totalPaginas);
+            
+            if (json.data.length > 0) {
+                setSelectedProperty(json.data[0]);
+            } else {
+                setSelectedProperty(null);
+            }
+        } else if (Array.isArray(json)) {
+            // Fallback para endpoints individuales (ej. ID directo)
+            setPropiedadesData(json);
+            setTotalPropiedades(json.length);
+            setTotalPaginas(1);
+            if (json.length > 0) setSelectedProperty(json[0]);
+        } else if (json.id || json.codigo) {
+            setPropiedadesData([json]);
+            setTotalPropiedades(1);
+            setTotalPaginas(1);
+            setSelectedProperty(json);
         }
 
       } catch (error) {
@@ -265,7 +261,7 @@ const SearchView = () => {
     };
     
     fetchResultados();
-  }, [searchParams]);
+  }, [searchParams, paginaActual]);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -283,12 +279,6 @@ const SearchView = () => {
     backgroundAttachment: 'fixed' 
   };
 
-  const propiedadesPorPagina = 10;
-  const startIndex = (paginaActual - 1) * propiedadesPorPagina;
-  const propiedadesRender = propiedadesData.length > propiedadesPorPagina
-    ? propiedadesData.slice(startIndex, startIndex + propiedadesPorPagina)
-    : propiedadesData;
-
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white font-[Outfit]">
       <Navbar />
@@ -299,9 +289,19 @@ const SearchView = () => {
             <FaArrowLeft />
           </button>
           
-          <h1 className="pt-2 text-lg lg:!text-2xl font-bold !font-[Outfit] tracking-tighter uppercase italic leading-tight">
-            Total {obtenerLabelPorId(searchParams.get("tipo_prop"))} encontradas <span className="text-[#24B6C1]"> {totalPropiedades}</span> 
-          </h1>
+          {/* ⏱️ BADGE Y CONTADOR EN EL HEADER */}
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 pt-2">
+            <h1 className="text-lg lg:!text-2xl font-bold !font-[Outfit] tracking-tighter uppercase italic leading-tight">
+              Total {obtenerLabelPorId(searchParams.get("tipo_prop"))} encontradas <span className="text-[#24B6C1]"> {totalPropiedades}</span> 
+            </h1>
+            
+            {tiempoBusqueda && (
+              <div className="flex items-center gap-1.5 bg-[#24B6C1]/10 border border-[#24B6C1]/30 text-[#24B6C1] px-3 py-1 rounded-full text-xs font-bold tracking-wider w-fit">
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                {tiempoBusqueda}s
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -421,12 +421,12 @@ const SearchView = () => {
                 )}
             </div>
 
-            {/* GRILLA DE RESULTADOS (Renderizado con slice local) */}
+            {/* GRILLA DE RESULTADOS (Directamente desde propiedadesData) */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 relative z-10">
               {loading ? (
                 <div className="col-span-1 md:col-span-2 py-40 text-center"><div className="w-12 h-12 border-4 border-[#24B6C1] border-t-transparent rounded-full animate-spin inline-block"></div></div>
-              ) : propiedadesRender.length > 0 ? (
-                propiedadesRender.map((prop) => {
+              ) : propiedadesData.length > 0 ? (
+                propiedadesData.map((prop) => {
                   const esActiva = selectedProperty && (
                     selectedProperty.id == prop.id || 
                     selectedProperty.codigo == prop.codigo
@@ -501,7 +501,7 @@ const SearchView = () => {
             <div className="block lg:hidden h-[350px] md:h-[400px] mt-10 relative overflow-hidden shadow-2xl rounded-[30px] border border-white/20 bg-black z-20">
               <Suspense fallback={<MapaFallback />}>
                 <MapView 
-                  propiedades={propiedadesRender} 
+                  propiedades={propiedadesData} 
                   selectedProperty={selectedProperty}
                   setSelectedProperty={setSelectedProperty} 
                 />
@@ -517,7 +517,7 @@ const SearchView = () => {
               <div className="hidden lg:block h-[480px] relative overflow-hidden shadow-2xl rounded-[40px] border border-white/20 bg-black">
                 <Suspense fallback={<MapaFallback />}>
                   <MapView 
-                    propiedades={propiedadesRender} 
+                    propiedades={propiedadesData} 
                     selectedProperty={selectedProperty}
                     setSelectedProperty={setSelectedProperty} 
                   />
