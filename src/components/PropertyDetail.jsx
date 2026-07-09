@@ -63,9 +63,33 @@ const PropertyDetail = ({ property }) => {
 
   if (!property) return null;
 
+  
+console.log("PROPERTY", property);
+console.log("PRECIOS", property.precios);
+
   const imagenes = property.imagenes || [];
-  const precioPrincipal = property.precios?.venta?.valor || property.precios?.arriendo?.valor;
-  const moneda = property.precios?.venta?.moneda || property.precios?.arriendo?.moneda;
+  // Determinamos el precio y la moneda basándonos en si es venta o arriendo
+
+  const formatearPrecioConMoneda = (precio) => {
+  if (!precio || precio.valor == null) return null;
+
+  const moneda = (precio.moneda || "").trim().toUpperCase();
+  const numero = parseFloat(precio.valor);
+
+  if (moneda === "$" || moneda === "CLP") {
+    return `$${formatearPrecio(numero)}`;
+  }
+
+  if (moneda === "UF/M2" || moneda === "UF/M²") {
+    return `${formatearPrecio(numero)} UF/M²`;
+  }
+
+  if (moneda === "UF" && numero % 1 !== 0) {
+    return `${formatearPrecio(numero)} UF/M²`;
+  }
+
+  return `${formatearPrecio(numero)} ${precio.moneda}`;
+};
 
   const tipo = (
     property.desc_tipo ||
@@ -76,17 +100,17 @@ const PropertyDetail = ({ property }) => {
     ""
   ).toLowerCase();
 
-  const formatearPrecio = (valor, moneda) => {
-    if (!valor) return "";
+  // 🌟 FORMATEO INTELIGENTE: Sin decimales para enteros, 2 decimales para fraccionarios
+  const formatearPrecio = (valor) => {
+    if (!valor) return "0";
     const numero = parseFloat(valor);
     if (isNaN(numero)) return valor;
     
-    // Verificamos si es UF para forzar 2 decimales
-    const esUF = moneda?.toUpperCase().includes("UF");
+    const esDecimal = numero % 1 !== 0;
     
     return numero.toLocaleString("es-CL", {
-      minimumFractionDigits: esUF ? 2 : 0,
-      maximumFractionDigits: esUF ? 2 : 0,
+      minimumFractionDigits: esDecimal ? 2 : 0,
+      maximumFractionDigits: esDecimal ? 2 : 0,
     });
   };
 
@@ -187,10 +211,6 @@ const PropertyDetail = ({ property }) => {
     showToast("¡Enlace copiado al portapapeles!", "success");
   };
 
-  const handleFilterClick = (tag) => {
-    setActiveFilter(prev => prev === tag ? null : tag);
-  };
-
   const generarProximosDias = () => {
     const dias = [];
     for (let i = 0; i < 7; i++) {
@@ -234,7 +254,6 @@ const PropertyDetail = ({ property }) => {
   return (
     <div className="min-h-screen bg-cover bg-center bg-fixed font-[Outfit] pb-20 text-gray-900" style={{ backgroundImage: `url(${fondoMarmol})` }}>
       
-      {/* 🌟 COMPONENTE TOAST DE ALALUF */}
       <AlalufToast 
         visible={toast.visible} 
         message={toast.message} 
@@ -244,10 +263,8 @@ const PropertyDetail = ({ property }) => {
 
       <div className="max-w-[1400px] mx-auto px-4 md:px-6 pt-24 sm:pt-28 lg:pt-32 pb-10 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12">
         
-        {/* COLUMNA IZQUIERDA: CONTENIDO PRINCIPAL */}
         <div className="col-span-1 lg:col-span-8 space-y-6">
           
-          {/* 1. GALERÍA DE FOTOS */}
           <section className="grid grid-cols-1 md:grid-cols-4 gap-2 md:gap-3 rounded-[24px] md:rounded-[40px] overflow-hidden shadow-2xl bg-black/5 h-64 sm:h-80 md:h-[400px] lg:h-[480px]">
             <div className="col-span-1 md:col-span-2 md:row-span-2 relative overflow-hidden group cursor-pointer h-full" onClick={() => openLightbox(0)}>
               <img src={imagenes[0] || "/placeholder.jpg"} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" alt="Principal" />
@@ -265,7 +282,6 @@ const PropertyDetail = ({ property }) => {
             </div>
           </section>
 
-          {/* 2. BARRA DE CONTROL */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-black/30 px-4 md:px-6 py-4 rounded-[20px] md:rounded-[24px] backdrop-blur-md border border-white/10 text-white shadow-lg">
             <div className="flex flex-row items-center gap-4">
               <button onClick={() => navigate(-1)} className="flex items-center gap-2 hover:text-[#24B6C1] transition font-semibold bg-white/10 px-4 py-2 rounded-full text-xs">
@@ -282,7 +298,6 @@ const PropertyDetail = ({ property }) => {
             </div>
           </div>
 
-          {/* 3. BLOQUE DE DETALLES */}
           <div className="bg-white/95 backdrop-blur-sm rounded-[24px] md:rounded-[40px] p-5 md:p-8 lg:p-10 shadow-xl border border-gray-100 space-y-8">
             <section className="space-y-4">
               <div className="flex flex-wrap gap-2">
@@ -293,32 +308,47 @@ const PropertyDetail = ({ property }) => {
               <div className="flex items-center gap-2 text-gray-500 text-sm md:text-lg">
                 <FaMapMarkerAlt className="text-[#24B6C1]" /> {property.ubicacion?.direccion}, {property.ubicacion?.comuna}
               </div>
-              <div className="text-3xl md:text-5xl font-black text-[#24B6C1]">
-                {formatearPrecio(precioPrincipal, moneda)} {moneda}
-              </div>
-            </section>
 
-            {/* Características por Tipo */}
+<div className="space-y-2">
+
+  {property.precios?.venta?.valor != null && (
+    <div className="text-3xl md:text-3xl font-bold text-[#252525]  ">
+      Venta: <span className="text-[#24B6C1] font-black">{formatearPrecioConMoneda(property.precios.venta)}</span>
+    </div>
+  )}
+
+  {property.precios?.arriendo?.valor != null && (
+    <div className="text-3xl md:text-3xl font-bold text-[#252525]">
+      Arriendo: <span className="text-[#24B6C1] font-black">{formatearPrecioConMoneda(property.precios.arriendo)}</span>
+    </div>
+  )}
+
+</div>
+
+
+
+              </section>
+
             <section className="grid grid-cols-2 sm:grid-cols-4 gap-4 py-6 border-y border-gray-100">
               {tipo.includes("casa") && !tipo.includes("comercial") && (
                 <>
-                  <Feature icon={FaRulerCombined} title="Construidos" value={`${getExtraValue("construidos") || getCampo("terreno") || 0} m²`} />
-                  <Feature icon={FaRulerCombined} title="Terreno" value={`${getExtraValue("terreno") || property.detalles?.superficie || 0} m²`} />
+                  <Feature icon={FaRulerCombined} title="Construidos" value={`${formatearPrecio(getExtraValue("construidos") || getCampo("terreno") || 0)} m²`} />
+                  <Feature icon={FaRulerCombined} title="Terreno" value={`${formatearPrecio(getExtraValue("terreno") || property.detalles?.superficie || 0)} m²`} />
                   <Feature icon={FaBed} title="Dormitorios" value={property.detalles?.dormitorios || 0} />
                   <Feature icon={FaBath} title="Baños" value={property.detalles?.banos || 0} />
                 </>
               )}
               {tipo.includes("departamento") && (
                 <>
-                  <Feature icon={FaRulerCombined} title="Totales" value={`${getExtraValue("totales") || 0} m²`} />
-                  <Feature icon={FaRulerCombined} title="Útiles" value={`${getExtraValue("útiles") || 0} m²`} />
+                  <Feature icon={FaRulerCombined} title="Totales" value={`${formatearPrecio(getExtraValue("totales") || 0)} m²`} />
+                  <Feature icon={FaRulerCombined} title="Útiles" value={`${formatearPrecio(getExtraValue("útiles") || 0)} m²`} />
                   <Feature icon={FaBed} title="Dormitorios" value={property.detalles?.dormitorios || 0} />
                   <Feature icon={FaBath} title="Baños" value={property.detalles?.banos || 0} />
                 </>
               )}
               {tipo.includes("oficina") && (
                 <>
-                  <Feature icon={FaRulerCombined} title="Superficie" value={`${getExtraValue("construidos") || property.detalles?.superficie || 0} m²`} />
+                  <Feature icon={FaRulerCombined} title="Superficie" value={`${formatearPrecio(getExtraValue("construidos") || property.detalles?.superficie || 0)} m²`} />
                   <Feature icon={FaBuilding} title="Edificio" value={getExtraValue("tipo edificio")} />
                   <Feature icon={FaDoorClosed} title="Privados" value={getExtraValue("privados")} />
                   <Feature icon={FaBath} title="Baños" value={property.detalles?.banos || 0} />
@@ -326,7 +356,7 @@ const PropertyDetail = ({ property }) => {
               )}
               {tipo.includes("local") && (
                 <>
-                  <Feature icon={FaRulerCombined} title="Superficie" value={`${property.detalles?.superficie || 0} m²`} />
+                  <Feature icon={FaRulerCombined} title="Superficie" value={`${formatearPrecio(property.detalles?.superficie || 0)} m²`} />
                   <Feature icon={FaCheckCircle} title="Habilitado" value={getExtraValue("habilitado")} />
                   <Feature icon={FaCar} title="Estacionamientos" value={property.detalles?.estacionamientos || 0} />
                   <Feature icon={FaBath} title="Baños" value={property.detalles?.banos || 0} />
@@ -352,7 +382,6 @@ const PropertyDetail = ({ property }) => {
           </div>
         </div>
 
-        {/* COLUMNA DERECHA: SIDEBAR DE AGENDA */}
         <div className="col-span-1 lg:col-span-4">
           <div className="lg:sticky lg:top-24 space-y-6">
             <div className="bg-white/95 backdrop-blur-sm rounded-[24px] md:rounded-[40px] p-5 md:p-8 border border-gray-100 shadow-sm">
@@ -368,7 +397,6 @@ const PropertyDetail = ({ property }) => {
                 ))}
               </div>
 
-              {/* BLOQUES DE HORARIO SIMPLIFICADOS (MAÑANA / TARDE) */}
               <div className="space-y-3 mb-6">
                 <button 
                   onClick={() => setBloqueHorario("manana")} 
@@ -434,7 +462,6 @@ const PropertyDetail = ({ property }) => {
         </div>
       </div>
 
-      {/* 4. MODAL LIGHTBOX CON SWIPE PARA MÓVIL */}
       {isLightboxOpen && (
         <div className="fixed inset-0 bg-black/95 z-[9999] flex flex-col items-center justify-center p-4">
           <button onClick={() => setIsLightboxOpen(false)} className="absolute right-4 top-4 text-white/70 hover:text-white p-2.5 bg-white/10 rounded-full z-20 backdrop-blur-md transition-all">
@@ -442,7 +469,6 @@ const PropertyDetail = ({ property }) => {
           </button>
 
           <div className="relative w-full max-w-5xl h-full flex items-center justify-center">
-            {/* 🌟 Contenedor de Framer Motion para deslizar */}
             <motion.div
               key={activeImage}
               drag="x"
@@ -466,7 +492,6 @@ const PropertyDetail = ({ property }) => {
               />
             </motion.div>
 
-            {/* Flechas Navegación (Desktop) */}
             <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 flex justify-between px-4 pointer-events-none">
               <button onClick={prevImage} className="pointer-events-auto p-3 bg-black/40 hover:bg-[#24B6C1] rounded-full text-white transition-colors hidden md:block">
                 <FaChevronLeft size={24} />

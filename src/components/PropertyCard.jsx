@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom"; // 🌟 Agregado useSearchParams
+import React, { useState, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { 
   FaRulerCombined, FaMapMarkerAlt, FaPhoneAlt, 
   FaChevronLeft, FaChevronRight, FaBed, FaBath, 
@@ -9,7 +9,7 @@ import {
 
 const PropertyCard = ({ item, onSelect, isActive }) => {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams(); // 🌟 Instanciamos los parámetros de la URL
+  const [searchParams] = useSearchParams();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   if (!item) return null;
@@ -20,8 +20,8 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
 
   // 🌟 LÓGICA DE FILTRADO ESTRICTO SEGÚN LA URL 🌟
   const objParam = searchParams.get("obj");
-  if (objParam === "1" && !tieneVenta) return null;    // Si buscan comprar y no tiene venta, no se muestra
-  if (objParam === "2" && !tieneArriendo) return null; // Si buscan arrendar y no tiene arriendo, no se muestra
+  if (objParam === "1" && !tieneVenta) return null;   
+  if (objParam === "2" && !tieneArriendo) return null; 
 
   const nextImage = (e) => {
     e.stopPropagation(); 
@@ -41,12 +41,18 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
     return campo && campo.value !== null ? campo.value : null;
   };
 
-  // Función para añadir separador de miles en formato chileno
+  // 🌟 FUNCIÓN FORMATO INTELIGENTE: 2 decimales si existen, ninguno si es entero
   const formatearPrecio = (valor) => {
     if (!valor) return "0";
     const numero = parseFloat(valor);
     if (isNaN(numero)) return valor;
-    return numero.toLocaleString("es-CL");
+    
+    const esDecimal = numero % 1 !== 0;
+    
+    return numero.toLocaleString("es-CL", {
+      minimumFractionDigits: esDecimal ? 2 : 0,
+      maximumFractionDigits: esDecimal ? 2 : 0,
+    });
   };
 
   const renderizarDetalles = () => {
@@ -62,7 +68,6 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
     const banos = item.detalles?.banos || 0;
     const estac = item.detalles?.estacionamientos || 0;
     
-    // Obtenemos valores sin formato primero
     const m2Construidos = obtenerCampoExtra("construidos") || item.detalles?.superficie || "0";
     const m2Terreno = obtenerCampoExtra("terreno") || item.detalles?.superficie || "0";
     const m2Utiles = obtenerCampoExtra("útiles") || item.detalles?.superficie || "0";
@@ -75,7 +80,6 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
       </div>
     );
 
-    // Lógica para CASAS
     if (tipo.includes("casa") && !tipo.includes("comercial")) {
       return (
         <div className="flex flex-wrap gap-2 mt-3 font-[Outfit]">
@@ -87,7 +91,6 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
       );
     }
     
-    // Lógica para DEPARTAMENTOS
     if (tipo.includes("departamento")) {
       return (
         <div className="flex flex-wrap gap-2 mt-3 font-[Outfit]">
@@ -99,7 +102,6 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
       );
     }
 
-    // LÓGICA PARA OFICINAS
     if (tipo.includes("oficina")) {
       const tipoEdificio = obtenerCampoExtra("tipo edificio");
       const habilitada = obtenerCampoExtra("habilitada");
@@ -117,7 +119,6 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
       );
     }
 
-    // Lógica para LOCALES
     if (tipo.includes("local")) {
       const habilitado = obtenerCampoExtra("habilitado");
       const banosLocal = item.detalles?.banos || 0;
@@ -132,7 +133,6 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
       );
     }
 
-    // Lógica para COMERCIAL
     if (tipo.includes("comercial")) {
       return (
         <div className="flex flex-wrap gap-2 mt-3 font-[Outfit]">
@@ -156,7 +156,6 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
       );
     }
 
-    // Lógica para TERRENOS
     if (tipo.includes("terreno")) {
       const uso = obtenerCampoExtra("uso") || obtenerCampoExtra("destino");
       const densidad = obtenerCampoExtra("densidad");
@@ -172,7 +171,6 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
       );
     }
 
-    // Lógica para GALPONES
     if (tipo.includes("galpón") || tipo.includes("galpon")) {
       const trifasica = obtenerCampoExtra("trifásica") || obtenerCampoExtra("trifasica");
       const alturaGalpon = obtenerCampoExtra("altura");
@@ -227,26 +225,46 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
           {renderizarDetalles()}
         </div>
 
-        <div className="border-t border-gray-100 pt-4 flex flex-col gap-2 font-[Outfit]">
-          {tieneVenta && (
-            <span className="text-gray-900 font-bold text-lg">
-              Venta: {formatearPrecio(item.precios.venta.valor)} <span className="text-xs text-gray-500">{item.precios.venta.moneda}</span>
-            </span>
-          )}
-          {tieneArriendo && (
-            <span className="text-gray-900 font-bold text-lg">
-              Arriendo: {formatearPrecio(item.precios.arriendo.valor)} <span className="text-xs text-gray-500">{item.precios.arriendo.moneda}</span>
-            </span>
-          )}
-          <div className="flex justify-end mt-2">
-            <button 
-              className="px-5 py-3 bg-[#24B6C1] text-white rounded-xl font-bold text-xs uppercase shadow-md hover:bg-cyan-600 transition"
-              onClick={(e) => { e.stopPropagation(); navigate(`/propiedad/${item.codigo || item.id}`); }} 
-            >
-              Ver Ficha
-            </button>
-          </div>
-        </div>
+        <div className="border-t border-gray-100 pt-4 flex flex-col gap-3 font-[Outfit]">
+  {tieneVenta && (
+    <div className="flex flex-col">
+      <span className="text-[#24B6C1] text-[11px] font-black uppercase tracking-widest">Venta</span>
+      <span className="text-black font-black text-2xl">
+        {(item.precios.venta.moneda === "$" || item.precios.venta.moneda?.toUpperCase() === "CLP")
+          ? `$${formatearPrecio(item.precios.venta.valor)}`
+          : `${formatearPrecio(item.precios.venta.valor)} `
+        }
+        {!(item.precios.venta.moneda === "$" || item.precios.venta.moneda?.toUpperCase() === "CLP") && (
+          <span className="text-base font-bold text-gray-600 ml-1">{item.precios.venta.moneda}</span>
+        )}
+      </span>
+    </div>
+  )}
+
+  {tieneArriendo && (
+    <div className="flex flex-col">
+      <span className="text-[#24B6C1] text-[11px] font-black uppercase tracking-widest">Arriendo</span>
+      <span className="text-black font-black text-2xl">
+        {(item.precios.arriendo.moneda === "$" || item.precios.arriendo.moneda?.toUpperCase() === "CLP")
+          ? `$${formatearPrecio(item.precios.arriendo.valor)}`
+          : `${formatearPrecio(item.precios.arriendo.valor)} `
+        }
+        {!(item.precios.arriendo.moneda === "$" || item.precios.arriendo.moneda?.toUpperCase() === "CLP") && (
+          <span className="text-base font-medium text-gray-500 ml-1">{item.precios.arriendo.moneda}</span>
+        )}
+      </span>
+    </div>
+  )}
+
+  <div className="flex justify-end mt-2">
+    <button 
+      className="px-5 py-3 bg-[#24B6C1] text-white rounded-xl font-bold text-xs uppercase shadow-md hover:bg-cyan-600 transition"
+      onClick={(e) => { e.stopPropagation(); navigate(`/propiedad/${item.codigo || item.id}`); }} 
+    >
+      Ver Ficha
+    </button>
+  </div>
+</div>
       </div>
     </div>
   );
