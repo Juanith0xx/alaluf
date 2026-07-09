@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import fondoMarmol from '../assets/Marmol.jpg';
 
 const ContactForm = ({ 
   className = "", 
@@ -9,9 +10,6 @@ const ContactForm = ({
   onSubmitSuccess 
 }) => {
 
-  console.log("PROPS RECIBIDAS EN EL FORMULARIO:", { propiedadId, objetivoLlamada, tipoPropiedadNombre });
-
-  // 🌟 FUNCIÓN DE MAPEO AUTOMÁTICO DE TIPO DE PROPIEDAD
   const mapearTipoPropiedad = (tipo) => {
     if (!tipo) return "1"; 
     const t = tipo.toLowerCase();
@@ -25,7 +23,6 @@ const ContactForm = ({
     return "1"; 
   };
 
-  // 🌟 ESTADOS DEL FORMULARIO
   const [formData, setFormData] = useState({
     nombre: "",
     rut: "",
@@ -35,15 +32,11 @@ const ContactForm = ({
     id_tipo_propiedad: mapearTipoPropiedad(tipoPropiedadNombre) 
   });
   
-  // 🌟 NUEVO ESTADO: Controla visual y lógicamente si es Venta o Arriendo
   const [objetivoActivo, setObjetivoActivo] = useState(objetivoLlamada);
-
   const [rutError, setRutError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-
   const esFichaPropiedad = propiedadId !== "0" && propiedadId !== 0 && propiedadId !== "";
 
-  // Sincroniza los estados si la propiedad cambia en la vista padre
   useEffect(() => {
     setFormData(prev => ({
       ...prev,
@@ -52,7 +45,6 @@ const ContactForm = ({
     setObjetivoActivo(objetivoLlamada);
   }, [tipoPropiedadNombre, objetivoLlamada]);
 
-  // VALIDACIÓN DE RUT
   const validarRutChileno = (rutCompleto) => {
     const rutLimpio = rutCompleto.replace(/[^0-9kK]/g, "").toUpperCase();
     if (rutLimpio.length < 2) return false;
@@ -102,12 +94,11 @@ const ContactForm = ({
     setFormData({ ...formData, [name]: value });
   };
 
-  // ENVÍO AL BACKEND
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!validarRutChileno(formData.rut)) {
-      setRutError("Por favor, ingresa un RUT real antes de continuar.");
+      setRutError("Por favor, ingresa un RUT válido antes de continuar.");
       return;
     }
 
@@ -120,21 +111,16 @@ const ContactForm = ({
 
     try {
       const rutSanitizado = formData.rut.replace(/\./g, "");
-
       const payload = {
         razon_social: formData.nombre,
         rut: rutSanitizado,
         email: formData.email,
         fono: formData.telefono,
         requerimiento: formData.mensaje || (esFichaPropiedad ? "Consulta por propiedad específica" : "Contacto desde Página Web"),
-        
         id_prop_pw: String(propiedadId),
         fk_comuna: Number(comunaId),
         id_tipo_propiedad: Number(formData.id_tipo_propiedad),
-
-        // 🌟 Usamos el estado del botón seleccionado (1 = Venta, 2 = Arriendo)
         id_objetivo_llamada: Number(objetivoActivo),
-        
         agendamiento: false
       };
 
@@ -167,96 +153,129 @@ const ContactForm = ({
   };
 
   return (
-    <div className={`bg-white text-gray-800 rounded-[40px] p-12 shadow-2xl ${className}`}>
-      
-      <h2 className="text-2xl md:text-3xl font-medium mb-2 text-start font-[Outfit] text-gray-900">
-        {esFichaPropiedad ? "Me interesa esta propiedad" : "¿No encuentras lo que buscas?"}
-      </h2>
-      <p className="text-gray-500 text-sm md:text-base font-medium mb-8 text-start font-[Outfit] leading-relaxed">
-        {esFichaPropiedad 
-          ? "Déjanos tus datos y un asesor especializado te contactará para entregarte más información." 
-          : "Completa este formulario y te ayudaremos a encontrar tu próxima inversión."}
-      </p>
-
-      <form onSubmit={handleSubmit} className="space-y-6 font-[Outfit]">
+    <div 
+      className="w-full min-h-screen flex items-center justify-center pt-24 md:pt-32 pb-8 md:pb-12 px-4 sm:px-6"
+      style={{ 
+        backgroundImage: `url(${fondoMarmol})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}
+    >
+      <div className={`bg-white text-gray-800 rounded-[28px] sm:rounded-3xl md:rounded-[32px] p-5 sm:p-8 md:p-10 shadow-2xl w-full max-w-3xl mx-auto border border-gray-100 ${className}`}>
         
-        {/* 🌟 BOTONES DE SELECCIÓN DE OPERACIÓN (COMPRAR / ARRENDAR) */}
-        <div className="flex bg-gray-100 p-1.5 rounded-xl border border-gray-200 mb-2">
-          <button
-            type="button"
-            onClick={() => setObjetivoActivo(1)}
-            className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all duration-300 ${
-              objetivoActivo === 1 || objetivoActivo === "1"
-                ? "bg-white text-[#0091A4] shadow-md"
-                : "text-gray-500 hover:text-gray-700 hover:bg-gray-200/50"
-            }`}
-          >
-            Comprar (Venta)
-          </button>
-          <button
-            type="button"
-            onClick={() => setObjetivoActivo(2)}
-            className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all duration-300 ${
-              objetivoActivo === 2 || objetivoActivo === "2"
-                ? "bg-white text-[#0091A4] shadow-md"
-                : "text-gray-500 hover:text-gray-700 hover:bg-gray-200/50"
-            }`}
-          >
-            Arrendar
-          </button>
+        <div className="mb-6 md:mb-8 text-center md:text-start">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold mb-2 md:mb-3 font-[Outfit] text-[#1A1A1A] tracking-tight">
+            {esFichaPropiedad ? "Me interesa esta propiedad" : "Lo primero es entenderte."}
+          </h2>
+          <p className="text-gray-500 text-sm sm:text-base md:text-lg font-normal font-[Outfit] leading-relaxed">
+            {esFichaPropiedad 
+              ? "Déjanos tus datos y un asesor te contactará para entregarte más información." 
+              : "Completa este formulario y te ayudaremos a encontrar tu próxima inversión."}
+          </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-4">
+        <form onSubmit={handleSubmit} className="space-y-5 md:space-y-6 font-[Outfit]">
           
-          <div className="space-y-2">
-            <label className="text-sm font-semibold text-gray-700">Nombre completo *</label>
-            <input type="text" name="nombre" value={formData.nombre} onChange={handleChange} placeholder="Tu nombre" className="w-full bg-white border border-gray-200 px-6 py-2 focus:ring-[#24B6C1] mt-2 rounded-md" required />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
+            
+            <div className="space-y-1.5">
+              <label className="block text-xs sm:text-sm font-medium text-gray-700 ml-1">Nombre completo *</label>
+              <input 
+                type="text" 
+                name="nombre" 
+                value={formData.nombre} 
+                onChange={handleChange} 
+                placeholder="Ej. Juan Pérez" 
+                className="w-full bg-gray-50/50 border border-gray-200 text-gray-800 text-base sm:text-sm px-4 py-3 md:py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0091A4]/30 focus:border-[#0091A4] transition-all duration-200 placeholder-gray-400" 
+                required 
+              />
+            </div>
+
+            <div className="space-y-1.5 relative">
+              <label className="block text-xs sm:text-sm font-medium text-gray-700 ml-1">Rut *</label>
+              <input 
+                type="text" 
+                value={formData.rut} 
+                onChange={handleRutChange} 
+                placeholder="12.345.678-K" 
+                className={`w-full bg-gray-50/50 border text-gray-800 text-base sm:text-sm px-4 py-3 md:py-2.5 rounded-xl focus:outline-none focus:ring-2 transition-all duration-200 placeholder-gray-400 ${rutError ? "border-red-500 focus:ring-red-500/30" : "border-gray-200 focus:ring-[#0091A4]/30 focus:border-[#0091A4]"}`} 
+                required 
+              />
+              {rutError && <p className="text-red-500 text-xs font-medium mt-1 ml-1 absolute -bottom-5">{rutError}</p>}
+            </div>
+
+            <div className="space-y-1.5 mt-2 md:mt-0">
+              <label className="block text-xs sm:text-sm font-medium text-gray-700 ml-1">Correo electrónico *</label>
+              <input 
+                type="email" 
+                name="email" 
+                value={formData.email} 
+                onChange={handleChange} 
+                placeholder="tu@email.com" 
+                className="w-full bg-gray-50/50 border border-gray-200 text-gray-800 text-base sm:text-sm px-4 py-3 md:py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0091A4]/30 focus:border-[#0091A4] transition-all duration-200 placeholder-gray-400" 
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="block text-xs sm:text-sm font-medium text-gray-700 ml-1">Teléfono</label>
+              <input 
+                type="text" 
+                name="telefono" 
+                value={formData.telefono} 
+                onChange={handleChange} 
+                placeholder="+56 9 1234 5678" 
+                className="w-full bg-gray-50/50 border border-gray-200 text-gray-800 text-base sm:text-sm px-4 py-3 md:py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0091A4]/30 focus:border-[#0091A4] transition-all duration-200 placeholder-gray-400" 
+              />
+            </div>
+
+            <div className="md:col-span-2 space-y-1.5 md:mt-1">
+              <label className="block text-xs sm:text-sm font-medium text-gray-700 ml-1">¿Qué estás buscando?</label>
+              <select 
+                name="id_tipo_propiedad" 
+                value={formData.id_tipo_propiedad} 
+                onChange={handleChange} 
+                disabled={esFichaPropiedad} 
+                className={`w-full border text-base sm:text-sm px-4 py-3 md:py-2.5 rounded-xl focus:outline-none transition-all duration-200 ${esFichaPropiedad ? 'bg-gray-100 border-gray-200 text-gray-500 cursor-not-allowed opacity-80' : 'bg-gray-50/50 border-gray-200 text-gray-800 cursor-pointer focus:ring-2 focus:ring-[#0091A4]/30 focus:border-[#0091A4]'}`}
+              >
+                <option value="1">Residencial</option>
+                <option value="3">Oficina</option>
+                <option value="4">Retail</option>
+                <option value="7">Industrial</option>
+                <option value="6">Terreno para Proyecto</option>
+                <option value="8">Administración de Arriendos</option>
+              </select>
+            </div>
+
+            <div className="md:col-span-2 space-y-1.5 md:mt-1">
+              <label className="block text-xs sm:text-sm font-medium text-gray-700 ml-1">Hablemos de lo que necesitas</label>
+              <textarea 
+                name="mensaje" 
+                value={formData.mensaje} 
+                onChange={handleChange} 
+                rows="4" 
+                placeholder={esFichaPropiedad ? "Quiero agendar una visita..." : "Cuéntanos qué tienes en mente..."} 
+                className="w-full bg-gray-50/50 border border-gray-200 text-gray-800 text-base sm:text-sm px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0091A4]/30 focus:border-[#0091A4] transition-all duration-200 placeholder-gray-400 resize-none" 
+              />
+            </div>
           </div>
 
-          <div className="space-y-2 relative">
-            <label className="text-sm font-semibold text-gray-700">Rut *</label>
-            <input type="text" value={formData.rut} onChange={handleRutChange} placeholder="12.345.678-K" className={`w-full bg-white border px-6 py-2 mt-2 rounded-md ${rutError ? "border-red-500" : "border-gray-200"}`} required />
-            {rutError && <p className="text-red-500 text-xs font-semibold mt-1 pl-2 absolute">{rutError}</p>}
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-semibold text-gray-700">Correo electrónico *</label>
-            <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="tu@email.com" className="w-full bg-white border border-gray-200 px-6 py-2 focus:ring-[#24B6C1] mt-2 rounded-md" />
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-semibold text-gray-700">Teléfono</label>
-            <input type="text" name="telefono" value={formData.telefono} onChange={handleChange} placeholder="+56 9 1234 5678" className="w-full bg-white border border-gray-200 px-6 py-2 focus:ring-[#24B6C1] mt-2 rounded-md" />
-          </div>
-
-          <div className="md:col-span-2 space-y-2">
-            <label className="text-sm font-semibold text-gray-700">Tipo de Propiedad de Interés</label>
-            <select 
-              name="id_tipo_propiedad" 
-              value={formData.id_tipo_propiedad} 
-              onChange={handleChange} 
-              disabled={esFichaPropiedad} 
-              className={`w-full bg-white border border-gray-200 px-5 py-2.5 text-gray-700 focus:ring-[#24B6C1] mt-2 rounded-md ${esFichaPropiedad ? 'bg-gray-100 cursor-not-allowed opacity-80' : 'cursor-pointer'}`}
+          <div className="pt-4 sm:pt-6">
+            <button 
+              type="submit" 
+              disabled={isSubmitting} 
+              className={`w-full md:w-auto md:min-w-[240px] text-white px-8 py-3.5 sm:py-3 rounded-xl text-base sm:text-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 mx-auto active:scale-95 ${
+                isSubmitting 
+                  ? 'bg-gray-400 cursor-not-allowed' 
+                  : 'bg-[#0091A4] hover:bg-[#007A8A] shadow-md shadow-[#0091A4]/20 hover:shadow-lg hover:shadow-[#0091A4]/30 hover:-translate-y-0.5'
+              }`}
             >
-              <option value="1">Residencial</option>
-              <option value="3">Oficina</option>
-              <option value="4">Retail</option>
-              <option value="7">Industrial</option>
-              <option value="6">Terreno para Proyecto</option>
-              <option value="8">Administración de Arriendos</option>
-            </select>
+              {isSubmitting ? "Enviando..." : "Continuar"}
+            </button>
           </div>
 
-          <div className="md:col-span-2 space-y-2">
-            <label className="text-sm font-semibold text-gray-700">Hablemos de lo que necesitas.</label>
-            <textarea name="mensaje" value={formData.mensaje} onChange={handleChange} rows="5" placeholder={esFichaPropiedad ? "Quiero agendar una visita o recibir más detalles..." : "Cuéntanos qué tienes en mente..."} className="w-full bg-white border border-gray-200 px-4 py-4 focus:ring-[#24B6C1] mt-2 rounded-md resize-none" />
-          </div>
-        </div>
-
-        <button type="submit" disabled={isSubmitting} className={`group ${isSubmitting ? 'bg-gray-400' : 'bg-[#158F9B] hover:bg-[#127C86]'} text-white px-20 py-2.5 rounded-lg text-xl font-light transition-all duration-300 flex items-center justify-center gap-2 mx-auto active:scale-95`}>
-          {isSubmitting ? "Enviando..." : "Continuar"}
-        </button>
-      </form>
+        </form>
+      </div>
     </div>
   );
 };

@@ -15,7 +15,8 @@ const Footer = () => {
   // Definición de las rutas para el mapa
   const navLinks = [
     { name: "Licitaciones", path: "/licitaciones" },
-    { name: "Industrial", path: "/terrenos_proyectos" },
+    { name: "Industrial", path: "/industrial " },
+    { name: "Terrenos Industriales", path: "/terrenos_proyectos" },
     { name: "Comercial", path: "/comercial" },
     { name: "Residencial", path: "/residencial" },
     { name: "Administracion de Arriendo", path: "/administracion-activo" },
@@ -120,6 +121,7 @@ const Footer = () => {
             </h4>
             <div className="space-y-5 lg:space-y-6 text-sm text-white/70">
               
+              {/* Teléfono */}
               <div className="flex items-start gap-4">
                 <div className="border border-[#24B6C1] p-2 rounded-lg text-[#24B6C1] shrink-0">
                   <FaPhoneAlt className="w-4 h-4" />
@@ -131,16 +133,23 @@ const Footer = () => {
                 </div>
               </div>
 
-              <div className="flex items-start gap-4">
-                <div className="border border-[#24B6C1] p-2 rounded-lg text-[#24B6C1] shrink-0">
+              {/* 🌟 E-mail (Bloque completo interactivo) */}
+              <a 
+                href="mailto:contacto@alaluf.cl" 
+                className="flex items-start gap-4 group cursor-pointer decoration-transparent"
+              >
+                <div className="border border-[#24B6C1] p-2 rounded-lg text-[#24B6C1] shrink-0 transition-colors duration-300 group-hover:bg-[#24B6C1] group-hover:text-white">
                   <FaEnvelope className="w-4 h-4" />
                 </div>
                 <div>
-                  <p className="text-white/50 text-[10px] uppercase">E-mail</p>
-                  <p className="text-white/90 break-all">contacto@alaluf.cl</p>
+                  <p className="text-white/50 text-[10px] uppercase mb-1">E-mail</p>
+                  <p className="text-white/90 break-all transition-colors duration-300 group-hover:text-[#24B6C1]">
+                    contacto@alaluf.cl
+                  </p>
                 </div>
-              </div>
+              </a>
 
+              {/* Oficina */}
               <div className="flex items-start gap-4">
                 <div className="border border-[#24B6C1] p-2 rounded-lg text-[#24B6C1] shrink-0">
                   <FaMapMarkerAlt className="w-4 h-4" />

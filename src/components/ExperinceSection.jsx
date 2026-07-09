@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { motion, AnimatePresence } from "framer-motion";
+import { ChevronDown } from "lucide-react";
 
 import bg from "../assets/Marmol.jpg";
 import imgThree from "../assets/ciudad.jpg";
@@ -24,6 +26,31 @@ const ExperienceSection = () => {
     requerimiento: "",
     id_tipo_propiedad: "1" 
   });
+
+  // 🌟 Estado y datos para el acordeón de Zonas de Cobertura
+  const [zonaAbierta, setZonaAbierta] = useState(null);
+
+  const zonasCobertura = [
+    {
+      id: 'norte',
+      titulo: 'Zona Norte',
+      comunas: ['La Serena', 'Coquimbo', 'Antofagasta', 'Iquique']
+    },
+    {
+      id: 'centro',
+      titulo: 'Zona Centro',
+      comunas: ['Santiago Centro', 'Las Condes', 'Vitacura', 'Quilicura', 'Lampa', 'Pudahuel', 'Colina', 'Región de Valparaíso']
+    },
+    {
+      id: 'sur',
+      titulo: 'Zona Sur',
+      comunas: ['Concepción', 'Temuco', 'Valdivia', 'Puerto Montt']
+    }
+  ];
+
+  const toggleZona = (id) => {
+    setZonaAbierta(zonaAbierta === id ? null : id);
+  };
 
   const validarRutChileno = (rutCompleto) => {
     const rutLimpio = rutCompleto.replace(/[^0-9kK]/g, "").toUpperCase();
@@ -145,7 +172,6 @@ const ExperienceSection = () => {
       {/* BLOQUE 1 — EXPERIENCIA */}
       <div className="relative py-16 md:py-28 bg-cover bg-center" style={{ backgroundImage: `url(${bg})` }}>
         <div className="max-w-7xl mx-auto px-6">
-          {/* Se ajustó md:flex-row a lg:flex-row para que en tablet mantenga orden apilado si es necesario */}
           <div className="flex flex-col lg:flex-row items-center justify-center gap-4 lg:gap-8">
             <div className="flex-shrink-0 leading-none">
               <h1 className="font-extrabold flex -space-x-1" style={{ fontSize: "clamp(120px, 25vw, 550px)", lineHeight: "0.85" }}>
@@ -153,7 +179,6 @@ const ExperienceSection = () => {
                 <span style={{ backgroundImage: `url(${imgc})`, backgroundSize: "cover", backgroundPosition: "center", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>5</span>
               </h1>
             </div>
-            {/* mt-10 en móvil, respetando tu mt-41 en desktop mediante lg:mt-41 */}
             <div className="text-center lg:text-left mt-10 lg:mt-41">
               <p className="text-xs md:text-sm tracking-[0.15em] lg:tracking-[0.25em] text-[#24B6C1] font-bold">
                 AÑOS JUNTO A LAS EMPRESAS MÁS <br className="hidden md:block" />IMPORTANTES DE CHILE.
@@ -164,7 +189,7 @@ const ExperienceSection = () => {
             </div>
           </div>
 
-          {/* CLIENTES */}
+          {/* CLIENTES 
           <div className="mt-16 md:mt-24 text-center">
             <h3 className="text-2xl md:text-[36px] font-medium tracking-widest">
               NUESTROS <span className="text-[#24B6C1]">CLIENTES</span>
@@ -183,7 +208,7 @@ const ExperienceSection = () => {
                 </div>
               ))}
             </div>
-          </div>
+          </div>*/}
         </div>
       </div>
 
@@ -194,27 +219,65 @@ const ExperienceSection = () => {
             ESTAMOS <span className="text-[#24B6C1]">EN TODO CHILE</span>
           </h2>
 
-          {/* Grilla principal: apilada en móvil/tablet, 2 columnas en desktop (lg:) y se respeta tu -mr-30 original */}
           <div className="grid grid-cols-1 lg:grid-cols-2 lg:-mr-30 gap-16 lg:gap-0 items-start">
             
             {/* IZQUIERDA — Imagen + Regiones */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 lg:gap-1 items-start">
               <div className="flex justify-center sm:justify-start">
-                {/* Se preserva tu -mt-28 en desktop (lg:-mt-28) */}
                 <img src={mapImage} alt="Mapa de cobertura en Chile" className="w-[80%] sm:w-[75%] lg:w-[68%] object-cover rounded-3xl shadow-2xl lg:-mt-28" />
               </div>
-              {/* Se preserva tu -ml-14 en desktop (lg:-ml-14) */}
-              <div className="text-white/60 space-y-4 lg:-ml-14 text-center sm:text-left px-4 sm:px-0">
+              
+              {/* 🌟 AQUÍ SE REEMPLAZÓ LA LISTA POR EL ACORDEÓN INTERACTIVO */}
+              <div className="text-white/60 lg:-ml-14 text-center sm:text-left px-4 sm:px-0">
                 <p className="font-semibold text-white mb-4 md:mb-6">Zonas de cobertura</p>
-                {["Santiago Centro", "Las Condes", "Vitacura", "Quilicura", "Lampa", "Pudahuel", "Colina", "Región de Valparaíso", "Concepción", "La Serena"].map((zona, i) => (
-                  <p key={i} className="text-sm hover:text-white transition">{zona}</p>
-                ))}
+                
+                <div className="space-y-4">
+                  {zonasCobertura.map((zona) => (
+                    <div key={zona.id} className="flex flex-col items-center sm:items-start">
+                      <button 
+                        onClick={() => toggleZona(zona.id)}
+                        type="button"
+                        className="flex items-center justify-between gap-2 text-sm hover:text-white transition w-full sm:w-auto text-left font-medium group"
+                      >
+                        {zona.titulo}
+                        <ChevronDown 
+                          size={14} 
+                          className={`transition-transform duration-300 ${
+                            zonaAbierta === zona.id ? 'rotate-180 text-white' : 'opacity-60 group-hover:opacity-100'
+                          }`} 
+                        />
+                      </button>
+
+                      <AnimatePresence>
+                        {zonaAbierta === zona.id && (
+                          <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{ duration: 0.3 }}
+                            className="overflow-hidden w-full"
+                          >
+                            <ul className="pt-2 pb-1 space-y-2 pl-3 border-l border-white/20 mt-2 ml-2 text-left">
+                              {zona.comunas.map((comuna, i) => (
+                                <li 
+                                  key={i} 
+                                  className="text-[13px] text-white/50 hover:text-white transition cursor-pointer"
+                                >
+                                  {comuna}
+                                </li>
+                              ))}
+                            </ul>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
 
-            {/* 🌟 DERECHA — Formulario */}
-            {/* Se preserva tu -mt-23 y -ml-34 exclusivos de desktop mediante prefijo lg: */}
-            <div id="contacto" className="bg-white text-gray-800 rounded-[40px] md:rounded-[60px] lg:rounded-[80px] p-6 sm:p-12 shadow-2xl lg:-mt-23 lg:-ml-34 scroll-mt-32 relative z-10">
+            {/* DERECHA — Formulario */}
+            <div  className="bg-white text-gray-800 rounded-[40px] md:rounded-[60px] lg:rounded-[80px] p-6 sm:p-12 shadow-2xl lg:-mt-23 lg:-ml-34 scroll-mt-32 relative z-10">
               <h2 className="text-2xl md:text-3xl font-medium mb-8 md:mb-10 text-center sm:text-start font-[Outfit]">
                 Lo primero es entenderte.
               </h2>

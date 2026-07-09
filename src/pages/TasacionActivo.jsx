@@ -1,5 +1,6 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async'; // <-- Importación para SEO añadida
+import { Link } from 'react-router-dom';
 
 // Importación de imágenes
 import heroTasacion from '../assets/tasacion.png'; 
@@ -159,9 +160,11 @@ const TasacionActivos = () => {
                 Para que vendas, arriendes o inviertas con los números claros.
               </p>
 
-              <button className="w-full sm:w-fit bg-white text-[#0091A4] hover:bg-gray-100 font-bold text-base md:text-xl px-8 sm:px-12 py-3.5 sm:py-4 rounded-xl shadow-xl transition-all duration-300 active:scale-95">
-                Tasar mi activo
-              </button>
+              <Link to="/tasa-propiedad">
+  <button className="w-full sm:w-fit bg-white text-[#0091A4] hover:bg-gray-100 font-bold text-base md:text-xl px-8 sm:px-12 py-3.5 sm:py-4 rounded-xl shadow-xl transition-all duration-300 active:scale-95">
+    Valoriza tu activo
+  </button>
+</Link>
             </div>
           </div>
         </section>

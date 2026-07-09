@@ -165,9 +165,12 @@ const ClubDealsInversiones = () => {
                 Family Office Inmobiliario: 45 años de criterio al servicio de tu próxima inversión.
               </p>
 
-              <button className="w-full sm:w-fit bg-white text-[#0091A4] hover:bg-gray-100 font-bold text-base md:text-xl px-8 sm:px-12 py-3.5 sm:py-4 rounded-xl shadow-xl transition-all duration-300 active:scale-95">
-                Quiero conocer las oportunidades
-              </button>
+              <a 
+  href="/contacto" 
+  className="w-full sm:w-fit bg-white text-[#0091A4] hover:bg-gray-100 font-bold text-base md:text-xl px-8 sm:px-12 py-3.5 sm:py-4 rounded-xl shadow-xl transition-all duration-300 active:scale-95 inline-block text-center cursor-pointer"
+>
+  Quiero conocer las oportunidades
+</a>
             </div>
           </div>
         </section>

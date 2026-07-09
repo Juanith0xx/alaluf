@@ -30,6 +30,7 @@ import TerrenoProyecto from './pages/TerrenosProyecto';
 
 // 🌟 NUEVA IMPORTACIÓN: FORMULARIO DE PUBLICACIÓN DE VENTA
 import Vender from './pages/PublishPropertyForm';
+import ContactForm from './components/ContacForm';
 
 function App() {
   return (
@@ -63,6 +64,7 @@ function App() {
           <Route path="/tasacion-activo" element={<TasacionActivos />} />
           <Route path="/club_deals_inversiones" element={<ClubDealsInversiones/>} />
           <Route path="/nosotros" element={<Nosotros/>} />
+          <Route path="/contacto" element={<ContactForm/>} />
         </Routes>
         <Footer />
         <WhatsAppBubble />

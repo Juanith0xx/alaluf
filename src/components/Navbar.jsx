@@ -5,20 +5,17 @@ import logo from "../assets/Logo_A.png";
 import { Link, useNavigate } from 'react-router-dom';
 
 /* =========================
-   UTILERÍA: SCROLL PERSONALIZADO
+   UTILERÍA: SCROLL PERSONALIZADO (Mantenido por si lo usas en otros elementos)
 ========================= */
-// Función para hacer scroll con tiempo exacto (duration en milisegundos)
 const customSmoothScroll = (targetId, duration = 1000) => {
   const target = document.getElementById(targetId);
   if (!target) return;
 
-  // Calculamos la posición considerando un pequeño margen (ej. -80px para el header)
   const targetPosition = target.getBoundingClientRect().top + window.scrollY - 80;
   const startPosition = window.scrollY;
   const distance = targetPosition - startPosition;
   let startTime = null;
 
-  // Ecuación de suavizado (EaseInOutQuad) para un movimiento elegante
   const easeInOutQuad = (t, b, c, d) => {
     t /= d / 2;
     if (t < 1) return (c / 2) * t * t + b;
@@ -30,15 +27,13 @@ const customSmoothScroll = (targetId, duration = 1000) => {
     if (startTime === null) startTime = currentTime;
     const timeElapsed = currentTime - startTime;
     
-    // Calculamos la siguiente posición
     const run = easeInOutQuad(timeElapsed, startPosition, distance, duration);
     window.scrollTo(0, run);
     
-    // Continuamos la animación hasta alcanzar la duración
     if (timeElapsed < duration) {
       requestAnimationFrame(animation);
     } else {
-      window.scrollTo(0, targetPosition); // Aseguramos posición final exacta
+      window.scrollTo(0, targetPosition); 
     }
   };
 
@@ -152,17 +147,13 @@ const NavbarDesktop = ({
               </AnimatePresence>
             </div>
 
-            {/* 🌟 AQUÍ LLAMAMOS A LA FUNCIÓN (ej. 1200ms = 1.2 segundos de duración) */}
-            <a 
-              href="#contacto" 
-              onClick={(e) => {
-                e.preventDefault();
-                customSmoothScroll('contacto', 1200); // <-- Cambia este número para controlar la velocidad
-              }}
+            {/* 🌟 AQUÍ ESTÁ EL CAMBIO PARA ESCRITORIO: Navega directamente a /contacto */}
+            <Link 
+              to="/contacto" 
               className="hover:text-teal-400 transition duration-300 font-medium"
             >
               Contacto
-            </a>
+            </Link>
           </div>
 
           <a href="https://alaluf.cl/mialaluf/" className="ml-auto hover:text-teal-400 transition duration-300 font-medium">
@@ -237,13 +228,13 @@ const NavbarMobile = ({
                 onClick={() => setOpenMobileServices(!openMobileServices)}
                 className="cursor-pointer hover:text-teal-400 transition flex items-center justify-between">
                 Servicios <ChevronDown
-  size={16}
-  className={`transition-transform duration-200 ${
-    openMobileServices
-      ? "rotate-180 text-teal-400"
-      : "opacity-70"
-  }`}
-/>
+                  size={16}
+                  className={`transition-transform duration-200 ${
+                    openMobileServices
+                      ? "rotate-180 text-teal-400"
+                      : "opacity-70"
+                  }`}
+                />
               </span>
               <AnimatePresence>
                 {openMobileServices && (
@@ -254,92 +245,92 @@ const NavbarMobile = ({
                     className="pl-4 mt-3 space-y-3 border-l border-white/10 text-sm font-medium overflow-hidden"
                   >
                     <Link
-  to="/licitaciones"
-  onClick={() => {
-    setOpenMenu(false);
-    setOpenMobileServices(false);
-  }}
-  className="block hover:text-teal-400 transition py-1"
->
-  Licitaciones
-</Link>
+                      to="/licitaciones"
+                      onClick={() => {
+                        setOpenMenu(false);
+                        setOpenMobileServices(false);
+                      }}
+                      className="block hover:text-teal-400 transition py-1"
+                    >
+                      Licitaciones
+                    </Link>
 
-<Link
-  to="/industrial"
-  onClick={() => {
-    setOpenMenu(false);
-    setOpenMobileServices(false);
-  }}
-  className="block hover:text-teal-400 transition py-1"
->
-  Industrial
-</Link>
+                    <Link
+                      to="/industrial"
+                      onClick={() => {
+                        setOpenMenu(false);
+                        setOpenMobileServices(false);
+                      }}
+                      className="block hover:text-teal-400 transition py-1"
+                    >
+                      Industrial
+                    </Link>
 
-<Link
-  to="/terrenos_proyectos"
-  onClick={() => {
-    setOpenMenu(false);
-    setOpenMobileServices(false);
-  }}
-  className="block hover:text-teal-400 transition py-1"
->
-  Terrenos para Proyectos
-</Link>
+                    <Link
+                      to="/terrenos_proyectos"
+                      onClick={() => {
+                        setOpenMenu(false);
+                        setOpenMobileServices(false);
+                      }}
+                      className="block hover:text-teal-400 transition py-1"
+                    >
+                      Terrenos para Proyectos
+                    </Link>
 
-<Link
-  to="/comercial"
-  onClick={() => {
-    setOpenMenu(false);
-    setOpenMobileServices(false);
-  }}
-  className="block hover:text-teal-400 transition py-1"
->
-  Comercial
-</Link>
+                    <Link
+                      to="/comercial"
+                      onClick={() => {
+                        setOpenMenu(false);
+                        setOpenMobileServices(false);
+                      }}
+                      className="block hover:text-teal-400 transition py-1"
+                    >
+                      Comercial
+                    </Link>
 
-<Link
-  to="/residencial"
-  onClick={() => {
-    setOpenMenu(false);
-    setOpenMobileServices(false);
-  }}
-  className="block hover:text-teal-400 transition py-1"
->
-  Residencial
-</Link>
+                    <Link
+                      to="/residencial"
+                      onClick={() => {
+                        setOpenMenu(false);
+                        setOpenMobileServices(false);
+                      }}
+                      className="block hover:text-teal-400 transition py-1"
+                    >
+                      Residencial
+                    </Link>
 
-<Link
-  to="/administracion-activo"
-  onClick={() => {
-    setOpenMenu(false);
-    setOpenMobileServices(false);
-  }}
-  className="block hover:text-teal-400 transition py-1"
->
-  Administración de Arriendos
-</Link>
+                    <Link
+                      to="/administracion-activo"
+                      onClick={() => {
+                        setOpenMenu(false);
+                        setOpenMobileServices(false);
+                      }}
+                      className="block hover:text-teal-400 transition py-1"
+                    >
+                      Administración de Arriendos
+                    </Link>
 
-<Link
-  to="/tasacion-activo"
-  onClick={() => {
-    setOpenMenu(false);
-    setOpenMobileServices(false);
-  }}
-  className="block hover:text-teal-400 transition py-1"
->
-  Tasación de Activos
-</Link>
+                    <Link
+                      to="/tasacion-activo"
+                      onClick={() => {
+                        setOpenMenu(false);
+                        setOpenMobileServices(false);
+                      }}
+                      className="block hover:text-teal-400 transition py-1"
+                    >
+                      Tasación de Activos
+                    </Link>
 
-<Link
-  to="/club_deals_inversiones"
-  onClick={() => {
-    setOpenMenu(false);
-    setOpenMobileServices(false);
-  }}
-  className="block hover:text-teal-400 transition py-1"
->
-  Club Deals e Inversiones
-</Link>
+                    <Link
+                      to="/club_deals_inversiones"
+                      onClick={() => {
+                        setOpenMenu(false);
+                        setOpenMobileServices(false);
+                      }}
+                      className="block hover:text-teal-400 transition py-1"
+                    >
+                      Club Deals e Inversiones
+                    </Link>
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -373,20 +364,14 @@ const NavbarMobile = ({
               </AnimatePresence>
             </div>
 
-            {/* 🌟 AQUÍ LLAMAMOS A LA FUNCIÓN EN MÓVIL */}
-            <a 
-              href="#contacto" 
-              onClick={(e) => {
-                e.preventDefault();
-                setOpenMenu(false); // Cierra el menú hamburguesa
-                setTimeout(() => {
-                  customSmoothScroll('contacto', 1200); // <-- Velocidad parametrizada
-                }, 150);
-              }} 
+            {/* 🌟 AQUÍ ESTÁ EL CAMBIO PARA MÓVIL: Navega directamente y cierra el menú */}
+            <Link 
+              to="/contacto" 
+              onClick={() => setOpenMenu(false)} 
               className="hover:text-teal-400 transition"
             >
               Contacto
-            </a>
+            </Link>
             
             <a href="https://alaluf.cl/mialaluf/" className="hover:text-teal-400 transition font-semibold">Mi Alaluf</a>
 
@@ -454,7 +439,7 @@ const Navbar = () => {
           searchCode={searchCode}
           setSearchCode={setSearchCode}
           onSearch={handleSearch}
-    />
+      />
     </>
   );
 };

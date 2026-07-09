@@ -130,7 +130,7 @@ const AdministracionActivo = () => {
 
               {/* 🌟 BOTÓN CON NAVEGACIÓN A /vender */}
               <button 
-                onClick={() => navigate('/vender')} 
+                onClick={() => navigate('/contacto')} 
                 className="w-full sm:w-fit bg-white text-[#0091A4] hover:bg-gray-100 font-bold text-base md:text-xl px-8 sm:px-12 py-3.5 md:py-4 rounded-xl shadow-xl transition-all duration-300 active:scale-95"
               >
                 Administrar mi propiedad
