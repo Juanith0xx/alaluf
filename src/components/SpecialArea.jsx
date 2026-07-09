@@ -18,7 +18,7 @@ const EspecialPorArea = () => {
   const tabToPropId = {
     "Residencial": "1A",  
     "Terrenos": "6",     
-    "Industrial": "7",   
+    "Industrial": "7A",   
     "Comercial": "4",    
     "Licitaciones": "12" 
   };
