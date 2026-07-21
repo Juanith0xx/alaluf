@@ -100,6 +100,23 @@ console.log("PRECIOS", property.precios);
     ""
   ).toLowerCase();
 
+  // Normalizamos el tipo para reconocer nombres con o sin acentos.
+  const tipoNormalizado = tipo
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+
+  const esCasaComercial = tipoNormalizado.includes("casa") && tipoNormalizado.includes("comercial");
+  const esCasa = tipoNormalizado.includes("casa") && !esCasaComercial;
+  const esDepartamento = tipoNormalizado.includes("departamento");
+  const esOficina = tipoNormalizado.includes("oficina");
+  const esLocal = tipoNormalizado.includes("local");
+  const esTerrenoProyecto = tipoNormalizado.includes("terreno") && tipoNormalizado.includes("proyecto");
+  const esTerrenoIndustrial = tipoNormalizado.includes("terreno") && tipoNormalizado.includes("industrial");
+  const esGalpon = tipoNormalizado.includes("galpon") || tipoNormalizado.includes("bodega industrial");
+  const esParcelaFundo = ["parcela", "fundo", "campo", "sitio"].some(nombre =>
+    tipoNormalizado.includes(nombre)
+  );
+
   // 🌟 FORMATEO INTELIGENTE: Sin decimales para enteros, 2 decimales para fraccionarios
   const formatearPrecio = (valor) => {
     if (!valor) return "0";
@@ -235,13 +252,43 @@ console.log("PRECIOS", property.precios);
     }
   }, [diasDisponibles, diaSeleccionado]);
 
-  const getExtraValue = (texto) => {
-    const campo = property.detalles?.caracteristicasExtra?.find(
-      c => c.label?.toLowerCase().includes(texto.toLowerCase())
-    );
-    return (campo?.value === null || campo?.value === undefined || campo?.value === "") 
-      ? "Sin información" 
+  const normalizarTextoCampo = (valor = "") =>
+    String(valor)
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+
+  const getExtraValue = (...textos) => {
+    const campos = property.detalles?.caracteristicasExtra || [];
+    const busquedas = textos.map(normalizarTextoCampo);
+
+    const campo = campos.find(campoActual => {
+      const label = normalizarTextoCampo(campoActual?.label);
+      return busquedas.some(busqueda => label.includes(busqueda));
+    });
+
+    return (campo?.value === null || campo?.value === undefined || campo?.value === "")
+      ? "Sin información"
       : campo.value;
+  };
+
+  const obtenerPrimerValor = (...valores) => {
+    const valorEncontrado = valores.find(valor =>
+      valor !== null &&
+      valor !== undefined &&
+      valor !== "" &&
+      valor !== "Sin información" &&
+      valor !== "No especificado"
+    );
+
+    return valorEncontrado ?? "Sin información";
+  };
+
+  const formatearArea = (...valores) => {
+    const valor = obtenerPrimerValor(...valores);
+    return valor === "Sin información" ? valor : `${formatearPrecio(valor)} m²`;
   };
 
   const Feature = ({ icon: Icon, title, value }) => (
@@ -330,37 +377,67 @@ console.log("PRECIOS", property.precios);
               </section>
 
             <section className="grid grid-cols-2 sm:grid-cols-4 gap-4 py-6 border-y border-gray-100">
-              {tipo.includes("casa") && !tipo.includes("comercial") && (
+              {esCasa && (
                 <>
-                  <Feature icon={FaRulerCombined} title="Construidos" value={`${formatearPrecio(getExtraValue("construidos") || getCampo("terreno") || 0)} m²`} />
-                  <Feature icon={FaRulerCombined} title="Terreno" value={`${formatearPrecio(getExtraValue("terreno") || property.detalles?.superficie || 0)} m²`} />
-                  <Feature icon={FaBed} title="Dormitorios" value={property.detalles?.dormitorios || 0} />
-                  <Feature icon={FaBath} title="Baños" value={property.detalles?.banos || 0} />
+                  <Feature icon={FaRulerCombined} title="Construidos" value={formatearArea(getExtraValue("construidos"), getCampo("construidos"))} />
+                  <Feature icon={FaRulerCombined} title="Terreno" value={formatearArea(getExtraValue("terreno"), getCampo("terreno"), property.detalles?.superficie)} />
+                  <Feature icon={FaBed} title="Dormitorios" value={obtenerPrimerValor(property.detalles?.dormitorios, getExtraValue("dormitorios"))} />
+                  <Feature icon={FaBath} title="Baños" value={obtenerPrimerValor(property.detalles?.banos, getExtraValue("baños", "banos"))} />
                 </>
               )}
-              {tipo.includes("departamento") && (
+
+              {esDepartamento && (
                 <>
-                  <Feature icon={FaRulerCombined} title="Totales" value={`${formatearPrecio(getExtraValue("totales") || 0)} m²`} />
-                  <Feature icon={FaRulerCombined} title="Útiles" value={`${formatearPrecio(getExtraValue("útiles") || 0)} m²`} />
-                  <Feature icon={FaBed} title="Dormitorios" value={property.detalles?.dormitorios || 0} />
-                  <Feature icon={FaBath} title="Baños" value={property.detalles?.banos || 0} />
+                  <Feature icon={FaRulerCombined} title="Totales" value={formatearArea(getExtraValue("totales"), getCampo("totales"))} />
+                  <Feature icon={FaRulerCombined} title="Útiles" value={formatearArea(getExtraValue("útiles", "utiles"), getCampo("útiles"), getCampo("utiles"))} />
+                  <Feature icon={FaBed} title="Dormitorios" value={obtenerPrimerValor(property.detalles?.dormitorios, getExtraValue("dormitorios"))} />
+                  <Feature icon={FaBath} title="Baños" value={obtenerPrimerValor(property.detalles?.banos, getExtraValue("baños", "banos"))} />
                 </>
               )}
-              {tipo.includes("oficina") && (
+
+              {esOficina && (
                 <>
-                  <Feature icon={FaRulerCombined} title="Superficie" value={`${formatearPrecio(getExtraValue("construidos") || property.detalles?.superficie || 0)} m²`} />
-                  <Feature icon={FaBuilding} title="Edificio" value={getExtraValue("tipo edificio")} />
-                  <Feature icon={FaDoorClosed} title="Privados" value={getExtraValue("privados")} />
-                  <Feature icon={FaBath} title="Baños" value={property.detalles?.banos || 0} />
+                  <Feature icon={FaRulerCombined} title="Construidos" value={formatearArea(getExtraValue("construidos"), getCampo("construidos"), property.detalles?.superficie)} />
+                  <Feature icon={FaCar} title="Estacionamientos" value={obtenerPrimerValor(property.detalles?.estacionamientos, getExtraValue("estacionamientos"))} />
+                  <Feature icon={FaBuilding} title="Tipo Edificio" value={getExtraValue("tipo edificio")} />
                 </>
               )}
-              {tipo.includes("local") && (
+
+              {esLocal && (
                 <>
-                  <Feature icon={FaRulerCombined} title="Superficie" value={`${formatearPrecio(property.detalles?.superficie || 0)} m²`} />
-                  <Feature icon={FaCheckCircle} title="Habilitado" value={getExtraValue("habilitado")} />
-                  <Feature icon={FaCar} title="Estacionamientos" value={property.detalles?.estacionamientos || 0} />
-                  <Feature icon={FaBath} title="Baños" value={property.detalles?.banos || 0} />
+                  <Feature icon={FaRulerCombined} title="Construidos" value={formatearArea(getExtraValue("construidos"), getCampo("construidos"), property.detalles?.superficie)} />
+                  <Feature icon={FaCar} title="Estacionamientos" value={obtenerPrimerValor(property.detalles?.estacionamientos, getExtraValue("estacionamientos"))} />
                 </>
+              )}
+
+              {esCasaComercial && (
+                <>
+                  <Feature icon={FaRulerCombined} title="Construidos" value={formatearArea(getExtraValue("construidos"), getCampo("construidos"))} />
+                  <Feature icon={FaRulerCombined} title="Terreno" value={formatearArea(getExtraValue("terreno"), getCampo("terreno"), property.detalles?.superficie)} />
+                  <Feature icon={FaCar} title="Estacionamientos" value={obtenerPrimerValor(property.detalles?.estacionamientos, getExtraValue("estacionamientos"))} />
+                </>
+              )}
+
+              {esTerrenoProyecto && (
+                <>
+                  <Feature icon={FaRulerCombined} title="Terreno" value={formatearArea(getExtraValue("terreno"), getCampo("terreno"), property.detalles?.superficie)} />
+                  <Feature icon={FaInfoCircle} title="Uso / Destino" value={getExtraValue("uso / destino", "uso/destino", "uso destino")} />
+                </>
+              )}
+
+              {esTerrenoIndustrial && (
+                <Feature icon={FaRulerCombined} title="Terreno" value={formatearArea(getExtraValue("terreno"), getCampo("terreno"), property.detalles?.superficie)} />
+              )}
+
+              {esGalpon && (
+                <>
+                  <Feature icon={FaRulerCombined} title="Construidos" value={formatearArea(getExtraValue("construidos"), getCampo("construidos"))} />
+                  <Feature icon={FaRulerCombined} title="Terreno" value={formatearArea(getExtraValue("terreno"), getCampo("terreno"), property.detalles?.superficie)} />
+                </>
+              )}
+
+              {esParcelaFundo && (
+                <Feature icon={FaRulerCombined} title="Superficie Terreno" value={formatearArea(getExtraValue("superficie terreno", "terreno"), getCampo("terreno"), property.detalles?.superficie)} />
               )}
             </section>
 

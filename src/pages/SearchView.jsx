@@ -116,12 +116,14 @@ const SearchView = () => {
 
     const objID = (accionActiva === "Comprar" || accionActiva === "Vender") ? 1 : 2;
     const comunaID = selectedComuna?.id || "";
+    const comunaNombre = selectedComuna?.label || "";
     const tipoID = tipoPropiedad?.id || "";
 
     setSearchParams({ 
       ...(tipoID && { tipo_prop: tipoID }), 
       obj: objID, 
-      ...(comunaID && { comuna: comunaID }), 
+      ...(comunaID && { comuna: comunaID }),
+      ...(comunaNombre && { comuna_nombre: comunaNombre }),
       page: 1 
     });
   };
@@ -136,6 +138,8 @@ const SearchView = () => {
   };
 
   useEffect(() => {
+    const controller = new AbortController();
+
     const fetchResultados = async () => {
       setLoading(true);
       const startTime = performance.now();
@@ -144,62 +148,100 @@ const SearchView = () => {
         const tipo_prop = searchParams.get("tipo_prop");
         const obj = searchParams.get("obj");
         const comuna = searchParams.get("comuna");
+        const comunaNombre = searchParams.get("comuna_nombre") || "";
+        const codigo = searchParams.get("q");
 
         const supDesde = searchParams.get("sup_desde") || "";
         const supHasta = searchParams.get("sup_hasta") || "";
         const precioDesde = searchParams.get("precio_desde") || "";
         const precioHasta = searchParams.get("precio_hasta") || "";
         const moneda = searchParams.get("moneda") || "CLP";
-        const orden = searchParams.get("orden") || "reciente"; 
+        const orden = searchParams.get("orden") || "reciente";
 
         if (tipo_prop && (!tipoPropiedad || tipoPropiedad.id != tipo_prop)) {
           setTipoPropiedad({ label: obtenerLabelPorId(tipo_prop), id: tipo_prop });
         }
 
         let url = "";
-        if (query) {
-          url = `${API_URL}/api/propiedades/${query}`;
+
+        if (codigo) {
+          url = `${API_URL}/api/propiedades/codigo/${encodeURIComponent(codigo)}`;
         } else {
-          const safeTipoProp = tipo_prop || ""; 
-          const safeObj = obj || "1"; 
-          const safeComuna = comuna || ""; 
-          url = `${API_URL}/api/propiedades/buscar?tipo_prop=${safeTipoProp}&obj=${safeObj}&comuna=${safeComuna}&sup_desde=${supDesde}&sup_hasta=${supHasta}&precio_desde=${precioDesde}&precio_hasta=${precioHasta}&moneda=${moneda}&orden=${orden}&page=${paginaActual}&limit=10`;
+          const params = new URLSearchParams({
+            tipo_prop: tipo_prop || "",
+            obj: obj || "1",
+            comuna: comuna || "",
+            comuna_nombre: comunaNombre,
+            sup_desde: supDesde,
+            sup_hasta: supHasta,
+            precio_desde: precioDesde,
+            precio_hasta: precioHasta,
+            moneda,
+            orden,
+            page: String(paginaActual),
+            limit: "10"
+          });
+
+          url = `${API_URL}/api/propiedades/buscar?${params.toString()}`;
         }
-        
-        const response = await fetch(url);
+
+        const response = await fetch(url, {
+          signal: controller.signal
+        });
+
+        if (!response.ok) {
+          const errorPayload = await response.json().catch(() => ({}));
+          throw new Error(errorPayload.error || `Error HTTP ${response.status}`);
+        }
+
         const json = await response.json();
-        
+
+        if (controller.signal.aborted) return;
+
         const endTime = performance.now();
         const tiempoEnSegundos = ((endTime - startTime) / 1000).toFixed(2);
-        
         setTiempoBusqueda(tiempoEnSegundos);
 
-        if (json.paginacion && json.data) {
-            setPropiedadesData(json.data);
-            setTotalPropiedades(json.paginacion.totalPropiedades);
-            setTotalPaginas(json.paginacion.totalPaginas);
-            setSelectedProperty(json.data.length > 0 ? json.data[0] : null);
+        if (json.paginacion && Array.isArray(json.data)) {
+          setPropiedadesData(json.data);
+          setTotalPropiedades(json.paginacion.totalPropiedades || 0);
+          setTotalPaginas(Math.max(json.paginacion.totalPaginas || 1, 1));
+          setSelectedProperty(json.data.length > 0 ? json.data[0] : null);
         } else if (Array.isArray(json)) {
-            setPropiedadesData(json);
-            setTotalPropiedades(json.length);
-            setTotalPaginas(1);
-            if (json.length > 0) setSelectedProperty(json[0]);
+          setPropiedadesData(json);
+          setTotalPropiedades(json.length);
+          setTotalPaginas(1);
+          setSelectedProperty(json.length > 0 ? json[0] : null);
         } else if (json.id || json.codigo) {
-            setPropiedadesData([json]);
-            setTotalPropiedades(1);
-            setTotalPaginas(1);
-            setSelectedProperty(json);
+          setPropiedadesData([json]);
+          setTotalPropiedades(1);
+          setTotalPaginas(1);
+          setSelectedProperty(json);
+        } else {
+          setPropiedadesData([]);
+          setTotalPropiedades(0);
+          setTotalPaginas(1);
+          setSelectedProperty(null);
         }
       } catch (error) {
+        if (error.name === "AbortError") return;
+
+        console.error("Error buscando propiedades:", error);
         setPropiedadesData([]);
         setTotalPropiedades(0);
         setTotalPaginas(1);
+        setSelectedProperty(null);
       } finally {
-        setLoading(false);
+        if (!controller.signal.aborted) {
+          setLoading(false);
+        }
       }
     };
+
     fetchResultados();
-  }, [searchParams, paginaActual]);
+
+    return () => controller.abort();
+  }, [searchParams.toString(), paginaActual]);
 
   const fullSectionStyle = {
     backgroundImage: `linear-gradient(rgba(10, 10, 10, 0.4), rgba(10, 10, 10, 0.4)), url(${fondoMarmol})`,
@@ -299,7 +341,11 @@ const SearchView = () => {
                   <input 
                     type="text" 
                     value={searchQueryInput} 
-                    onChange={(e) => { setSearchQueryInput(e.target.value); setShowSuggestions(true); }}
+                    onChange={(e) => {
+                      setSearchQueryInput(e.target.value);
+                      setShowSuggestions(true);
+                      if (selectedComuna) setSelectedComuna(null);
+                    }}
                     onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                     placeholder="Comuna, ciudad o código..."
                     className="w-full px-6 py-3.5 bg-white/5 border border-white/10 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-[#24B6C1]"

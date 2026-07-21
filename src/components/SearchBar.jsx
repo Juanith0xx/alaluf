@@ -153,12 +153,14 @@ const SearchBar = () => {
       obj: objID // Aplicamos el filtro de Venta(1) o Arriendo(2)
     };
 
-    // Tomar la comuna seleccionada o escrita
+    // La API de Alaluf espera el código de comuna, no su nombre.
+    // Si el usuario no selecciona una sugerencia, se ejecuta búsqueda general.
     if (selectedComuna?.id) {
-      queryParams.comuna = selectedComuna.label;
-    } else if (textInput.length > 2 && isNaN(textInput)) {
-      queryParams.comuna = textInput;
+      queryParams.comuna = selectedComuna.id;
+      queryParams.comuna_nombre = selectedComuna.label;
     }
+
+    queryParams.page = 1;
 
     const params = new URLSearchParams(queryParams); 
     navigate(`/buscar?${params.toString()}`); 
@@ -172,6 +174,7 @@ const SearchBar = () => {
     if (supHasta) params.set("sup_hasta", supHasta); else params.delete("sup_hasta");
     if (precioDesde) params.set("precio_desde", precioDesde); else params.delete("precio_desde");
     if (precioHasta) params.set("precio_hasta", precioHasta); else params.delete("precio_hasta");
+    params.set("page", "1");
     
     navigate(`/buscar?${params.toString()}`);
   };
@@ -208,6 +211,7 @@ const SearchBar = () => {
                   // NUEVA LÓGICA: Si ya está en la vista de búsqueda, actualizamos el parámetro 'obj' en la URL automáticamente.
                   const params = new URLSearchParams(searchParams);
                   params.set("obj", accion === "Comprar" ? "1" : "2");
+                  params.set("page", "1");
                   navigate(`/buscar?${params.toString()}`);
                 }
               }} 
@@ -306,7 +310,7 @@ const SearchBar = () => {
             }} 
             onFocus={() => setShowSuggestions(true)} 
             onKeyDown={(e) => e.key === "Enter" && handleSearch()} 
-            placeholder={searchParams.get('comuna') ? comunasDataset.find(c => c.label.toLowerCase() === searchParams.get('comuna')?.toLowerCase())?.label || searchParams.get('comuna') : "Comuna, ciudad o código..."} 
+            placeholder={searchParams.get('comuna_nombre') || (searchParams.get('comuna') ? comunasDataset.find(c => c.id === searchParams.get('comuna'))?.label || searchParams.get('comuna') : "Comuna, ciudad o código...")} 
             className="w-full px-6 py-4 bg-gray-400/90 text-white rounded-xl placeholder-white/90 focus:outline-none focus:ring-1 focus:ring-[#24B6C1] text-sm" 
           /> 
 
