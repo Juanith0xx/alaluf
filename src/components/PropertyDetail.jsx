@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, lazy, Suspense } from "react";
+import { createPortal } from "react-dom";
 import {
   FaRulerCombined,
   FaBed,
@@ -53,6 +54,39 @@ const PropertyDetail = ({ property }) => {
   // ESTADOS PARA EL FLUJO DE AGENDA ADJUNTO AL FORMULARIO
   const [visitaAgendada, setVisitaAgendada] = useState(null);
   const [enviandoLead, setEnviandoLead] = useState(false);
+
+  // ESTADOS PARA INSERTAR EL AGENDAMIENTO DENTRO DEL FORMULARIO ORIGINAL
+  const contactFormWrapperRef = useRef(null);
+  const [agendamientoPortalTarget, setAgendamientoPortalTarget] = useState(null);
+  const [formularioCompleto, setFormularioCompleto] = useState(false);
+  const [necesitaVisita, setNecesitaVisita] = useState("");
+
+  const verificarFormularioCompleto = () => {
+    const wrapper = contactFormWrapperRef.current;
+    if (!wrapper) return;
+
+    const buscarValor = (...nombres) => {
+      for (const nombre of nombres) {
+        const campo = wrapper.querySelector(
+          `[name="${nombre}"], #${nombre}`
+        );
+
+        const valor = String(campo?.value || "").trim();
+        if (valor) return valor;
+      }
+
+      return "";
+    };
+
+    const nombre = buscarValor("nombre", "razon_social");
+    const email = buscarValor("email", "correo");
+    const telefono = buscarValor("fono", "telefono");
+    const mensaje = buscarValor("requerimiento", "mensaje");
+
+    setFormularioCompleto(
+      Boolean(nombre && (email || telefono) && mensaje)
+    );
+  };
 
   // 🌟 FUNCIÓN PARA MOSTRAR EL TOAST (Reemplaza al alert nativo)
   const showToast = (message, type = "success") => {
@@ -163,6 +197,19 @@ console.log("PRECIOS", property.precios);
       return;
     }
 
+    if (necesitaVisita === "") {
+      showToast("Indica si necesitas agendar una visita.", "error");
+      return;
+    }
+
+    if (necesitaVisita === "si" && !visitaAgendada) {
+      showToast(
+        "Selecciona un día y un bloque horario para agendar la visita.",
+        "error"
+      );
+      return;
+    }
+
     let requerimientoFinal = requerimiento.trim();
     if (visitaAgendada) {
       const detalleVisita = `--- ASUNTO: Solicitud de Visita Agendada ---\nDía: ${visitaAgendada.fechaFormateada}\nBloque: ${visitaAgendada.hora}`;
@@ -182,7 +229,7 @@ console.log("PRECIOS", property.precios);
         id_tipo_propiedad: property.idtipo || null, 
         fk_comuna: property.ubicacion?.comuna_id || null,
         id_prop_pw: String(property.codigo) || "0",
-        agendamiento: !!visitaAgendada,
+        agendamiento: necesitaVisita === "si" && !!visitaAgendada,
         fecha_visita_meli: visitaAgendada ? visitaAgendada.fechaId : "",
         hora_visita_meli: visitaAgendada ? visitaAgendada.hora : ""
       };
@@ -197,6 +244,9 @@ console.log("PRECIOS", property.precios);
       if (response.ok) {
         showToast("¡Solicitud enviada con éxito! Un asesor te contactará pronto.", "success");
         setVisitaAgendada(null);
+        setNecesitaVisita("");
+        setBloqueHorario(null);
+        setFormularioCompleto(false);
       } else {
         showToast("Hubo un error al registrar tu solicitud.", "error");
       }
@@ -251,6 +301,75 @@ console.log("PRECIOS", property.precios);
       setDiaSeleccionado(diasDisponibles[0]);
     }
   }, [diasDisponibles, diaSeleccionado]);
+
+
+  /**
+   * Inserta un contenedor dentro del formulario original, inmediatamente
+   * después del campo de mensaje/requerimiento, sin modificar ContacForm.
+   */
+  useEffect(() => {
+    const wrapper = contactFormWrapperRef.current;
+    if (!wrapper) return;
+
+    let portalContainer = null;
+    let observer = null;
+
+    const montarPortal = () => {
+      const formulario = wrapper.querySelector("form");
+      if (!formulario) return false;
+      
+      // Evitamos montarlo múltiples veces
+      if (wrapper.querySelector('[data-agendamiento-integrado="true"]')) return true;
+
+      const campoMensaje =
+        formulario.querySelector(
+          'textarea[name="requerimiento"], textarea[name="mensaje"], textarea'
+        );
+
+      if (!campoMensaje) return false;
+
+      const bloqueCampo =
+        campoMensaje.closest(".space-y-2") ||
+        campoMensaje.parentElement;
+
+      if (!bloqueCampo) return false;
+
+      portalContainer = document.createElement("div");
+      portalContainer.setAttribute("data-agendamiento-integrado", "true");
+      
+      // Forzamos que abarque toda la grilla/espacio del formulario
+      portalContainer.className = "w-full col-span-full block clear-both";
+      portalContainer.style.gridColumn = "1 / -1";
+      portalContainer.style.width = "100%";
+
+      bloqueCampo.insertAdjacentElement("afterend", portalContainer);
+      setAgendamientoPortalTarget(portalContainer);
+
+      return true;
+    };
+
+    if (!montarPortal()) {
+      observer = new MutationObserver(() => {
+        if (montarPortal() && observer) {
+          observer.disconnect();
+        }
+      });
+
+      observer.observe(wrapper, {
+        childList: true,
+        subtree: true
+      });
+    }
+
+    return () => {
+      observer?.disconnect();
+      setAgendamientoPortalTarget(null);
+
+      if (portalContainer?.parentNode) {
+        portalContainer.parentNode.removeChild(portalContainer);
+      }
+    };
+  }, [property.codigo]);
 
   const normalizarTextoCampo = (valor = "") =>
     String(valor)
@@ -310,7 +429,7 @@ console.log("PRECIOS", property.precios);
 
       <div className="max-w-[1400px] mx-auto px-4 md:px-6 pt-24 sm:pt-28 lg:pt-32 pb-10 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12">
         
-        <div className="col-span-1 lg:col-span-8 space-y-6">
+        <div className="col-span-1 lg:col-span-7 space-y-6">
           
           <section className="grid grid-cols-1 md:grid-cols-4 gap-2 md:gap-3 rounded-[24px] md:rounded-[40px] overflow-hidden shadow-2xl bg-black/5 h-64 sm:h-80 md:h-[400px] lg:h-[480px]">
             <div className="col-span-1 md:col-span-2 md:row-span-2 relative overflow-hidden group cursor-pointer h-full" onClick={() => openLightbox(0)}>
@@ -371,8 +490,6 @@ console.log("PRECIOS", property.precios);
   )}
 
 </div>
-
-
 
               </section>
 
@@ -459,85 +576,234 @@ console.log("PRECIOS", property.precios);
           </div>
         </div>
 
-        <div className="col-span-1 lg:col-span-4">
-          <div className="lg:sticky lg:top-24 space-y-6">
-            <div className="bg-white/95 backdrop-blur-sm rounded-[24px] md:rounded-[40px] p-5 md:p-8 border border-gray-100 shadow-sm">
-              <h3 className="text-lg md:text-xl font-bold mb-1 text-gray-900">Agenda tu visita</h3>
-              <p className="text-gray-400 text-xs mb-6">Elige el bloque horario que más te acomode.</p>
-              
-              <div className="flex gap-2 overflow-x-auto pb-4 scrollbar-hide">
-                {diasDisponibles.map((dia) => (
-                  <button key={dia.id} onClick={() => setDiaSeleccionado(dia)} className={`flex flex-col items-center justify-center min-w-[52px] h-[60px] rounded-xl border transition-all ${diaSeleccionado?.id === dia.id ? "bg-[#24B6C1] text-white border-[#24B6C1] shadow-md scale-105" : "bg-gray-50 text-gray-700 border-gray-100 hover:bg-gray-100"}`}>
-                    <span className="text-[9px] font-bold uppercase opacity-80">{dia.nombre}</span>
-                    <span className="text-base font-black mt-0.5">{dia.numero}</span>
-                  </button>
-                ))}
-              </div>
-
-              <div className="space-y-3 mb-6">
-                <button 
-                  onClick={() => setBloqueHorario("manana")} 
-                  className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all ${
-                    bloqueHorario === "manana" 
-                    ? "border-[#24B6C1] bg-[#24B6C1]/5 ring-1 ring-[#24B6C1]" 
-                    : "border-gray-100 bg-gray-50/50 hover:bg-gray-50"
-                  }`}
-                >
-                   <div className="flex items-center gap-3">
-                      <FaSun className={bloqueHorario === "manana" ? "text-[#24B6C1]" : "text-gray-400"} size={16} />
-                      <span className={`text-sm font-bold ${bloqueHorario === "manana" ? "text-gray-900" : "text-gray-600"}`}>Mañana</span>
-                   </div>
-                   <span className="text-[11px] text-gray-400 font-medium tracking-tight">09:30 a 12:30 hrs</span>
-                </button>
-
-                <button 
-                  onClick={() => setBloqueHorario("tarde")} 
-                  className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all ${
-                    bloqueHorario === "tarde" 
-                    ? "border-[#24B6C1] bg-[#24B6C1]/5 ring-1 ring-[#24B6C1]" 
-                    : "border-gray-100 bg-gray-50/50 hover:bg-gray-50"
-                  }`}
-                >
-                   <div className="flex items-center gap-3">
-                      <FaMoon className={bloqueHorario === "tarde" ? "text-[#24B6C1]" : "text-gray-400"} size={16} />
-                      <span className={`text-sm font-bold ${bloqueHorario === "tarde" ? "text-gray-900" : "text-gray-600"}`}>Tarde</span>
-                   </div>
-                   <span className="text-[11px] text-gray-400 font-medium tracking-tight">15:00 a 17:30 hrs</span>
-                </button>
-              </div>
-
-              <button 
-                onClick={() => {
-                  if (!diaSeleccionado || !bloqueHorario) {
-                    showToast("Por favor, selecciona un día y un bloque horario.", "error");
-                    return;
-                  }
-                  
-                  const rango = bloqueHorario === "manana" ? "09:30 a 12:30 hrs" : "15:00 a 17:30 hrs";
-                  
-                  setVisitaAgendada({ 
-                    fechaFormateada: diaSeleccionado.fechaCompleta, 
-                    hora: rango, 
-                    fechaId: diaSeleccionado.id 
-                  });
-                  showToast(`¡Bloque ${bloqueHorario === "manana" ? "Mañana" : "Tarde"} cargado correctamente! , Ahora completa los datos del formulario para finalizar`, "success");
-                }}
-                className="w-full py-4 bg-[#24B6C1] hover:bg-[#1da0ab] text-white rounded-xl font-bold text-xs uppercase tracking-widest shadow-lg transition-all active:scale-[0.98]"
-              >
-                + Agregar Agendamiento
-              </button>
+        <div className="col-span-1 lg:col-span-5">
+          <div className="lg:sticky lg:top-28 space-y-6 max-h-[calc(100vh-120px)] overflow-y-auto scrollbar-hide pb-10 px-1">
+            <div
+              ref={contactFormWrapperRef}
+              onInputCapture={verificarFormularioCompleto}
+              onChangeCapture={verificarFormularioCompleto}
+            >
+              <ContactForm 
+                propiedadId={String(property.codigo)}
+                comunaId={property.ubicacion?.comuna_id || 0}
+                objetivoLlamada={property.precios?.venta?.valor ? 1 : 2}
+                tipoPropiedadNombre={property.titulo || ""}
+                onSubmitSuccess={handleContactSubmit}
+                enviando={enviandoLead}
+              />
             </div>
-
-            <ContactForm 
-              propiedadId={String(property.codigo)}
-              comunaId={property.ubicacion?.comuna_id || 0}
-              objetivoLlamada={property.precios?.venta?.valor ? 1 : 2}
-              tipoPropiedadNombre={property.titulo || ""}
-              onSubmitSuccess={handleContactSubmit}
-            />
           </div>
         </div>
       </div>
+
+      {agendamientoPortalTarget &&
+        createPortal(
+          <AnimatePresence>
+            {formularioCompleto && (
+              <motion.div
+                initial={{ opacity: 0, y: -10, height: 0 }}
+                animate={{ opacity: 1, y: 0, height: "auto" }}
+                exit={{ opacity: 0, y: -10, height: 0 }}
+                className="w-full min-w-0 overflow-visible mt-4 pt-4 border-t border-gray-200"
+              >
+                {/* 🌟 FIX: Añadimos pb-4 (padding bottom) y z-50 para darle respiro horizontal y vertical al selector */}
+                <div className="space-y-2 pb-4 relative z-50">
+                  <label className="text-sm font-semibold text-gray-800 block">
+                    ¿Necesitas agendar una visita?
+                  </label>
+
+                  <select
+                    value={necesitaVisita}
+                    onChange={(event) => {
+                      const valor = event.target.value;
+                      setNecesitaVisita(valor);
+                      setVisitaAgendada(null);
+
+                      if (valor !== "si") {
+                        setBloqueHorario(null);
+                      }
+                    }}
+                    className="w-full bg-white border border-gray-200 px-4 py-3 text-gray-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#24B6C1]"
+                  >
+                    <option value="">Selecciona</option>
+                    <option value="si">Sí</option>
+                    <option value="no">No</option>
+                  </select>
+                </div>
+
+                <AnimatePresence>
+                  {necesitaVisita === "si" && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10, height: 0 }}
+                      animate={{ opacity: 1, y: 0, height: "auto" }}
+                      exit={{ opacity: 0, y: -10, height: 0 }}
+                      className="w-full min-w-0 overflow-visible space-y-6"
+                    >
+                      <div>
+                        <h3 className="text-lg md:text-xl font-bold mb-1 text-gray-900">
+                          Agenda tu visita
+                        </h3>
+                        <p className="text-gray-400 text-xs mb-2">
+                          Elige el bloque horario que más te acomode.
+                        </p>
+                      </div>
+
+                      {/* 🌟 FIX: Incrementamos de nuevo el gap (gap-3 y lg:gap-4) para que el diseño no se vea estrecho y respire a lo ancho */}
+                      <div className="flex w-full gap-3 overflow-x-auto py-2 pb-2 scrollbar-hide snap-x snap-mandatory lg:grid lg:grid-cols-6 lg:gap-4 lg:overflow-visible">
+                        {diasDisponibles.map((dia) => (
+                          <button
+                            type="button"
+                            key={dia.id}
+                            onClick={() => {
+                              setDiaSeleccionado(dia);
+                              setVisitaAgendada(null);
+                            }}
+                            className={`flex flex-col items-center justify-center min-w-[64px] h-[72px] rounded-xl border transition-all snap-start lg:min-w-0 lg:w-full lg:h-[76px] ${
+                              diaSeleccionado?.id === dia.id
+                                ? "bg-[#24B6C1] text-white border-[#24B6C1] shadow-md scale-105"
+                                : "bg-gray-50 text-gray-700 border-gray-100 hover:bg-gray-100"
+                            }`}
+                          >
+                            <span className="text-[9px] font-bold uppercase opacity-80">
+                              {dia.nombre}
+                            </span>
+                            <span className="text-base font-black mt-0.5">
+                              {dia.numero}
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+
+                      <div className="space-y-4 mb-6">
+                        {/* 🌟 FIX: Restauramos el padding horizontal de los bloques (lg:px-6) para que no parezcan aplastados */}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setBloqueHorario("manana");
+                            setVisitaAgendada(null);
+                          }}
+                          className={`w-full min-h-[94px] flex flex-col items-start justify-center gap-3 p-4 rounded-xl border transition-all lg:min-h-[68px] lg:flex-row lg:items-center lg:justify-between lg:gap-4 lg:px-6 ${
+                            bloqueHorario === "manana"
+                              ? "border-[#24B6C1] bg-[#24B6C1]/5 ring-1 ring-[#24B6C1]"
+                              : "border-gray-100 bg-gray-50/50 hover:bg-gray-50"
+                          }`}
+                        >
+                          <div className="flex items-center gap-3 shrink-0">
+                            <FaSun
+                              className={
+                                bloqueHorario === "manana"
+                                  ? "text-[#24B6C1]"
+                                  : "text-gray-400"
+                              }
+                              size={16}
+                            />
+                            <span
+                              className={`text-sm font-bold ${
+                                bloqueHorario === "manana"
+                                  ? "text-gray-900"
+                                  : "text-gray-600"
+                              }`}
+                            >
+                              Mañana
+                            </span>
+                          </div>
+                          <span className="text-[11px] leading-5 text-gray-400 font-medium tracking-tight whitespace-nowrap sm:text-right lg:text-xs">
+                            09:30 a 12:30 hrs
+                          </span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setBloqueHorario("tarde");
+                            setVisitaAgendada(null);
+                          }}
+                          className={`w-full min-h-[94px] flex flex-col items-start justify-center gap-3 p-4 rounded-xl border transition-all lg:min-h-[68px] lg:flex-row lg:items-center lg:justify-between lg:gap-4 lg:px-6 ${
+                            bloqueHorario === "tarde"
+                              ? "border-[#24B6C1] bg-[#24B6C1]/5 ring-1 ring-[#24B6C1]"
+                              : "border-gray-100 bg-gray-50/50 hover:bg-gray-50"
+                          }`}
+                        >
+                          <div className="flex items-center gap-3 shrink-0">
+                            <FaMoon
+                              className={
+                                bloqueHorario === "tarde"
+                                  ? "text-[#24B6C1]"
+                                  : "text-gray-400"
+                              }
+                              size={16}
+                            />
+                            <span
+                              className={`text-sm font-bold ${
+                                bloqueHorario === "tarde"
+                                  ? "text-gray-900"
+                                  : "text-gray-600"
+                              }`}
+                            >
+                              Tarde
+                            </span>
+                          </div>
+                          <span className="text-[11px] leading-5 text-gray-400 font-medium tracking-tight whitespace-nowrap sm:text-right lg:text-xs">
+                            15:00 a 17:30 hrs
+                          </span>
+                        </button>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (!diaSeleccionado || !bloqueHorario) {
+                            showToast(
+                              "Por favor, selecciona un día y un bloque horario.",
+                              "error"
+                            );
+                            return;
+                          }
+
+                          const rango =
+                            bloqueHorario === "manana"
+                              ? "09:30 a 12:30 hrs"
+                              : "15:00 a 17:30 hrs";
+
+                          setVisitaAgendada({
+                            fechaFormateada: diaSeleccionado.fechaCompleta,
+                            hora: rango,
+                            fechaId: diaSeleccionado.id
+                          });
+
+                          showToast(
+                            "Agendamiento agregado correctamente.",
+                            "success"
+                          );
+                        }}
+                        className="w-full py-4 bg-[#24B6C1] hover:bg-[#1da0ab] text-white rounded-xl font-bold text-xs uppercase tracking-widest shadow-lg transition-all active:scale-[0.98]"
+                      >
+                        {visitaAgendada
+                          ? "✓ Agendamiento agregado"
+                          : "+ Agregar Agendamiento"}
+                      </button>
+
+                      {visitaAgendada && (
+                        <div className="p-4 rounded-xl border border-[#24B6C1]/30 bg-[#24B6C1]/5">
+                          <p className="text-xs font-bold uppercase tracking-widest text-[#24B6C1]">
+                            Visita seleccionada
+                          </p>
+                          <p className="text-sm font-bold text-gray-800 mt-1">
+                            {visitaAgendada.fechaFormateada}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            {visitaAgendada.hora}
+                          </p>
+                        </div>
+                      )}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            )}
+          </AnimatePresence>,
+          agendamientoPortalTarget
+        )}
 
       {isLightboxOpen && (
         <div className="fixed inset-0 bg-black/95 z-[9999] flex flex-col items-center justify-center p-4">
