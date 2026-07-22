@@ -67,27 +67,14 @@ const Nosotros = () => {
     },
   ];
 
-  /**
-   * Intenta abrir el cliente de correo predeterminado del dispositivo.
-   * Si el sistema no tiene un manejador de mailto configurado, usa Gmail web
-   * como respaldo para que el clic nunca quede sin respuesta.
-   */
   const crearDatosCorreo = ({ email, name }) => {
     const asuntoTexto = name
       ? `Contacto Sitio Web - Atención ${name}`
       : "Consulta desde Sitio Web - Nosotros";
 
     const cuerpoTexto = name
-      ? `Hola ${name},
-
-Me gustaría ponerme en contacto contigo para recibir información y asesoría inmobiliaria.
-
-Saludos.`
-      : `Hola,
-
-Me gustaría ponerme en contacto con el equipo de Alaluf para recibir información y asesoría inmobiliaria.
-
-Saludos.`;
+      ? `Hola ${name},\n\nMe gustaría ponerme en contacto contigo para recibir información y asesoría inmobiliaria.\n\nSaludos.`
+      : `Hola,\n\nMe gustaría ponerme en contacto con el equipo de Alaluf para recibir información y asesoría inmobiliaria.\n\nSaludos.`;
 
     const asunto = encodeURIComponent(asuntoTexto);
     const cuerpo = encodeURIComponent(cuerpoTexto);
@@ -103,6 +90,17 @@ Saludos.`;
     event.preventDefault();
 
     const { mailto, gmail } = crearDatosCorreo(contacto);
+    
+    // Detectar si es un dispositivo móvil (iOS / Android)
+    const esDispositivoMobil = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+    if (esDispositivoMobil) {
+      // En móviles, abrimos directamente el mailto nativo de forma limpia
+      window.location.href = mailto;
+      return;
+    }
+
+    // En computadoras de escritorio (Desktop), aplicamos la estrategia de respaldo con Gmail web
     let clienteAbierto = false;
 
     const marcarComoAbierto = () => {
@@ -120,10 +118,11 @@ Saludos.`;
       window.removeEventListener("blur", marcarComoAbierto);
       document.removeEventListener("visibilitychange", marcarComoAbierto);
 
+      // Si no abrió ningún cliente de correo en el escritorio tras 1.5s, abrimos Gmail web en una pestaña nueva
       if (!clienteAbierto && document.visibilityState === "visible") {
-        window.location.href = gmail;
+        window.open(gmail, "_blank");
       }
-    }, 1400);
+    }, 1500);
   };
 
   return (
@@ -195,7 +194,7 @@ Saludos.`;
                 key={member.email}
                 className="flex flex-col items-center text-center w-[160px] sm:w-[200px] transition-transform hover:scale-105 duration-300 mb-4"
               >
-                {/* FOTO DEL EQUIPO: ABRE REDACTOR DE GMAIL */}
+                {/* FOTO DEL EQUIPO: ABRE CLIENTE DE CORREO O GMAIL */}
                 <a
                   href={crearDatosCorreo(member).mailto}
                   onClick={(event) => abrirCorreo(event, member)}

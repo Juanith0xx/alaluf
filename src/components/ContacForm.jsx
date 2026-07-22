@@ -152,6 +152,132 @@ const ContactForm = ({
     }
   };
 
+  // 🌟 GUARDAMOS LA CAJA DEL FORMULARIO EN UNA CONSTANTE
+  // Si no es ficha de propiedad, le añadimos "max-w-3xl mx-auto" para que no se estire.
+  const formularioContenido = (
+    <div className={`bg-white text-gray-800 rounded-[24px] md:rounded-[40px] p-5 sm:p-8 md:p-10 shadow-xl border border-gray-100 w-full ${!esFichaPropiedad ? 'max-w-3xl mx-auto' : ''} ${className}`}>
+      
+      <div className="mb-6 md:mb-8 text-center md:text-start">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold mb-2 md:mb-3 font-[Outfit] text-[#1A1A1A] tracking-tight">
+          {esFichaPropiedad ? "Me interesa esta propiedad" : "Lo primero es entenderte."}
+        </h2>
+        <p className="text-gray-500 text-sm sm:text-base md:text-lg font-normal font-[Outfit] leading-relaxed">
+          {esFichaPropiedad 
+            ? "Déjanos tus datos y un asesor te contactará para entregarte más información." 
+            : "Completa este formulario y te ayudaremos a encontrar tu próxima inversión."}
+        </p>
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-5 md:space-y-6 font-[Outfit]">
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
+          
+          <div className="space-y-1.5">
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 ml-1">Nombre completo *</label>
+            <input 
+              type="text" 
+              name="nombre" 
+              value={formData.nombre} 
+              onChange={handleChange} 
+              placeholder="Ej. Juan Pérez" 
+              className="w-full bg-gray-50/50 border border-gray-200 text-gray-800 text-base sm:text-sm px-4 py-3 md:py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0091A4]/30 focus:border-[#0091A4] transition-all duration-200 placeholder-gray-400" 
+              required 
+            />
+          </div>
+
+          <div className="space-y-1.5 relative">
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 ml-1">Rut *</label>
+            <input 
+              type="text" 
+              value={formData.rut} 
+              onChange={handleRutChange} 
+              placeholder="12.345.678-K" 
+              className={`w-full bg-gray-50/50 border text-gray-800 text-base sm:text-sm px-4 py-3 md:py-2.5 rounded-xl focus:outline-none focus:ring-2 transition-all duration-200 placeholder-gray-400 ${rutError ? "border-red-500 focus:ring-red-500/30" : "border-gray-200 focus:ring-[#0091A4]/30 focus:border-[#0091A4]"}`} 
+              required 
+            />
+            {rutError && <p className="text-red-500 text-xs font-medium mt-1 ml-1 absolute -bottom-5">{rutError}</p>}
+          </div>
+
+          <div className="space-y-1.5 mt-2 md:mt-0">
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 ml-1">Correo electrónico *</label>
+            <input 
+              type="email" 
+              name="email" 
+              value={formData.email} 
+              onChange={handleChange} 
+              placeholder="tu@email.com" 
+              className="w-full bg-gray-50/50 border border-gray-200 text-gray-800 text-base sm:text-sm px-4 py-3 md:py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0091A4]/30 focus:border-[#0091A4] transition-all duration-200 placeholder-gray-400" 
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 ml-1">Teléfono</label>
+            <input 
+              type="text" 
+              name="telefono" 
+              value={formData.telefono} 
+              onChange={handleChange} 
+              placeholder="+56 9 1234 5678" 
+              className="w-full bg-gray-50/50 border border-gray-200 text-gray-800 text-base sm:text-sm px-4 py-3 md:py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0091A4]/30 focus:border-[#0091A4] transition-all duration-200 placeholder-gray-400" 
+            />
+          </div>
+
+          <div className="md:col-span-2 space-y-1.5 md:mt-1">
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 ml-1">¿Qué estás buscando?</label>
+            <select 
+              name="id_tipo_propiedad" 
+              value={formData.id_tipo_propiedad} 
+              onChange={handleChange} 
+              disabled={esFichaPropiedad} 
+              className={`w-full border text-base sm:text-sm px-4 py-3 md:py-2.5 rounded-xl focus:outline-none transition-all duration-200 ${esFichaPropiedad ? 'bg-gray-100 border-gray-200 text-gray-500 cursor-not-allowed opacity-80' : 'bg-gray-50/50 border-gray-200 text-gray-800 cursor-pointer focus:ring-2 focus:ring-[#0091A4]/30 focus:border-[#0091A4]'}`}
+            >
+              <option value="1">Residencial</option>
+              <option value="3">Oficina</option>
+              <option value="4">Retail</option>
+              <option value="7">Industrial</option>
+              <option value="6">Terreno para Proyecto</option>
+              <option value="8">Administración de Arriendos</option>
+            </select>
+          </div>
+
+          <div className="md:col-span-2 space-y-1.5 md:mt-1">
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 ml-1">Hablemos de lo que necesitas</label>
+            <textarea 
+              name="mensaje" 
+              value={formData.mensaje} 
+              onChange={handleChange} 
+              rows="4" 
+              placeholder={esFichaPropiedad ? "Quiero agendar una visita..." : "Cuéntanos qué tienes en mente..."} 
+              className="w-full bg-gray-50/50 border border-gray-200 text-gray-800 text-base sm:text-sm px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0091A4]/30 focus:border-[#0091A4] transition-all duration-200 placeholder-gray-400 resize-none" 
+            />
+          </div>
+        </div>
+
+        <div className="pt-4 sm:pt-6">
+          <button 
+            type="submit" 
+            disabled={isSubmitting} 
+            className={`w-full md:w-auto md:min-w-[240px] text-white px-8 py-3.5 sm:py-3 rounded-xl text-base sm:text-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 mx-auto active:scale-95 ${
+              isSubmitting 
+                ? 'bg-gray-400 cursor-not-allowed' 
+                : 'bg-[#0091A4] hover:bg-[#007A8A] shadow-md shadow-[#0091A4]/20 hover:shadow-lg hover:shadow-[#0091A4]/30 hover:-translate-y-0.5'
+            }`}
+          >
+            {isSubmitting ? "Enviando..." : "Continuar"}
+          </button>
+        </div>
+
+      </form>
+    </div>
+  );
+
+  // 🌟 RENDERIZADO CONDICIONAL
+  // Si estamos en la ficha de la propiedad, devolvemos SOLO la caja blanca (ancho 100%).
+  if (esFichaPropiedad) {
+    return formularioContenido;
+  }
+
+  // Si estamos en la página de Contacto, devolvemos la caja envuelta en la pantalla completa de mármol.
   return (
     <div 
       className="w-full min-h-screen flex items-center justify-center pt-24 md:pt-32 pb-8 md:pb-12 px-4 sm:px-6"
@@ -162,120 +288,7 @@ const ContactForm = ({
         backgroundRepeat: 'no-repeat'
       }}
     >
-      <div className={`bg-white text-gray-800 rounded-[28px] sm:rounded-3xl md:rounded-[32px] p-5 sm:p-8 md:p-10 shadow-2xl w-full max-w-3xl mx-auto border border-gray-100 ${className}`}>
-        
-        <div className="mb-6 md:mb-8 text-center md:text-start">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold mb-2 md:mb-3 font-[Outfit] text-[#1A1A1A] tracking-tight">
-            {esFichaPropiedad ? "Me interesa esta propiedad" : "Lo primero es entenderte."}
-          </h2>
-          <p className="text-gray-500 text-sm sm:text-base md:text-lg font-normal font-[Outfit] leading-relaxed">
-            {esFichaPropiedad 
-              ? "Déjanos tus datos y un asesor te contactará para entregarte más información." 
-              : "Completa este formulario y te ayudaremos a encontrar tu próxima inversión."}
-          </p>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-5 md:space-y-6 font-[Outfit]">
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
-            
-            <div className="space-y-1.5">
-              <label className="block text-xs sm:text-sm font-medium text-gray-700 ml-1">Nombre completo *</label>
-              <input 
-                type="text" 
-                name="nombre" 
-                value={formData.nombre} 
-                onChange={handleChange} 
-                placeholder="Ej. Juan Pérez" 
-                className="w-full bg-gray-50/50 border border-gray-200 text-gray-800 text-base sm:text-sm px-4 py-3 md:py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0091A4]/30 focus:border-[#0091A4] transition-all duration-200 placeholder-gray-400" 
-                required 
-              />
-            </div>
-
-            <div className="space-y-1.5 relative">
-              <label className="block text-xs sm:text-sm font-medium text-gray-700 ml-1">Rut *</label>
-              <input 
-                type="text" 
-                value={formData.rut} 
-                onChange={handleRutChange} 
-                placeholder="12.345.678-K" 
-                className={`w-full bg-gray-50/50 border text-gray-800 text-base sm:text-sm px-4 py-3 md:py-2.5 rounded-xl focus:outline-none focus:ring-2 transition-all duration-200 placeholder-gray-400 ${rutError ? "border-red-500 focus:ring-red-500/30" : "border-gray-200 focus:ring-[#0091A4]/30 focus:border-[#0091A4]"}`} 
-                required 
-              />
-              {rutError && <p className="text-red-500 text-xs font-medium mt-1 ml-1 absolute -bottom-5">{rutError}</p>}
-            </div>
-
-            <div className="space-y-1.5 mt-2 md:mt-0">
-              <label className="block text-xs sm:text-sm font-medium text-gray-700 ml-1">Correo electrónico *</label>
-              <input 
-                type="email" 
-                name="email" 
-                value={formData.email} 
-                onChange={handleChange} 
-                placeholder="tu@email.com" 
-                className="w-full bg-gray-50/50 border border-gray-200 text-gray-800 text-base sm:text-sm px-4 py-3 md:py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0091A4]/30 focus:border-[#0091A4] transition-all duration-200 placeholder-gray-400" 
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="block text-xs sm:text-sm font-medium text-gray-700 ml-1">Teléfono</label>
-              <input 
-                type="text" 
-                name="telefono" 
-                value={formData.telefono} 
-                onChange={handleChange} 
-                placeholder="+56 9 1234 5678" 
-                className="w-full bg-gray-50/50 border border-gray-200 text-gray-800 text-base sm:text-sm px-4 py-3 md:py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0091A4]/30 focus:border-[#0091A4] transition-all duration-200 placeholder-gray-400" 
-              />
-            </div>
-
-            <div className="md:col-span-2 space-y-1.5 md:mt-1">
-              <label className="block text-xs sm:text-sm font-medium text-gray-700 ml-1">¿Qué estás buscando?</label>
-              <select 
-                name="id_tipo_propiedad" 
-                value={formData.id_tipo_propiedad} 
-                onChange={handleChange} 
-                disabled={esFichaPropiedad} 
-                className={`w-full border text-base sm:text-sm px-4 py-3 md:py-2.5 rounded-xl focus:outline-none transition-all duration-200 ${esFichaPropiedad ? 'bg-gray-100 border-gray-200 text-gray-500 cursor-not-allowed opacity-80' : 'bg-gray-50/50 border-gray-200 text-gray-800 cursor-pointer focus:ring-2 focus:ring-[#0091A4]/30 focus:border-[#0091A4]'}`}
-              >
-                <option value="1">Residencial</option>
-                <option value="3">Oficina</option>
-                <option value="4">Retail</option>
-                <option value="7">Industrial</option>
-                <option value="6">Terreno para Proyecto</option>
-                <option value="8">Administración de Arriendos</option>
-              </select>
-            </div>
-
-            <div className="md:col-span-2 space-y-1.5 md:mt-1">
-              <label className="block text-xs sm:text-sm font-medium text-gray-700 ml-1">Hablemos de lo que necesitas</label>
-              <textarea 
-                name="mensaje" 
-                value={formData.mensaje} 
-                onChange={handleChange} 
-                rows="4" 
-                placeholder={esFichaPropiedad ? "Quiero agendar una visita..." : "Cuéntanos qué tienes en mente..."} 
-                className="w-full bg-gray-50/50 border border-gray-200 text-gray-800 text-base sm:text-sm px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0091A4]/30 focus:border-[#0091A4] transition-all duration-200 placeholder-gray-400 resize-none" 
-              />
-            </div>
-          </div>
-
-          <div className="pt-4 sm:pt-6">
-            <button 
-              type="submit" 
-              disabled={isSubmitting} 
-              className={`w-full md:w-auto md:min-w-[240px] text-white px-8 py-3.5 sm:py-3 rounded-xl text-base sm:text-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 mx-auto active:scale-95 ${
-                isSubmitting 
-                  ? 'bg-gray-400 cursor-not-allowed' 
-                  : 'bg-[#0091A4] hover:bg-[#007A8A] shadow-md shadow-[#0091A4]/20 hover:shadow-lg hover:shadow-[#0091A4]/30 hover:-translate-y-0.5'
-              }`}
-            >
-              {isSubmitting ? "Enviando..." : "Continuar"}
-            </button>
-          </div>
-
-        </form>
-      </div>
+      {formularioContenido}
     </div>
   );
 };

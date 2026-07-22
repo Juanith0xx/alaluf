@@ -88,42 +88,35 @@ const PropertyDetail = ({ property }) => {
     );
   };
 
-  // 🌟 FUNCIÓN PARA MOSTRAR EL TOAST (Reemplaza al alert nativo)
   const showToast = (message, type = "success") => {
     setToast({ visible: true, message, type });
-    // Auto-ocultar después de 4 segundos
     setTimeout(() => setToast(prev => ({ ...prev, visible: false })), 4000);
   };
 
   if (!property) return null;
 
-  
-console.log("PROPERTY", property);
-console.log("PRECIOS", property.precios);
-
   const imagenes = property.imagenes || [];
-  // Determinamos el precio y la moneda basándonos en si es venta o arriendo
 
   const formatearPrecioConMoneda = (precio) => {
-  if (!precio || precio.valor == null) return null;
+    if (!precio || precio.valor == null) return null;
 
-  const moneda = (precio.moneda || "").trim().toUpperCase();
-  const numero = parseFloat(precio.valor);
+    const moneda = (precio.moneda || "").trim().toUpperCase();
+    const numero = parseFloat(precio.valor);
 
-  if (moneda === "$" || moneda === "CLP") {
-    return `$${formatearPrecio(numero)}`;
-  }
+    if (moneda === "$" || moneda === "CLP") {
+      return `$${formatearPrecio(numero)}`;
+    }
 
-  if (moneda === "UF/M2" || moneda === "UF/M²") {
-    return `${formatearPrecio(numero)} UF/M²`;
-  }
+    if (moneda === "UF/M2" || moneda === "UF/M²") {
+      return `${formatearPrecio(numero)} UF/M²`;
+    }
 
-  if (moneda === "UF" && numero % 1 !== 0) {
-    return `${formatearPrecio(numero)} UF/M²`;
-  }
+    if (moneda === "UF" && numero % 1 !== 0) {
+      return `${formatearPrecio(numero)} UF/M²`;
+    }
 
-  return `${formatearPrecio(numero)} ${precio.moneda}`;
-};
+    return `${formatearPrecio(numero)} ${precio.moneda}`;
+  };
 
   const tipo = (
     property.desc_tipo ||
@@ -134,7 +127,6 @@ console.log("PRECIOS", property.precios);
     ""
   ).toLowerCase();
 
-  // Normalizamos el tipo para reconocer nombres con o sin acentos.
   const tipoNormalizado = tipo
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "");
@@ -151,7 +143,6 @@ console.log("PRECIOS", property.precios);
     tipoNormalizado.includes(nombre)
   );
 
-  // 🌟 FORMATEO INTELIGENTE: Sin decimales para enteros, 2 decimales para fraccionarios
   const formatearPrecio = (valor) => {
     if (!valor) return "0";
     const numero = parseFloat(valor);
@@ -303,10 +294,6 @@ console.log("PRECIOS", property.precios);
   }, [diasDisponibles, diaSeleccionado]);
 
 
-  /**
-   * Inserta un contenedor dentro del formulario original, inmediatamente
-   * después del campo de mensaje/requerimiento, sin modificar ContacForm.
-   */
   useEffect(() => {
     const wrapper = contactFormWrapperRef.current;
     if (!wrapper) return;
@@ -318,7 +305,6 @@ console.log("PRECIOS", property.precios);
       const formulario = wrapper.querySelector("form");
       if (!formulario) return false;
       
-      // Evitamos montarlo múltiples veces
       if (wrapper.querySelector('[data-agendamiento-integrado="true"]')) return true;
 
       const campoMensaje =
@@ -337,7 +323,6 @@ console.log("PRECIOS", property.precios);
       portalContainer = document.createElement("div");
       portalContainer.setAttribute("data-agendamiento-integrado", "true");
       
-      // Forzamos que abarque toda la grilla/espacio del formulario
       portalContainer.className = "w-full col-span-full block clear-both";
       portalContainer.style.gridColumn = "1 / -1";
       portalContainer.style.width = "100%";
@@ -427,7 +412,8 @@ console.log("PRECIOS", property.precios);
         onClose={() => setToast(prev => ({ ...prev, visible: false }))} 
       />
 
-      <div className="max-w-[1400px] mx-auto px-4 md:px-6 pt-24 sm:pt-28 lg:pt-32 pb-10 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12">
+      {/* 🌟 FIX: items-start alinea la galería y el formulario al tope absoluto del grid */}
+      <div className="max-w-[1400px] mx-auto px-4 md:px-6 pt-24 sm:pt-28 lg:pt-32 pb-10 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12 items-start">
         
         <div className="col-span-1 lg:col-span-7 space-y-6">
           
@@ -475,23 +461,19 @@ console.log("PRECIOS", property.precios);
                 <FaMapMarkerAlt className="text-[#24B6C1]" /> {property.ubicacion?.direccion}, {property.ubicacion?.comuna}
               </div>
 
-<div className="space-y-2">
-
-  {property.precios?.venta?.valor != null && (
-    <div className="text-3xl md:text-3xl font-bold text-[#252525]  ">
-      Venta: <span className="text-[#24B6C1] font-black">{formatearPrecioConMoneda(property.precios.venta)}</span>
-    </div>
-  )}
-
-  {property.precios?.arriendo?.valor != null && (
-    <div className="text-3xl md:text-3xl font-bold text-[#252525]">
-      Arriendo: <span className="text-[#24B6C1] font-black">{formatearPrecioConMoneda(property.precios.arriendo)}</span>
-    </div>
-  )}
-
-</div>
-
-              </section>
+              <div className="space-y-2">
+                {property.precios?.venta?.valor != null && (
+                  <div className="text-3xl md:text-3xl font-bold text-[#252525]  ">
+                    Venta: <span className="text-[#24B6C1] font-black">{formatearPrecioConMoneda(property.precios.venta)}</span>
+                  </div>
+                )}
+                {property.precios?.arriendo?.valor != null && (
+                  <div className="text-3xl md:text-3xl font-bold text-[#252525]">
+                    Arriendo: <span className="text-[#24B6C1] font-black">{formatearPrecioConMoneda(property.precios.arriendo)}</span>
+                  </div>
+                )}
+              </div>
+            </section>
 
             <section className="grid grid-cols-2 sm:grid-cols-4 gap-4 py-6 border-y border-gray-100">
               {esCasa && (
@@ -502,7 +484,6 @@ console.log("PRECIOS", property.precios);
                   <Feature icon={FaBath} title="Baños" value={obtenerPrimerValor(property.detalles?.banos, getExtraValue("baños", "banos"))} />
                 </>
               )}
-
               {esDepartamento && (
                 <>
                   <Feature icon={FaRulerCombined} title="Totales" value={formatearArea(getExtraValue("totales"), getCampo("totales"))} />
@@ -511,7 +492,6 @@ console.log("PRECIOS", property.precios);
                   <Feature icon={FaBath} title="Baños" value={obtenerPrimerValor(property.detalles?.banos, getExtraValue("baños", "banos"))} />
                 </>
               )}
-
               {esOficina && (
                 <>
                   <Feature icon={FaRulerCombined} title="Construidos" value={formatearArea(getExtraValue("construidos"), getCampo("construidos"), property.detalles?.superficie)} />
@@ -519,14 +499,12 @@ console.log("PRECIOS", property.precios);
                   <Feature icon={FaBuilding} title="Tipo Edificio" value={getExtraValue("tipo edificio")} />
                 </>
               )}
-
               {esLocal && (
                 <>
                   <Feature icon={FaRulerCombined} title="Construidos" value={formatearArea(getExtraValue("construidos"), getCampo("construidos"), property.detalles?.superficie)} />
                   <Feature icon={FaCar} title="Estacionamientos" value={obtenerPrimerValor(property.detalles?.estacionamientos, getExtraValue("estacionamientos"))} />
                 </>
               )}
-
               {esCasaComercial && (
                 <>
                   <Feature icon={FaRulerCombined} title="Construidos" value={formatearArea(getExtraValue("construidos"), getCampo("construidos"))} />
@@ -534,25 +512,21 @@ console.log("PRECIOS", property.precios);
                   <Feature icon={FaCar} title="Estacionamientos" value={obtenerPrimerValor(property.detalles?.estacionamientos, getExtraValue("estacionamientos"))} />
                 </>
               )}
-
               {esTerrenoProyecto && (
                 <>
                   <Feature icon={FaRulerCombined} title="Terreno" value={formatearArea(getExtraValue("terreno"), getCampo("terreno"), property.detalles?.superficie)} />
                   <Feature icon={FaInfoCircle} title="Uso / Destino" value={getExtraValue("uso / destino", "uso/destino", "uso destino")} />
                 </>
               )}
-
               {esTerrenoIndustrial && (
                 <Feature icon={FaRulerCombined} title="Terreno" value={formatearArea(getExtraValue("terreno"), getCampo("terreno"), property.detalles?.superficie)} />
               )}
-
               {esGalpon && (
                 <>
                   <Feature icon={FaRulerCombined} title="Construidos" value={formatearArea(getExtraValue("construidos"), getCampo("construidos"))} />
                   <Feature icon={FaRulerCombined} title="Terreno" value={formatearArea(getExtraValue("terreno"), getCampo("terreno"), property.detalles?.superficie)} />
                 </>
               )}
-
               {esParcelaFundo && (
                 <Feature icon={FaRulerCombined} title="Superficie Terreno" value={formatearArea(getExtraValue("superficie terreno", "terreno"), getCampo("terreno"), property.detalles?.superficie)} />
               )}
@@ -576,12 +550,14 @@ console.log("PRECIOS", property.precios);
           </div>
         </div>
 
-        <div className="col-span-1 lg:col-span-5">
-          <div className="lg:sticky lg:top-28 space-y-6 max-h-[calc(100vh-120px)] overflow-y-auto scrollbar-hide pb-10 px-1">
+        <div className="col-span-1 lg:col-span-5 relative">
+          {/* 🌟 FIX: Forzamos top-32 para el sticky y eliminamos cualquier margen extra (lg:mt-0) */}
+          <div className="w-full lg:sticky lg:top-32 lg:mt-0 pb-10">
             <div
               ref={contactFormWrapperRef}
               onInputCapture={verificarFormularioCompleto}
               onChangeCapture={verificarFormularioCompleto}
+              className="w-full block"
             >
               <ContactForm 
                 propiedadId={String(property.codigo)}
@@ -606,7 +582,6 @@ console.log("PRECIOS", property.precios);
                 exit={{ opacity: 0, y: -10, height: 0 }}
                 className="w-full min-w-0 overflow-visible mt-4 pt-4 border-t border-gray-200"
               >
-                {/* 🌟 FIX: Añadimos pb-4 (padding bottom) y z-50 para darle respiro horizontal y vertical al selector */}
                 <div className="space-y-2 pb-4 relative z-50">
                   <label className="text-sm font-semibold text-gray-800 block">
                     ¿Necesitas agendar una visita?
@@ -648,7 +623,6 @@ console.log("PRECIOS", property.precios);
                         </p>
                       </div>
 
-                      {/* 🌟 FIX: Incrementamos de nuevo el gap (gap-3 y lg:gap-4) para que el diseño no se vea estrecho y respire a lo ancho */}
                       <div className="flex w-full gap-3 overflow-x-auto py-2 pb-2 scrollbar-hide snap-x snap-mandatory lg:grid lg:grid-cols-6 lg:gap-4 lg:overflow-visible">
                         {diasDisponibles.map((dia) => (
                           <button
@@ -675,7 +649,6 @@ console.log("PRECIOS", property.precios);
                       </div>
 
                       <div className="space-y-4 mb-6">
-                        {/* 🌟 FIX: Restauramos el padding horizontal de los bloques (lg:px-6) para que no parezcan aplastados */}
                         <button
                           type="button"
                           onClick={() => {
