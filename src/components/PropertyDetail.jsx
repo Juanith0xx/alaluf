@@ -22,7 +22,9 @@ import {
   FaSun,
   FaMoon,
   FaBuilding,
-  FaDoorClosed
+  FaDoorClosed,
+  FaPlay,
+  FaExpand
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -95,7 +97,193 @@ const PropertyDetail = ({ property }) => {
 
   if (!property) return null;
 
-  const imagenes = property.imagenes || [];
+  const imagenes = Array.isArray(property.imagenes)
+    ? property.imagenes.filter(Boolean)
+    : [];
+
+  // La API puede entregar el video con distintos nombres o dentro de objetos anidados.
+  // Esta normalización evita que la galería ignore el video cuando no viene
+  // exactamente como property.video_url.
+  const obtenerUrlDesdeValor = (valor) => {
+    if (typeof valor === "string") return valor.trim();
+
+    if (valor && typeof valor === "object") {
+      const posibleUrl = valor.url || valor.value || valor.src || valor.video_url;
+      return typeof posibleUrl === "string" ? posibleUrl.trim() : "";
+    }
+
+    return "";
+  };
+
+  const campoVideo = Array.isArray(property.campos_especificos)
+    ? property.campos_especificos.find((campo) => {
+        const etiqueta = String(campo?.label || campo?.nombre || "")
+          .toLowerCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "");
+
+        return etiqueta.includes("video");
+      })
+    : null;
+
+  const videoUrl = [
+    property.video_url,
+    property.videoUrl,
+    property.url_video,
+    property.video,
+    property.detalles?.video_url,
+    property.detalles?.videoUrl,
+    property.detalles?.video,
+    property.multimedia?.video_url,
+    property.multimedia?.videoUrl,
+    property.multimedia?.video,
+    property.raw?.video_url,
+    property.data?.video_url,
+    campoVideo?.value,
+    campoVideo?.url
+  ]
+    .map(obtenerUrlDesdeValor)
+    .find(Boolean) || "";
+
+  if (import.meta.env.DEV) {
+    console.log("🎬 video_url detectado:", videoUrl || "SIN VIDEO", property);
+  }
+
+  /**
+   * Convierte enlaces de YouTube y Vimeo a una URL embebible.
+   * Para archivos directos como MP4, WEBM u OGG se utiliza la etiqueta <video>.
+   */
+  const obtenerInfoVideo = (url) => {
+    if (!url) {
+      return {
+        embedUrl: null,
+        thumbnailUrl: null
+      };
+    }
+
+    try {
+      const urlNormalizada = /^https?:\/\//i.test(url)
+        ? url
+        : `https://${url}`;
+
+      const parsedUrl = new URL(urlNormalizada);
+      const hostname = parsedUrl.hostname
+        .replace(/^www\./, "")
+        .toLowerCase();
+
+      if (hostname === "youtu.be") {
+        const videoId = parsedUrl.pathname.split("/").filter(Boolean)[0];
+
+        if (videoId) {
+          return {
+            embedUrl: `https://www.youtube.com/embed/${videoId}`,
+            thumbnailUrl: `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`
+          };
+        }
+      }
+
+      if (
+        hostname === "youtube.com" ||
+        hostname === "m.youtube.com" ||
+        hostname === "music.youtube.com"
+      ) {
+        let videoId = parsedUrl.searchParams.get("v");
+
+        if (!videoId) {
+          const partes = parsedUrl.pathname.split("/").filter(Boolean);
+          const indiceEspecial = partes.findIndex(parte =>
+            ["embed", "shorts", "live"].includes(parte)
+          );
+
+          if (indiceEspecial >= 0) {
+            videoId = partes[indiceEspecial + 1];
+          }
+        }
+
+        if (videoId) {
+          return {
+            embedUrl: `https://www.youtube.com/embed/${videoId}`,
+            thumbnailUrl: `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`
+          };
+        }
+      }
+
+      if (
+        hostname === "vimeo.com" ||
+        hostname === "player.vimeo.com"
+      ) {
+        const videoId = parsedUrl.pathname
+          .split("/")
+          .filter(Boolean)
+          .find(parte => /^\d+$/.test(parte));
+
+        if (videoId) {
+          return {
+            embedUrl: `https://player.vimeo.com/video/${videoId}`,
+            thumbnailUrl: null
+          };
+        }
+      }
+    } catch (error) {
+      console.warn("No se pudo interpretar video_url:", error);
+    }
+
+    return {
+      embedUrl: null,
+      thumbnailUrl: null
+    };
+  };
+
+  const infoVideo = obtenerInfoVideo(videoUrl);
+
+  const elementosImagen = imagenes.map((url, index) => ({
+    tipo: "imagen",
+    url,
+    alt: `Imagen ${index + 1} de la propiedad`
+  }));
+
+  const elementoVideo = videoUrl
+    ? {
+        tipo: "video",
+        url: videoUrl,
+        embedUrl: infoVideo.embedUrl,
+        thumbnailUrl:
+          infoVideo.thumbnailUrl ||
+          imagenes[0] ||
+          "/placeholder.jpg",
+        alt: "Video de la propiedad"
+      }
+    : null;
+
+  /*
+   * El video queda como quinto elemento para que siempre sea visible
+   * en el mosaico principal cuando existen varias fotografías.
+   */
+  const galeria = elementoVideo
+    ? [
+        ...elementosImagen.slice(0, 4),
+        elementoVideo,
+        ...elementosImagen.slice(4)
+      ]
+    : [...elementosImagen];
+
+  if (galeria.length === 0) {
+    galeria.push({
+      tipo: "imagen",
+      url: "/placeholder.jpg",
+      alt: "Imagen no disponible"
+    });
+  }
+
+  const imagenPrincipal = elementosImagen[0] || {
+    tipo: "imagen",
+    url: "/placeholder.jpg",
+    alt: "Imagen principal no disponible"
+  };
+
+  const indiceVideo = galeria.findIndex(item => item.tipo === "video");
+
+  const elementoActivo = galeria[activeImage] || galeria[0];
 
   const formatearPrecioConMoneda = (precio) => {
     if (!precio || precio.valor == null) return null;
@@ -255,11 +443,13 @@ const PropertyDetail = ({ property }) => {
   };
 
   const nextImage = () => {
-    setActiveImage((prev) => (prev + 1) % imagenes.length);
+    setActiveImage((prev) => (prev + 1) % galeria.length);
   };
 
   const prevImage = () => {
-    setActiveImage((prev) => (prev - 1 + imagenes.length) % imagenes.length);
+    setActiveImage(
+      (prev) => (prev - 1 + galeria.length) % galeria.length
+    );
   };
 
   const currentUrl = encodeURIComponent(window.location.href);
@@ -402,6 +592,85 @@ const PropertyDetail = ({ property }) => {
     </div>
   );
 
+  const GalleryItem = ({
+    item,
+    fallbackItem,
+    mostrarBotonVerMas = false
+  }) => {
+    const media = item || fallbackItem || imagenPrincipal;
+
+    return (
+      <>
+        <img
+          src={media?.url || "/placeholder.jpg"}
+          className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+          alt={media?.alt || "Imagen de la propiedad"}
+        />
+
+        {mostrarBotonVerMas && (
+          <div className="absolute inset-0 bg-black/30 backdrop-blur-[1px] flex items-end justify-end p-4">
+            <span className="bg-white text-[#24B6C1] px-4 py-2 rounded-full text-xs font-bold shadow-lg">
+              Ver más fotos
+            </span>
+          </div>
+        )}
+      </>
+    );
+  };
+
+  const VideoEnGaleria = ({ media }) => {
+    if (!media) return null;
+
+    const separador = media.embedUrl?.includes("?") ? "&" : "?";
+    const embedSrc = media.embedUrl
+      ? `${media.embedUrl}${separador}rel=0&playsinline=1`
+      : null;
+
+    return (
+      <div className="relative w-full h-full bg-black overflow-hidden">
+        {embedSrc ? (
+          <iframe
+            src={embedSrc}
+            title="Video de la propiedad"
+            className="absolute inset-0 w-full h-full"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+            allowFullScreen
+          />
+        ) : (
+          <video
+            src={media.url}
+            controls
+            playsInline
+            preload="metadata"
+            poster={media.thumbnailUrl || imagenPrincipal.url}
+            className="w-full h-full object-contain bg-black"
+          >
+            Tu navegador no permite reproducir este video.
+          </video>
+        )}
+
+        <div className="absolute top-3 left-3 z-10 pointer-events-none">
+          <span className="inline-flex items-center gap-2 bg-black/65 backdrop-blur-md text-white px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest border border-white/10">
+            <FaPlay size={9} className="text-[#24B6C1]" />
+            Video
+          </span>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => {
+            if (indiceVideo >= 0) openLightbox(indiceVideo);
+          }}
+          className="absolute top-3 right-3 z-10 inline-flex items-center gap-2 bg-white/90 hover:bg-[#24B6C1] text-gray-900 hover:text-white px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest shadow-lg transition-colors"
+          aria-label="Ampliar video"
+        >
+          <FaExpand size={10} />
+          Ampliar
+        </button>
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-cover bg-center bg-fixed font-[Outfit] pb-20 text-gray-900" style={{ backgroundImage: `url(${fondoMarmol})` }}>
       
@@ -417,21 +686,76 @@ const PropertyDetail = ({ property }) => {
         
         <div className="col-span-1 lg:col-span-7 space-y-6">
           
-          <section className="grid grid-cols-1 md:grid-cols-4 gap-2 md:gap-3 rounded-[24px] md:rounded-[40px] overflow-hidden shadow-2xl bg-black/5 h-64 sm:h-80 md:h-[400px] lg:h-[480px]">
-            <div className="col-span-1 md:col-span-2 md:row-span-2 relative overflow-hidden group cursor-pointer h-full" onClick={() => openLightbox(0)}>
-              <img src={imagenes[0] || "/placeholder.jpg"} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" alt="Principal" />
-            </div>
-            {[1, 2, 3].map((idx) => (
-              <div key={idx} className="hidden md:block md:col-span-1 relative overflow-hidden group cursor-pointer h-full" onClick={() => openLightbox(idx)}>
-                <img src={imagenes[idx] || imagenes[0]} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" alt="Interior" />
+          <section className="relative grid grid-cols-1 md:grid-cols-4 md:grid-rows-2 gap-2 md:gap-3 rounded-[24px] md:rounded-[40px] overflow-hidden shadow-2xl bg-black/5 h-auto md:h-[400px] lg:h-[480px]">
+            {/* Si la propiedad tiene video, este ocupa el espacio principal grande.
+                Si no tiene video, se mantiene la imagen principal original. */}
+            {elementoVideo ? (
+              <div className="col-span-1 md:col-span-2 md:row-span-2 relative overflow-hidden h-64 sm:h-80 md:h-full bg-black">
+                <VideoEnGaleria media={elementoVideo} />
               </div>
-            ))}
-            <div className="hidden md:block md:col-span-1 relative overflow-hidden group cursor-pointer h-full" onClick={() => openLightbox(4)}>
-              <img src={imagenes[4] || imagenes[0]} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" alt="Mas" />
-              <div className="absolute inset-0 bg-black/30 backdrop-blur-[1px] flex items-end justify-end p-4">
-                <span className="bg-white text-[#24B6C1] px-4 py-2 rounded-full text-xs font-bold shadow-lg">Ver más</span>
-              </div>
-            </div>
+            ) : (
+              <button
+                type="button"
+                className="col-span-1 md:col-span-2 md:row-span-2 relative overflow-hidden group cursor-pointer h-64 sm:h-80 md:h-full text-left"
+                onClick={() => {
+                  const indicePrincipal = galeria.findIndex(
+                    item =>
+                      item.tipo === "imagen" &&
+                      item.url === imagenPrincipal.url
+                  );
+
+                  openLightbox(
+                    indicePrincipal >= 0 ? indicePrincipal : 0
+                  );
+                }}
+                aria-label="Abrir imagen principal"
+              >
+                <GalleryItem item={imagenPrincipal} />
+              </button>
+            )}
+
+            {/* Las cuatro posiciones pequeñas quedan reservadas para fotografías. */}
+            {[0, 1, 2, 3].map((idx) => {
+              const imagen = elementosImagen[idx] || imagenPrincipal;
+              const indiceGaleria = galeria.findIndex(
+                item =>
+                  item.tipo === "imagen" &&
+                  item.url === imagen.url
+              );
+
+              const esUltimaVisible = idx === 3;
+              const hayMasFotos = elementosImagen.length > 4;
+
+              return (
+                <button
+                  type="button"
+                  key={`foto-galeria-${idx}`}
+                  className={`${
+                    idx === 0
+                      ? "block"
+                      : "hidden md:block"
+                  } md:col-span-1 relative overflow-hidden group cursor-pointer h-52 sm:h-64 md:h-full text-left`}
+                  onClick={() =>
+                    openLightbox(
+                      indiceGaleria >= 0 ? indiceGaleria : 0
+                    )
+                  }
+                  aria-label={
+                    esUltimaVisible && hayMasFotos
+                      ? "Abrir galería completa"
+                      : `Abrir imagen ${idx + 1}`
+                  }
+                >
+                  <GalleryItem
+                    item={imagen}
+                    fallbackItem={imagenPrincipal}
+                    mostrarBotonVerMas={
+                      esUltimaVisible && hayMasFotos
+                    }
+                  />
+                </button>
+              );
+            })}
           </section>
 
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-black/30 px-4 md:px-6 py-4 rounded-[20px] md:rounded-[24px] backdrop-blur-md border border-white/10 text-white shadow-lg">
@@ -780,46 +1104,112 @@ const PropertyDetail = ({ property }) => {
 
       {isLightboxOpen && (
         <div className="fixed inset-0 bg-black/95 z-[9999] flex flex-col items-center justify-center p-4">
-          <button onClick={() => setIsLightboxOpen(false)} className="absolute right-4 top-4 text-white/70 hover:text-white p-2.5 bg-white/10 rounded-full z-20 backdrop-blur-md transition-all">
+          <button
+            type="button"
+            onClick={() => setIsLightboxOpen(false)}
+            className="absolute right-4 top-4 text-white/70 hover:text-white p-2.5 bg-white/10 rounded-full z-20 backdrop-blur-md transition-all"
+            aria-label="Cerrar galería"
+          >
             <FaTimes size={20} />
           </button>
 
           <div className="relative w-full max-w-5xl h-full flex items-center justify-center">
-            <motion.div
-              key={activeImage}
-              drag="x"
-              dragConstraints={{ left: 0, right: 0 }}
-              dragElastic={0.4}
-              onDragEnd={(e, { offset }) => {
-                const swipeThreshold = 50;
-                if (offset.x < -swipeThreshold) nextImage();
-                else if (offset.x > swipeThreshold) prevImage();
-              }}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              className="w-full h-full flex items-center justify-center cursor-grab active:cursor-grabbing"
-            >
-              <img 
-                src={imagenes[activeImage]} 
-                className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl select-none" 
-                draggable="false"
-                alt={`Slide ${activeImage + 1}`}
-              />
-            </motion.div>
+            <AnimatePresence mode="wait">
+              {elementoActivo?.tipo === "video" ? (
+                <motion.div
+                  key={`video-${activeImage}-${elementoActivo.url}`}
+                  initial={{ opacity: 0, scale: 0.98 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.98 }}
+                  className="w-full flex items-center justify-center"
+                >
+                  {elementoActivo.embedUrl ? (
+                    <div className="relative w-full max-w-5xl aspect-video rounded-xl overflow-hidden bg-black shadow-2xl">
+                      <iframe
+                        src={`${elementoActivo.embedUrl}?autoplay=1&rel=0`}
+                        title="Video de la propiedad"
+                        className="absolute inset-0 w-full h-full"
+                        allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+                        allowFullScreen
+                      />
+                    </div>
+                  ) : (
+                    <video
+                      src={elementoActivo.url}
+                      controls
+                      autoPlay
+                      playsInline
+                      preload="metadata"
+                      className="max-w-full max-h-[85vh] rounded-xl bg-black shadow-2xl"
+                    >
+                      Tu navegador no permite reproducir este video.
+                    </video>
+                  )}
+                </motion.div>
+              ) : (
+                <motion.div
+                  key={`imagen-${activeImage}-${elementoActivo?.url}`}
+                  drag="x"
+                  dragConstraints={{ left: 0, right: 0 }}
+                  dragElastic={0.4}
+                  onDragEnd={(e, { offset }) => {
+                    const swipeThreshold = 50;
 
-            <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 flex justify-between px-4 pointer-events-none">
-              <button onClick={prevImage} className="pointer-events-auto p-3 bg-black/40 hover:bg-[#24B6C1] rounded-full text-white transition-colors hidden md:block">
-                <FaChevronLeft size={24} />
-              </button>
-              <button onClick={nextImage} className="pointer-events-auto p-3 bg-black/40 hover:bg-[#24B6C1] rounded-full text-white transition-colors hidden md:block">
-                <FaChevronRight size={24} />
-              </button>
-            </div>
+                    if (offset.x < -swipeThreshold) {
+                      nextImage();
+                    } else if (offset.x > swipeThreshold) {
+                      prevImage();
+                    }
+                  }}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  className="w-full h-full flex items-center justify-center cursor-grab active:cursor-grabbing"
+                >
+                  <img
+                    src={elementoActivo?.url || "/placeholder.jpg"}
+                    className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl select-none"
+                    draggable="false"
+                    alt={
+                      elementoActivo?.alt ||
+                      `Imagen ${activeImage + 1}`
+                    }
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {galeria.length > 1 && (
+              <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 flex justify-between px-2 md:px-4 pointer-events-none">
+                <button
+                  type="button"
+                  onClick={prevImage}
+                  className="pointer-events-auto p-3 bg-black/50 hover:bg-[#24B6C1] rounded-full text-white transition-colors"
+                  aria-label="Elemento anterior"
+                >
+                  <FaChevronLeft size={22} />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={nextImage}
+                  className="pointer-events-auto p-3 bg-black/50 hover:bg-[#24B6C1] rounded-full text-white transition-colors"
+                  aria-label="Elemento siguiente"
+                >
+                  <FaChevronRight size={22} />
+                </button>
+              </div>
+            )}
           </div>
-          
-          <div className="mt-4 text-white/60 text-xs font-bold tracking-widest bg-white/5 px-4 py-1.5 rounded-full border border-white/5">
-            {activeImage + 1} / {imagenes.length}
+
+          <div className="mt-4 text-white/70 text-xs font-bold tracking-widest bg-white/5 px-4 py-1.5 rounded-full border border-white/5 flex items-center gap-2">
+            {elementoActivo?.tipo === "video" && (
+              <FaPlay size={9} className="text-[#24B6C1]" />
+            )}
+
+            <span>
+              {activeImage + 1} / {galeria.length}
+            </span>
           </div>
         </div>
       )}
