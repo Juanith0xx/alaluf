@@ -11,6 +11,22 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isResponsive, setIsResponsive] = useState(false);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(max-width: 1023px)");
+
+    const actualizarModoResponsive = () => {
+      setIsResponsive(mediaQuery.matches);
+    };
+
+    actualizarModoResponsive();
+    mediaQuery.addEventListener("change", actualizarModoResponsive);
+
+    return () => {
+      mediaQuery.removeEventListener("change", actualizarModoResponsive);
+    };
+  }, []);
 
   if (!item) return null;
 
@@ -192,9 +208,36 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
     );
   };
 
+  const codigoPropiedad = item.codigo || item.id;
+
+  const irAlDetalle = () => {
+    if (!codigoPropiedad) return;
+    navigate(`/propiedad/${codigoPropiedad}`);
+  };
+
+  const handleCardClick = () => {
+    if (isResponsive) {
+      irAlDetalle();
+      return;
+    }
+
+    onSelect?.();
+  };
+
+  const handleCardKeyDown = (event) => {
+    if (event.key !== "Enter" && event.key !== " ") return;
+
+    event.preventDefault();
+    handleCardClick();
+  };
+
   return (
     <div 
-      onClick={onSelect} 
+      role="button"
+      tabIndex={0}
+      onClick={handleCardClick}
+      onKeyDown={handleCardKeyDown}
+      aria-label={`Ver propiedad ${codigoPropiedad || ""}`}
       className={`bg-white rounded-2xl overflow-hidden shadow-xl group cursor-pointer transition-all duration-300 font-[Outfit] ${
         isActive ? 'ring-4 ring-[#24B6C1] scale-[1.02]' : 'hover:shadow-2xl'
       }`}
@@ -256,10 +299,14 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
     </div>
   )}
 
-  <div className="flex justify-end mt-2">
+  <div className="hidden lg:flex justify-end mt-2">
     <button 
+      type="button"
       className="px-5 py-3 bg-[#24B6C1] text-white rounded-xl font-bold text-xs uppercase shadow-md hover:bg-cyan-600 transition"
-      onClick={(e) => { e.stopPropagation(); navigate(`/propiedad/${item.codigo || item.id}`); }} 
+      onClick={(e) => {
+        e.stopPropagation();
+        irAlDetalle();
+      }} 
     >
       Ver Ficha
     </button>
