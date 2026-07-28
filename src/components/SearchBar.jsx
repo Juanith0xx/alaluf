@@ -191,32 +191,55 @@ const SearchBar = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside); 
   }, []); 
 
+  const togglePropertyDropdown = () => {
+    setOpenDropdown((current) => {
+      const next = !current;
+
+      if (!next) {
+        setActiveCategory(null);
+      }
+
+      return next;
+    });
+  };
+
+  const handleSelectProperty = (sub) => {
+    setTipoPropiedad(sub);
+    setOpenDropdown(false);
+    setActiveCategory(null);
+  };
+
   return ( 
-    <div className="relative z-30 px-4 pt-4 md:pt-22 font-[Outfit]"> 
+    <div className="relative z-30 px-3 pt-4 sm:px-4 xl:pt-22 font-[Outfit]"> 
 
       {/* --- BARRA DE BÚSQUEDA PRINCIPAL --- */}
-      <div className="max-w-6xl mx-auto bg-gray-200/20 backdrop-blur-md p-4 flex flex-wrap items-center gap-3 justify-center rounded-[40px] border border-white/20 shadow-2xl relative z-40"> 
+      <div className="relative z-40 mx-auto grid max-w-6xl grid-cols-1 items-center gap-3 rounded-3xl border border-white/20 bg-gray-200/20 p-3 shadow-2xl backdrop-blur-md sm:p-4 md:grid-cols-2 xl:grid-cols-[auto_14rem_minmax(260px,1fr)_auto] xl:rounded-[40px]"> 
          
         {/* Selector de Acción */} 
-        <div className="flex flex-wrap sm:flex-nowrap bg-black/60 p-1 rounded-xl border border-white/5 justify-center gap-1 w-full sm:w-auto"> 
+        <div className="grid w-full grid-cols-3 gap-1 rounded-xl border border-white/5 bg-black/60 p-1 md:col-span-2 xl:col-span-1 xl:w-auto"> 
           {["Comprar", "Arrendar", "Vender"].map((accion) => ( 
             <button 
+              type="button"
               key={accion} 
               onClick={() => { 
                 setAccionActiva(accion); 
+                setOpenDropdown(false);
+                setActiveCategory(null);
+                setShowSuggestions(false);
                 
                 if (accion === "Vender") {
                   navigate('/vender'); 
                 } else if (location.pathname.includes('/buscar')) {
-                  // NUEVA LÓGICA: Si ya está en la vista de búsqueda, actualizamos el parámetro 'obj' en la URL automáticamente.
                   const params = new URLSearchParams(searchParams);
                   params.set("obj", accion === "Comprar" ? "1" : "2");
                   params.set("page", "1");
                   navigate(`/buscar?${params.toString()}`);
                 }
               }} 
-              className={`px-4 sm:px-6 py-3 rounded-lg text-xs sm:text-sm font-medium transition-all duration-300 whitespace-nowrap ${ 
-                accionActiva === accion ? "bg-[#24B6C1] text-white shadow-lg" : "text-white/60 hover:text-white" 
+              className={`w-full whitespace-nowrap rounded-lg px-2 py-3 text-xs font-medium transition-all duration-300 sm:px-5 sm:text-sm ${ 
+                accionActiva === accion
+                  ? "bg-[#24B6C1] text-white shadow-lg"
+                  : "text-white/60 hover:text-white" 
               }`} 
             > 
               {accion} 
@@ -225,72 +248,157 @@ const SearchBar = () => {
         </div> 
 
         {/* Dropdown de Propiedad */} 
-        <div className="relative w-full sm:w-56" ref={dropdownRef}> 
+        <div className="relative min-w-0 md:col-span-1" ref={dropdownRef}> 
           <button 
-            onClick={() => setOpenDropdown(!openDropdown)} 
-            className="px-5 py-4 bg-gray-600/60 text-white rounded-xl flex items-center justify-between w-full border border-white/10" 
+            type="button"
+            onClick={togglePropertyDropdown}
+            aria-haspopup="menu"
+            aria-expanded={openDropdown}
+            className="flex w-full items-center justify-between rounded-xl border border-white/10 bg-gray-600/60 px-5 py-4 text-white transition-colors hover:bg-gray-600/75 focus:outline-none focus:ring-2 focus:ring-[#24B6C1]/60" 
           > 
-            <span className="text-sm truncate">
+            <span className="truncate text-sm">
               {tipoPropiedad?.label || 
-               propiedades.flatMap(p => p.sub).find(s => s.id.toString() === searchParams.get('tipo_prop'))?.label || 
+               propiedades.flatMap((p) => p.sub).find((s) => s.id.toString() === searchParams.get('tipo_prop'))?.label || 
                "Tipo de propiedad"}
             </span> 
-            <ChevronDown size={16} className={`text-[#24B6C1] transition-transform ${openDropdown ? "rotate-180" : ""}`} /> 
+            <ChevronDown 
+              size={16} 
+              className={`shrink-0 text-[#24B6C1] transition-transform ${openDropdown ? "rotate-180" : ""}`} 
+            /> 
           </button> 
 
           <AnimatePresence> 
             {openDropdown && ( 
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 10 }} className="absolute top-full mt-3 left-0 bg-[#1a1a1a]/95 backdrop-blur-2xl p-4 shadow-2xl w-full sm:w-72 border border-white/10 rounded-2xl z-50 max-h-72 overflow-y-visible sm:overflow-visible overflow-x-visible"> 
-                 
-                {/* VISTA MÓVIL */} 
-                <div className="sm:hidden overflow-y-auto max-h-60"> 
-                  {!activeCategory ? ( 
-                    <ul className="space-y-1"> 
-                      {propiedades.map((prop, i) => ( 
-                        <li key={i} className="relative"> 
-                          <div onClick={() => setActiveCategory(prop)} className="w-full text-left px-4 py-3 rounded-xl hover:bg-[#24B6C1]/10 text-white/80 transition flex items-center justify-between cursor-pointer"> 
-                            <span className="text-sm font-semibold">{prop.nombre}</span> 
-                            <ChevronRight size={14} className="text-gray-400" /> 
-                          </div> 
-                        </li> 
-                      ))} 
-                    </ul> 
-                  ) : ( 
-                    <div> 
-                      <button onClick={() => setActiveCategory(null)} className="flex items-center gap-2 text-xs font-bold text-[#24B6C1] mb-3 px-2 py-1 hover:underline uppercase tracking-wider"> 
-                        ← Volver atrás 
-                      </button> 
-                      <ul className="space-y-0.5"> 
-                        {activeCategory.sub.map((sub, j) => ( 
-                          <li key={j} onClick={() => { setTipoPropiedad(sub); setOpenDropdown(false); setActiveCategory(null); }} className="flex items-center justify-between px-4 py-3 rounded-lg cursor-pointer text-sm text-gray-300 hover:bg-[#24B6C1]/10 hover:text-[#24B6C1] whitespace-nowrap"> 
-                            {sub.label} {tipoPropiedad?.id === sub.id && <Check size={14} className="text-[#24B6C1]" />} 
+              <motion.div
+                initial={{ opacity: 0, y: 8, scale: 0.98 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 8, scale: 0.98 }}
+                transition={{ duration: 0.18 }}
+                className="absolute left-0 right-0 top-full z-50 mt-3 max-h-[min(65vh,28rem)] overflow-hidden rounded-2xl border border-white/10 bg-[#1a1a1a]/95 p-3 shadow-2xl backdrop-blur-2xl xl:right-auto xl:w-72 xl:max-h-none xl:overflow-visible"
+              > 
+                {/* MÓVIL + TABLET: navegación dentro del mismo panel */} 
+                <div className="max-h-[min(60vh,25rem)] overflow-y-auto overscroll-contain xl:hidden"> 
+                  <AnimatePresence mode="wait" initial={false}>
+                    {!activeCategory ? ( 
+                      <motion.ul
+                        key="categorias"
+                        initial={{ opacity: 0, x: -12 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -12 }}
+                        className="space-y-1"
+                      > 
+                        {propiedades.map((prop) => ( 
+                          <li key={prop.nombre}> 
+                            <button
+                              type="button"
+                              onClick={() => setActiveCategory(prop)}
+                              className="flex w-full items-center justify-between rounded-xl px-4 py-3 text-left text-white/80 transition hover:bg-[#24B6C1]/10 hover:text-[#24B6C1]"
+                            > 
+                              <span className="text-sm font-semibold">{prop.nombre}</span> 
+                              <ChevronRight size={16} className="shrink-0 text-gray-400" /> 
+                            </button> 
                           </li> 
                         ))} 
-                      </ul> 
-                    </div> 
-                  )} 
+                      </motion.ul> 
+                    ) : ( 
+                      <motion.div
+                        key={activeCategory.nombre}
+                        initial={{ opacity: 0, x: 12 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: 12 }}
+                      > 
+                        <button
+                          type="button"
+                          onClick={() => setActiveCategory(null)}
+                          className="mb-3 flex items-center gap-2 rounded-lg px-2 py-2 text-xs font-bold uppercase tracking-wider text-[#24B6C1] transition hover:bg-white/5"
+                        > 
+                          <ChevronRight size={14} className="rotate-180" />
+                          Volver a categorías
+                        </button> 
+
+                        <p className="mb-2 px-4 text-xs font-semibold uppercase tracking-wide text-white/40">
+                          {activeCategory.nombre}
+                        </p>
+
+                        <ul className="space-y-0.5"> 
+                          {activeCategory.sub.map((sub) => ( 
+                            <li key={sub.id}> 
+                              <button
+                                type="button"
+                                onClick={() => handleSelectProperty(sub)}
+                                className="flex w-full items-center justify-between rounded-lg px-4 py-3 text-left text-sm text-gray-300 transition hover:bg-[#24B6C1]/10 hover:text-[#24B6C1]"
+                              > 
+                                <span>{sub.label}</span>
+                                {tipoPropiedad?.id === sub.id && <Check size={14} className="shrink-0 text-[#24B6C1]" />} 
+                              </button>
+                            </li> 
+                          ))} 
+                        </ul> 
+                      </motion.div> 
+                    )}
+                  </AnimatePresence> 
                 </div> 
 
-                {/* VISTA DESKTOP */} 
-                <div className="hidden sm:block"> 
+                {/* DESKTOP: la subcategoría se abre a la derecha mediante click */} 
+                <div className="relative hidden xl:block"> 
                   <ul className="space-y-1"> 
-                    {propiedades.map((prop, i) => ( 
-                      <li key={i} className="group relative"> 
-                        <div className="w-full text-left px-4 py-3 rounded-xl hover:bg-[#24B6C1]/10 text-white/80 transition flex items-center justify-between cursor-pointer"> 
-                          <span className="text-sm font-semibold group-hover:text-[#24B6C1] transition-colors">{prop.nombre}</span> 
-                          <ChevronRight size={14} className="text-gray-400 group-hover:text-[#24B6C1] transition-colors" /> 
-                        </div> 
-                        <div className="hidden group-hover:block absolute left-full top-0 ml-2 bg-[#1a1a1a]/95 backdrop-blur-2xl p-2 shadow-2xl w-60 border border-white/10 rounded-2xl z-50"> 
-                          <ul className="space-y-0.5"> 
-                            {prop.sub.map((sub, j) => ( 
-                              <li key={j} onClick={(e) => { e.stopPropagation(); setTipoPropiedad(sub); setOpenDropdown(false); }} className="flex items-center justify-between px-4 py-3 rounded-lg cursor-pointer text-sm text-gray-300 hover:bg-[#24B6C1]/10 hover:text-[#24B6C1] hover:translate-x-1 transition-all duration-300 whitespace-nowrap"> 
-                                {sub.label} {tipoPropiedad?.id === sub.id && <Check size={14} className="text-[#24B6C1]" />} 
-                              </li> 
-                            ))} 
-                          </ul> 
-                        </div> 
-                      </li> 
-                    ))} 
+                    {propiedades.map((prop) => {
+                      const isActive = activeCategory?.nombre === prop.nombre;
+
+                      return (
+                        <li key={prop.nombre} className="relative"> 
+                          <button
+                            type="button"
+                            onClick={() => setActiveCategory(isActive ? null : prop)}
+                            aria-expanded={isActive}
+                            className={`flex w-full items-center justify-between rounded-xl px-4 py-3 text-left transition ${
+                              isActive
+                                ? "bg-[#24B6C1]/15 text-[#24B6C1]"
+                                : "text-white/80 hover:bg-[#24B6C1]/10 hover:text-[#24B6C1]"
+                            }`}
+                          > 
+                            <span className="text-sm font-semibold">{prop.nombre}</span> 
+                            <ChevronRight
+                              size={16}
+                              className={`shrink-0 transition-transform ${isActive ? "translate-x-1 text-[#24B6C1]" : "text-gray-400"}`}
+                            /> 
+                          </button> 
+
+                          <AnimatePresence>
+                            {isActive && (
+                              <motion.div
+                                initial={{ opacity: 0, x: -8, scale: 0.98 }}
+                                animate={{ opacity: 1, x: 0, scale: 1 }}
+                                exit={{ opacity: 0, x: -8, scale: 0.98 }}
+                                transition={{ duration: 0.16 }}
+                                className="absolute left-full top-0 z-[60] ml-3 w-64 rounded-2xl border border-white/10 bg-[#1a1a1a]/98 p-2 shadow-2xl backdrop-blur-2xl"
+                              >
+                                <p className="px-4 pb-2 pt-1 text-xs font-semibold uppercase tracking-wide text-white/40">
+                                  {prop.nombre}
+                                </p>
+                                <ul className="space-y-0.5"> 
+                                  {prop.sub.map((sub) => ( 
+                                    <li key={sub.id}> 
+                                      <button
+                                        type="button"
+                                        onClick={(event) => {
+                                          event.stopPropagation();
+                                          handleSelectProperty(sub);
+                                        }}
+                                        className="flex w-full items-center justify-between rounded-lg px-4 py-3 text-left text-sm text-gray-300 transition-all duration-200 hover:translate-x-1 hover:bg-[#24B6C1]/10 hover:text-[#24B6C1]"
+                                      > 
+                                        <span>{sub.label}</span>
+                                        {tipoPropiedad?.id === sub.id && <Check size={14} className="shrink-0 text-[#24B6C1]" />} 
+                                      </button>
+                                    </li> 
+                                  ))} 
+                                </ul> 
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </li> 
+                      );
+                    })} 
                   </ul> 
                 </div> 
               </motion.div> 
@@ -299,49 +407,79 @@ const SearchBar = () => {
         </div> 
 
         {/* Input Comuna */} 
-        <div className="flex-1 min-w-[240px] w-full sm:w-auto relative" ref={suggestionRef}> 
+        <div className="relative min-w-0 md:col-span-1" ref={suggestionRef}> 
           <input 
             type="text" 
             value={searchQuery} 
             onChange={(e) => { 
               setSearchQuery(e.target.value); 
               setShowSuggestions(true); 
+              setOpenDropdown(false);
+              setActiveCategory(null);
               if (selectedComuna) setSelectedComuna(null); 
             }} 
-            onFocus={() => setShowSuggestions(true)} 
+            onFocus={() => {
+              setShowSuggestions(true);
+              setOpenDropdown(false);
+              setActiveCategory(null);
+            }} 
             onKeyDown={(e) => e.key === "Enter" && handleSearch()} 
-            placeholder={searchParams.get('comuna_nombre') || (searchParams.get('comuna') ? comunasDataset.find(c => c.id === searchParams.get('comuna'))?.label || searchParams.get('comuna') : "Comuna, ciudad o código...")} 
-            className="w-full px-6 py-4 bg-gray-400/90 text-white rounded-xl placeholder-white/90 focus:outline-none focus:ring-1 focus:ring-[#24B6C1] text-sm" 
+            placeholder={searchParams.get('comuna_nombre') || (searchParams.get('comuna') ? comunasDataset.find((c) => c.id === searchParams.get('comuna'))?.label || searchParams.get('comuna') : "Comuna, ciudad o código...")} 
+            className="w-full rounded-xl bg-gray-400/90 px-5 py-4 text-sm text-white placeholder-white/90 focus:outline-none focus:ring-2 focus:ring-[#24B6C1]/60 sm:px-6" 
           /> 
 
           <AnimatePresence> 
             {showSuggestions && filteredComunas.length > 0 && ( 
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute top-full mt-2 left-0 w-full bg-[#1a1a1a] border border-white/10 rounded-xl shadow-2xl z-50 max-h-60 overflow-y-auto"> 
+              <motion.div
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 6 }}
+                className="absolute left-0 top-full z-50 mt-2 max-h-60 w-full overflow-y-auto overscroll-contain rounded-xl border border-white/10 bg-[#1a1a1a] shadow-2xl"
+              > 
                 {filteredComunas.map((c, index) => ( 
-                  <div key={`${c.id}-${index}`} onClick={() => { setSearchQuery(c.label); setSelectedComuna(c); setShowSuggestions(false); }} className="px-6 py-3 hover:bg-[#24B6C1]/20 cursor-pointer text-sm text-gray-300 flex items-center justify-between"> 
-                    {c.label} <span className="text-[10px] text-gray-500">ID: {c.id}</span> 
-                  </div> 
+                  <button
+                    type="button"
+                    key={`${c.id}-${index}`}
+                    onClick={() => {
+                      setSearchQuery(c.label);
+                      setSelectedComuna(c);
+                      setShowSuggestions(false);
+                    }}
+                    className="flex w-full items-center justify-between px-5 py-3 text-left text-sm text-gray-300 transition hover:bg-[#24B6C1]/20 sm:px-6"
+                  > 
+                    <span>{c.label}</span>
+                    <span className="text-[10px] text-gray-500">ID: {c.id}</span> 
+                  </button> 
                 ))} 
               </motion.div> 
             )} 
           </AnimatePresence> 
         </div> 
 
-        {/* Botón Buscar / Filtros (Doble funcionalidad visual) */} 
-        <div className="flex gap-2 w-full sm:w-auto">
-          <button onClick={handleSearch} className="flex-1 sm:flex-none px-8 py-4 bg-[#24B6C1] hover:bg-cyan-600 text-white rounded-xl flex items-center justify-center gap-2 transition-all group shadow-lg"> 
+        {/* Botón Buscar / Filtros */} 
+        <div className="flex w-full gap-2 md:col-span-2 xl:col-span-1 xl:w-auto">
+          <button
+            type="button"
+            onClick={handleSearch}
+            className="group flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#24B6C1] px-8 py-4 text-white shadow-lg transition-all hover:bg-cyan-600 xl:flex-none"
+          > 
             <span className="text-sm font-bold">Buscar</span> 
-            <Search size={18} className="group-hover:scale-110 transition-transform" /> 
+            <Search size={18} className="transition-transform group-hover:scale-110" /> 
           </button>
           
-          {/* Botón opcional para ocultar/mostrar filtros manualmente si el usuario ya está en /buscar */}
           {location.pathname.includes('/buscar') && (
-             <button 
-               onClick={() => setMostrarAvanzado(!mostrarAvanzado)}
-               className={`px-4 py-4 rounded-xl flex items-center justify-center transition-all shadow-lg ${mostrarAvanzado ? 'bg-[#1a1a1a] text-[#24B6C1] border border-white/10' : 'bg-gray-600/60 text-white hover:bg-gray-500'}`}
-             >
-               <SlidersHorizontal size={18} />
-             </button>
+            <button 
+              type="button"
+              onClick={() => setMostrarAvanzado(!mostrarAvanzado)}
+              aria-label={mostrarAvanzado ? "Ocultar filtros avanzados" : "Mostrar filtros avanzados"}
+              className={`flex shrink-0 items-center justify-center rounded-xl px-4 py-4 shadow-lg transition-all ${
+                mostrarAvanzado
+                  ? 'border border-white/10 bg-[#1a1a1a] text-[#24B6C1]'
+                  : 'bg-gray-600/60 text-white hover:bg-gray-500'
+              }`}
+            >
+              <SlidersHorizontal size={18} />
+            </button>
           )}
         </div>
       </div> 
@@ -353,7 +491,7 @@ const SearchBar = () => {
             initial={{ opacity: 0, y: -20, height: 0 }}
             animate={{ opacity: 1, y: 0, height: "auto" }}
             exit={{ opacity: 0, y: -20, height: 0 }}
-            className="max-w-5xl mx-auto mt-4 bg-[#1a1a1a]/95 backdrop-blur-2xl p-6 md:p-8 rounded-[30px] border border-white/10 shadow-2xl relative z-30"
+            className="relative z-30 mx-auto mt-4 max-w-5xl rounded-2xl border border-white/10 bg-[#1a1a1a]/95 p-4 shadow-2xl backdrop-blur-2xl sm:p-6 md:rounded-[30px] md:p-8"
           >
             <button 
               onClick={() => setMostrarAvanzado(false)}
@@ -366,14 +504,14 @@ const SearchBar = () => {
                Filtros Avanzados
             </h3>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-8">
               
               {/* Filtro: Superficie */}
               <div>
                 <label className="text-white/80 text-sm font-semibold mb-3 flex items-center gap-2">
                   <ChevronRight size={16} className="text-[#24B6C1]" /> Superficie (m²)
                 </label>
-                <div className="flex gap-4">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
                   <div className="flex-1 relative">
                     <input 
                       type="number" 
@@ -400,7 +538,7 @@ const SearchBar = () => {
                 <label className="text-white/80 text-sm font-semibold mb-3 flex items-center gap-2">
                   <ChevronRight size={16} className="text-[#24B6C1]" /> Precio | Moneda
                 </label>
-                <div className="flex gap-4">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
                   <div className="flex-1 relative">
                     <input 
                       type="number" 
