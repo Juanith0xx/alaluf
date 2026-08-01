@@ -238,11 +238,11 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
       onClick={handleCardClick}
       onKeyDown={handleCardKeyDown}
       aria-label={`Ver propiedad ${codigoPropiedad || ""}`}
-      className={`bg-white rounded-2xl overflow-hidden shadow-xl group cursor-pointer transition-all duration-300 font-[Outfit] ${
+      className={`bg-white h-full rounded-2xl overflow-hidden shadow-xl group cursor-pointer transition-all duration-300 font-[Outfit] flex flex-col ${
         isActive ? 'ring-4 ring-[#24B6C1] scale-[1.02]' : 'hover:shadow-2xl'
       }`}
     >
-      <div className="relative h-64 overflow-hidden bg-gray-200">
+      <div className="relative h-64 shrink-0 overflow-hidden bg-gray-200">
         <img 
           src={imagenes.length > 0 ? imagenes[currentImageIndex] : "https://via.placeholder.com/600x400?text=Imagen+No+Disponible"} 
           className="w-full h-full object-cover transition-opacity duration-500"
@@ -258,17 +258,19 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
         )}
       </div>
 
-      <div className="p-6 text-black font-[Outfit]">
-        <h3 className="text-xl font-bold mb-3 leading-tight uppercase line-clamp-1">{item.ubicacion?.sector || "Sector No Especificado"}</h3>
-        <div className="mb-6">
+      <div className="p-6 text-black font-[Outfit] flex flex-1 flex-col">
+        <div className="flex-1">
+          <h3 className="text-xl font-bold mb-3 leading-tight uppercase line-clamp-1">{item.ubicacion?.sector || "Sector No Especificado"}</h3>
+          <div className="mb-6">
           <div className="flex items-center gap-2 text-gray-500 text-sm">
             <FaMapMarkerAlt className="text-[#24B6C1]" /> 
             <span>{item.ubicacion?.comuna || "Sin Comuna"}, {item.ubicacion?.region || "Chile"}</span>
           </div>
-          {renderizarDetalles()}
+            {renderizarDetalles()}
+          </div>
         </div>
 
-        <div className="border-t border-gray-100 pt-4 flex flex-col gap-3 font-[Outfit]">
+        <div className="mt-auto border-t border-gray-100 pt-4 flex flex-col gap-3 font-[Outfit]">
   {tieneVenta && (
     <div className="flex flex-col">
       <span className="text-[#24B6C1] text-[11px] font-black uppercase tracking-widest">Venta</span>
@@ -299,7 +301,7 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
     </div>
   )}
 
-  <div className="hidden lg:flex justify-end mt-2">
+  <div className="mt-auto hidden justify-end pt-2 lg:flex">
     <button 
       type="button"
       className="px-5 py-3 bg-[#24B6C1] text-white rounded-xl font-bold text-xs uppercase shadow-md hover:bg-cyan-600 transition"

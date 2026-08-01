@@ -2,13 +2,15 @@ import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion"; 
 import { Search, ChevronDown, Check, ChevronRight, SlidersHorizontal, X } from "lucide-react"; 
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom'; 
+import comunasDataset from "../data/comunas";
 
 const SearchBar = () => { 
   const [tipoPropiedad, setTipoPropiedad] = useState(null); 
   const [searchQuery, setSearchQuery] = useState("");  
   const [selectedComuna, setSelectedComuna] = useState(null); 
   const [showSuggestions, setShowSuggestions] = useState(false); 
-  const [openDropdown, setOpenDropdown] = useState(false); 
+  const [openDropdown, setOpenDropdown] = useState(false);
+  const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1); 
   
   // Sincronizar estado inicial con la URL si existe (1 = Comprar, 2 = Arrendar)
   const [searchParams] = useSearchParams();
@@ -25,7 +27,8 @@ const SearchBar = () => {
   const [precioHasta, setPrecioHasta] = useState("");
    
   const dropdownRef = useRef(null); 
-  const suggestionRef = useRef(null); 
+  const suggestionRef = useRef(null);
+  const suggestionItemRefs = useRef([]); 
   
   const navigate = useNavigate(); 
   const location = useLocation();
@@ -57,64 +60,7 @@ const SearchBar = () => {
   }, [location.pathname, searchParams]);
 
 
-  const comunasDataset = [ 
-    { label: "Iquique", id: "1101" }, { label: "Alto Hospicio", id: "1211" }, { label: "Pozo Almonte", id: "1401" }, 
-    { label: "Antofagasta", id: "2101" }, { label: "Calama", id: "2301" }, { label: "Copiapó", id: "3101" }, 
-    { label: "Freirina", id: "3302" }, { label: "La Serena", id: "4101" }, { label: "Coquimbo", id: "4102" }, 
-    { label: "Paihuano", id: "4106" }, { label: "Los Vilos", id: "4203" }, { label: "Punitaqui", id: "4204" }, 
-    { label: "Ovalle", id: "4301" }, { label: "Valparaiso", id: "5101" }, { label: "Casablanca", id: "5102" }, 
-    { label: "Concón", id: "5103" }, { label: "Quilpué", id: "5106" }, { label: "Quintero", id: "5107" }, 
-    { label: "Viña del Mar", id: "5109" }, { label: "Los Andes", id: "5301" }, { label: "Rinconada", id: "5303" }, 
-    { label: "Quillota", id: "5501" }, { label: "Hijuelas", id: "5503" }, { label: "Limache", id: "5505" }, 
-    { label: "Olmue", id: "5507" }, { label: "San Antonio", id: "5601" }, { label: "Algarrobo", id: "5602" }, 
-    { label: "Cartagena", id: "5603" }, { label: "El Quisco", id: "5604" }, { label: "Santo Domingo", id: "5606" }, 
-    { label: "El Tabo", id: "5607" }, { label: "San Felipe", id: "5701" }, { label: "Catemu", id: "5702" }, 
-    { label: "Putaendo", id: "5705" }, { label: "Rancagua", id: "6101" }, { label: "Codegua", id: "6102" }, 
-    { label: "Las Cabras", id: "6107" }, { label: "Machalí", id: "6108" }, { label: "La Estrella", id: "6202" }, 
-    { label: "Litueche", id: "6203" }, { label: "San Fernando", id: "6301" }, { label: "Chimbarongo", id: "6303" }, 
-    { label: "Santa Cruz", id: "6310" }, { label: "Talca", id: "7101" }, { label: "Constitución", id: "7102" }, 
-    { label: "Romeral", id: "7103" }, { label: "Cauquenes", id: "7201" }, { label: "Maule", id: "7206" }, 
-    { label: "Curicó", id: "7301" }, { label: "Linares", id: "7401" }, { label: "Longaví", id: "7403" }, 
-    { label: "Parral", id: "7404" }, { label: "Concepción", id: "8101" }, { label: "San Carlos", id: "8109" }, 
-    { label: "Hualpén", id: "8212" }, { label: "Los Angeles", id: "8301" }, { label: "Chillán", id: "8401" }, 
-    { label: "Temuco", id: "9101" }, { label: "Pucón", id: "9115" }, { label: "Villarrica", id: "9120" }, 
-    { label: "Puerto Montt", id: "10101" }, { label: "Futrono", id: "10105" }, { label: "Panguipulli", id: "10108" }, 
-    { label: "Puerto Varas", id: "10109" }, { label: "Río Bueno", id: "10111" }, { label: "Castro", id: "10201" }, 
-    { label: "Puerto Octay", id: "10203" }, { label: "Osorno", id: "10301" }, { label: "Llanquihue", id: "10306" }, 
-    { label: "Chonchi", id: "10402" }, { label: "Ancud", id: "10406" }, { label: "Valdivia", id: "10501" }, 
-    { label: "Chile Chico", id: "11101" }, { label: "Aysén", id: "11201" }, { label: "Natales", id: "12101" }, 
-    { label: "Punta Arenas", id: "12205" }, { label: "Santiago", id: "13101" }, { label: "Cerrillos", id: "13102" }, 
-    { label: "Cerro Navia", id: "13103" }, { label: "Conchalí", id: "13104" }, { label: "El Bosque", id: "13105" }, 
-    { label: "Estación Central", id: "13106" }, { label: "Huechuraba", id: "13107" }, { label: "Independencia", id: "13108" }, 
-    { label: "La Cisterna", id: "13109" }, { label: "La Florida", id: "13110" }, { label: "La Granja", id: "13111" }, 
-    { label: "La Pintana", id: "13112" }, { label: "La Reina", id: "13113" }, { label: "Las Condes", id: "13114" }, 
-    { label: "Lo Barnechea", id: "13115" }, { label: "Lo Espejo", id: "13116" }, { label: "Lo Prado", id: "13117" }, 
-    { label: "Macul", id: "13118" }, { label: "Maipú", id: "13119" }, { label: "Ñuñoa", id: "13120" }, 
-    { label: "Pedro Aguirre Cerda", id: "13121" }, { label: "Peñalolén", id: "13122" }, { label: "Providencia", id: "13123" }, 
-    { label: "Pudahuel", id: "13124" }, { label: "Quilicura", id: "13125" }, { label: "Quinta Normal", id: "13126" }, 
-    { label: "Recoleta", id: "13127" }, { label: "Renca", id: "13128" }, { label: "San Joaquín", id: "13129" }, 
-    { label: "San Miguel", id: "13130" }, { label: "San Ramón", id: "13131" }, { label: "Vitacura", id: "13132" }, 
-    { label: "Laguna de Aculeo", id: "13134" }, { label: "Puente Alto", id: "13201" }, { label: "Pirque", id: "13202" }, 
-    { label: "San José de Maipo", id: "13203" }, { label: "Colina", id: "13301" }, { label: "Lampa", id: "13302" }, 
-    { label: "Tiltil", id: "13303" }, { label: "San Bernardo", id: "13401" }, { label: "Buin", id: "13402" }, 
-    { label: "Calera de Tango", id: "13403" }, { label: "Paine", id: "13404" }, { label: "Melipilla", id: "13501" }, 
-    { label: "Alhué", id: "13502" }, { label: "Curacaví", id: "13503" }, { label: "María Pinto", id: "13504" }, 
-    { label: "San Pedro", id: "13505" }, { label: "Talagante", id: "13601" }, { label: "El Monte", id: "13602" }, 
-    { label: "Isla de Maipo", id: "13603" }, { label: "Padre Hurtado", id: "13604" }, { label: "Peñaflor", id: "13605" }, 
-    { label: "Llay-Llay", id: "13608" }, { label: "La Ligua", id: "13609" }, { label: "Requinoa", id: "13612" }, 
-    { label: "Frutillar", id: "13617" }, { label: "Isla de Pascua", id: "13619" }, { label: "Puchuncavi", id: "13620" }, 
-    { label: "Placilla", id: "13621" }, { label: "Vallenar", id: "13622" }, { label: "Illapel", id: "13623" }, 
-    { label: "Salamanca", id: "13624" }, { label: "La Ligua", id: "13625" }, { label: "Pichilemu", id: "13626" }, 
-    { label: "Zapallar", id: "13627" }, { label: "Tome", id: "13628" }, { label: "Villa Alemana", id: "13629" }, 
-    { label: "Arauco", id: "13630" }, { label: "Papudo", id: "13631" }, { label: "Cochamo", id: "13632" }, 
-    { label: "Los Muermos", id: "13633" }, { label: "San Juan de la Costa", id: "13634" }, { label: "Santa Maria", id: "13635" }, 
-    { label: "Coronel", id: "13636" }, { label: "San Pedro de la Paz", id: "13637" }, { label: "Navidad", id: "13638" }, 
-    { label: "Arica", id: "13639" }, { label: "Vicuña", id: "13670" }, { label: "Talcahuano", id: "13671" }, 
-    { label: "La Cruz", id: "13672" }, { label: "La Unión", id: "14201" }, { label: "Nuble", id: "16101" }, 
-    { label: "San Francisco de Mostazal", id: "16103" } 
-  ]; 
-
-  const propiedades = [ 
+    const propiedades = [ 
     { nombre: "Residencial", sub: [{ label: "Casas", id: 1 }, { label: "Departamentos", id: 2 }] }, 
     { nombre: "Comercial / Oficinas", sub: [{ label: "Oficinas", id: 3 }, { label: "Locales", id: 4 }, { label: "Casa Comercial", id: 5 }, { label: "Hotelería", id: 13 }, { label: "Edificios Corporativos", id: 12 }] }, 
     { nombre: "Industrial", sub: [{ label: "Galpones", id: 8 }, { label: "Bodega Industrial", id: 17 }, { label: "Terreno Industrial", id: 7 }] },
@@ -123,7 +69,103 @@ const SearchBar = () => {
 
   const filteredComunas = searchQuery.length > 1  
     ? comunasDataset.filter(c => c.label.toLowerCase().includes(searchQuery.toLowerCase())) 
-    : []; 
+    : [];
+
+  const seleccionarComuna = (comuna) => {
+    setSearchQuery(comuna.label);
+    setSelectedComuna(comuna);
+    setShowSuggestions(false);
+    setActiveSuggestionIndex(-1);
+  };
+
+  const handleComunaKeyDown = (event) => {
+    if (event.key === "ArrowDown") {
+      event.preventDefault();
+
+      if (!showSuggestions) {
+        setShowSuggestions(true);
+      }
+
+      if (filteredComunas.length === 0) return;
+
+      setActiveSuggestionIndex((current) =>
+        current < filteredComunas.length - 1 ? current + 1 : 0
+      );
+
+      return;
+    }
+
+    if (event.key === "ArrowUp") {
+      event.preventDefault();
+
+      if (!showSuggestions) {
+        setShowSuggestions(true);
+      }
+
+      if (filteredComunas.length === 0) return;
+
+      setActiveSuggestionIndex((current) =>
+        current > 0 ? current - 1 : filteredComunas.length - 1
+      );
+
+      return;
+    }
+
+    if (event.key === "Enter") {
+      if (
+        showSuggestions &&
+        activeSuggestionIndex >= 0 &&
+        filteredComunas[activeSuggestionIndex]
+      ) {
+        event.preventDefault();
+        seleccionarComuna(filteredComunas[activeSuggestionIndex]);
+        return;
+      }
+
+      handleSearch();
+      return;
+    }
+
+    if (event.key === "Escape") {
+      event.preventDefault();
+      setShowSuggestions(false);
+      setActiveSuggestionIndex(-1);
+    }
+  };
+
+  useEffect(() => {
+    if (
+      activeSuggestionIndex < 0 ||
+      !showSuggestions ||
+      !suggestionItemRefs.current[activeSuggestionIndex]
+    ) {
+      return;
+    }
+
+    suggestionItemRefs.current[activeSuggestionIndex].scrollIntoView({
+      block: "nearest",
+      behavior: "smooth",
+    });
+  }, [activeSuggestionIndex, showSuggestions]);
+
+
+  useEffect(() => {
+    suggestionItemRefs.current = suggestionItemRefs.current.slice(
+      0,
+      filteredComunas.length
+    );
+
+    if (
+      activeSuggestionIndex >= filteredComunas.length &&
+      filteredComunas.length > 0
+    ) {
+      setActiveSuggestionIndex(filteredComunas.length - 1);
+    }
+
+    if (filteredComunas.length === 0) {
+      setActiveSuggestionIndex(-1);
+    }
+  }, [filteredComunas.length, activeSuggestionIndex]);
 
   const handleSearch = () => { 
     if (accionActiva === "Vender") { 
@@ -144,17 +186,14 @@ const SearchBar = () => {
       return; 
     } 
 
-    // Lógica principal: 1 = Comprar (Venta), 2 = Arrendar (Arriendo)
     const objID = accionActiva === "Comprar" ? 1 : 2; 
     const tipoPropID = tipoPropiedad?.id || searchParams.get('tipo_prop');
 
     const queryParams = {
       tipo_prop: tipoPropID,
-      obj: objID // Aplicamos el filtro de Venta(1) o Arriendo(2)
+      obj: objID 
     };
 
-    // La API de Alaluf espera el código de comuna, no su nombre.
-    // Si el usuario no selecciona una sugerencia, se ejecuta búsqueda general.
     if (selectedComuna?.id) {
       queryParams.comuna = selectedComuna.id;
       queryParams.comuna_nombre = selectedComuna.label;
@@ -166,7 +205,6 @@ const SearchBar = () => {
     navigate(`/buscar?${params.toString()}`); 
   };
 
-  // Función para aplicar los filtros avanzados a la URL
   const aplicarFiltrosAvanzados = () => {
     const params = new URLSearchParams(searchParams);
     
@@ -185,7 +223,10 @@ const SearchBar = () => {
         setOpenDropdown(false); 
         setActiveCategory(null); 
       } 
-      if (suggestionRef.current && !suggestionRef.current.contains(e.target)) setShowSuggestions(false); 
+      if (suggestionRef.current && !suggestionRef.current.contains(e.target)) {
+        setShowSuggestions(false);
+        setActiveSuggestionIndex(-1);
+      } 
     }; 
     document.addEventListener("mousedown", handleClickOutside); 
     return () => document.removeEventListener("mousedown", handleClickOutside); 
@@ -194,11 +235,7 @@ const SearchBar = () => {
   const togglePropertyDropdown = () => {
     setOpenDropdown((current) => {
       const next = !current;
-
-      if (!next) {
-        setActiveCategory(null);
-      }
-
+      if (!next) setActiveCategory(null);
       return next;
     });
   };
@@ -210,10 +247,10 @@ const SearchBar = () => {
   };
 
   return ( 
-    <div className="relative z-30 px-3 pt-4 sm:px-4 xl:pt-22 font-[Outfit]"> 
+    <div className="relative z-30 w-full px-3 pt-4 font-[Outfit] sm:px-4 xl:pt-22"> 
 
       {/* --- BARRA DE BÚSQUEDA PRINCIPAL --- */}
-      <div className="relative z-40 mx-auto grid max-w-6xl grid-cols-1 items-center gap-3 rounded-3xl border border-white/20 bg-gray-200/20 p-3 shadow-2xl backdrop-blur-md sm:p-4 md:grid-cols-2 xl:grid-cols-[auto_14rem_minmax(260px,1fr)_auto] xl:rounded-[40px]"> 
+      <div className="relative z-40 mx-auto grid w-full max-w-6xl grid-cols-1 items-center gap-3 rounded-3xl border border-white/20 bg-gray-200/20 p-3 shadow-2xl backdrop-blur-md sm:p-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:gap-4 xl:grid-cols-[auto_14rem_minmax(260px,1fr)_auto] xl:gap-3 xl:rounded-[40px]"> 
          
         {/* Selector de Acción */} 
         <div className="grid w-full grid-cols-3 gap-1 rounded-xl border border-white/5 bg-black/60 p-1 md:col-span-2 xl:col-span-1 xl:w-auto"> 
@@ -236,7 +273,7 @@ const SearchBar = () => {
                   navigate(`/buscar?${params.toString()}`);
                 }
               }} 
-              className={`w-full whitespace-nowrap rounded-lg px-2 py-3 text-xs font-medium transition-all duration-300 sm:px-5 sm:text-sm ${ 
+              className={`min-h-11 w-full touch-manipulation whitespace-nowrap rounded-lg px-2 py-3 text-[11px] font-medium transition-all duration-300 sm:min-h-12 sm:px-4 sm:text-xs md:text-sm xl:min-h-0 ${ 
                 accionActiva === accion
                   ? "bg-[#24B6C1] text-white shadow-lg"
                   : "text-white/60 hover:text-white" 
@@ -254,7 +291,7 @@ const SearchBar = () => {
             onClick={togglePropertyDropdown}
             aria-haspopup="menu"
             aria-expanded={openDropdown}
-            className="flex w-full items-center justify-between rounded-xl border border-white/10 bg-gray-600/60 px-5 py-4 text-white transition-colors hover:bg-gray-600/75 focus:outline-none focus:ring-2 focus:ring-[#24B6C1]/60" 
+            className="flex min-h-12 w-full touch-manipulation items-center justify-between rounded-xl border border-white/10 bg-gray-600/60 px-4 py-3.5 text-white transition-colors hover:bg-gray-600/75 focus:outline-none focus:ring-2 focus:ring-[#24B6C1]/60 sm:px-5 sm:py-4" 
           > 
             <span className="truncate text-sm">
               {tipoPropiedad?.label || 
@@ -274,10 +311,10 @@ const SearchBar = () => {
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 8, scale: 0.98 }}
                 transition={{ duration: 0.18 }}
-                className="absolute left-0 right-0 top-full z-50 mt-3 max-h-[min(65vh,28rem)] overflow-hidden rounded-2xl border border-white/10 bg-[#1a1a1a]/95 p-3 shadow-2xl backdrop-blur-2xl xl:right-auto xl:w-72 xl:max-h-none xl:overflow-visible"
+                className="absolute left-0 right-0 top-full z-50 mt-3 max-h-[min(52svh,28rem)] origin-top overflow-hidden rounded-2xl border border-white/10 bg-[#1a1a1a]/95 p-3 shadow-2xl backdrop-blur-2xl md:max-h-[min(48svh,28rem)] xl:right-auto xl:w-72 xl:max-h-none xl:overflow-visible"
               > 
                 {/* MÓVIL + TABLET: navegación dentro del mismo panel */} 
-                <div className="max-h-[min(60vh,25rem)] overflow-y-auto overscroll-contain xl:hidden"> 
+                <div className="max-h-[min(47svh,25rem)] overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch] md:max-h-[min(43svh,25rem)] xl:hidden"> 
                   <AnimatePresence mode="wait" initial={false}>
                     {!activeCategory ? ( 
                       <motion.ul
@@ -292,7 +329,7 @@ const SearchBar = () => {
                             <button
                               type="button"
                               onClick={() => setActiveCategory(prop)}
-                              className="flex w-full items-center justify-between rounded-xl px-4 py-3 text-left text-white/80 transition hover:bg-[#24B6C1]/10 hover:text-[#24B6C1]"
+                              className="flex min-h-12 w-full touch-manipulation items-center justify-between rounded-xl px-4 py-3 text-left text-white/80 transition hover:bg-[#24B6C1]/10 hover:text-[#24B6C1]"
                             > 
                               <span className="text-sm font-semibold">{prop.nombre}</span> 
                               <ChevronRight size={16} className="shrink-0 text-gray-400" /> 
@@ -310,7 +347,7 @@ const SearchBar = () => {
                         <button
                           type="button"
                           onClick={() => setActiveCategory(null)}
-                          className="mb-3 flex items-center gap-2 rounded-lg px-2 py-2 text-xs font-bold uppercase tracking-wider text-[#24B6C1] transition hover:bg-white/5"
+                          className="mb-3 flex min-h-11 touch-manipulation items-center gap-2 rounded-lg px-2 py-2 text-xs font-bold uppercase tracking-wider text-[#24B6C1] transition hover:bg-white/5"
                         > 
                           <ChevronRight size={14} className="rotate-180" />
                           Volver a categorías
@@ -326,7 +363,7 @@ const SearchBar = () => {
                               <button
                                 type="button"
                                 onClick={() => handleSelectProperty(sub)}
-                                className="flex w-full items-center justify-between rounded-lg px-4 py-3 text-left text-sm text-gray-300 transition hover:bg-[#24B6C1]/10 hover:text-[#24B6C1]"
+                                className="flex min-h-12 w-full touch-manipulation items-center justify-between rounded-lg px-4 py-3 text-left text-sm text-gray-300 transition hover:bg-[#24B6C1]/10 hover:text-[#24B6C1]"
                               > 
                                 <span>{sub.label}</span>
                                 {tipoPropiedad?.id === sub.id && <Check size={14} className="shrink-0 text-[#24B6C1]" />} 
@@ -412,7 +449,8 @@ const SearchBar = () => {
             type="text" 
             value={searchQuery} 
             onChange={(e) => { 
-              setSearchQuery(e.target.value); 
+              setSearchQuery(e.target.value);
+              setActiveSuggestionIndex(-1); 
               setShowSuggestions(true); 
               setOpenDropdown(false);
               setActiveCategory(null);
@@ -422,30 +460,48 @@ const SearchBar = () => {
               setShowSuggestions(true);
               setOpenDropdown(false);
               setActiveCategory(null);
-            }} 
-            onKeyDown={(e) => e.key === "Enter" && handleSearch()} 
+            }}
+            onKeyDown={handleComunaKeyDown}
+            role="combobox"
+            aria-autocomplete="list"
+            aria-expanded={showSuggestions && filteredComunas.length > 0}
+            aria-controls="comuna-suggestions"
+            aria-activedescendant={
+              activeSuggestionIndex >= 0
+                ? `comuna-suggestion-${activeSuggestionIndex}`
+                : undefined
+            }
             placeholder={searchParams.get('comuna_nombre') || (searchParams.get('comuna') ? comunasDataset.find((c) => c.id === searchParams.get('comuna'))?.label || searchParams.get('comuna') : "Comuna, ciudad o código...")} 
-            className="w-full rounded-xl bg-gray-400/90 px-5 py-4 text-sm text-white placeholder-white/90 focus:outline-none focus:ring-2 focus:ring-[#24B6C1]/60 sm:px-6" 
+            className="min-h-12 w-full rounded-xl bg-gray-400/90 px-4 py-3.5 text-sm text-white placeholder-white/90 focus:outline-none focus:ring-2 focus:ring-[#24B6C1]/60 sm:px-5 sm:py-4" 
           /> 
 
           <AnimatePresence> 
             {showSuggestions && filteredComunas.length > 0 && ( 
               <motion.div
+                id="comuna-suggestions"
+                role="listbox"
                 initial={{ opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 6 }}
-                className="absolute left-0 top-full z-50 mt-2 max-h-60 w-full overflow-y-auto overscroll-contain rounded-xl border border-white/10 bg-[#1a1a1a] shadow-2xl"
+                className="absolute left-0 top-full z-50 mt-2 max-h-[min(38svh,18rem)] w-full overflow-y-auto overscroll-contain rounded-xl border border-white/10 bg-[#1a1a1a] shadow-2xl [-webkit-overflow-scrolling:touch] sm:max-h-60"
               > 
                 {filteredComunas.map((c, index) => ( 
                   <button
                     type="button"
-                    key={`${c.id}-${index}`}
-                    onClick={() => {
-                      setSearchQuery(c.label);
-                      setSelectedComuna(c);
-                      setShowSuggestions(false);
+                    id={`comuna-suggestion-${index}`}
+                    role="option"
+                    aria-selected={activeSuggestionIndex === index}
+                    ref={(element) => {
+                      suggestionItemRefs.current[index] = element;
                     }}
-                    className="flex w-full items-center justify-between px-5 py-3 text-left text-sm text-gray-300 transition hover:bg-[#24B6C1]/20 sm:px-6"
+                    key={`${c.id}-${index}`}
+                    onMouseEnter={() => setActiveSuggestionIndex(index)}
+                    onClick={() => seleccionarComuna(c)}
+                    className={`flex min-h-12 w-full touch-manipulation items-center justify-between px-4 py-3 text-left text-sm transition sm:px-5 xl:min-h-0 ${
+                      activeSuggestionIndex === index
+                        ? "bg-[#24B6C1]/20 text-[#24B6C1]"
+                        : "text-gray-300 hover:bg-[#24B6C1]/20"
+                    }`}
                   > 
                     <span>{c.label}</span>
                     <span className="text-[10px] text-gray-500">ID: {c.id}</span> 
@@ -461,7 +517,7 @@ const SearchBar = () => {
           <button
             type="button"
             onClick={handleSearch}
-            className="group flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#24B6C1] px-8 py-4 text-white shadow-lg transition-all hover:bg-cyan-600 xl:flex-none"
+            className="group flex min-h-12 flex-1 touch-manipulation items-center justify-center gap-2 rounded-xl bg-[#24B6C1] px-6 py-3.5 text-white shadow-lg transition-all hover:bg-cyan-600 sm:py-4 xl:min-h-0 xl:flex-none"
           > 
             <span className="text-sm font-bold">Buscar</span> 
             <Search size={18} className="transition-transform group-hover:scale-110" /> 
@@ -472,7 +528,7 @@ const SearchBar = () => {
               type="button"
               onClick={() => setMostrarAvanzado(!mostrarAvanzado)}
               aria-label={mostrarAvanzado ? "Ocultar filtros avanzados" : "Mostrar filtros avanzados"}
-              className={`flex shrink-0 items-center justify-center rounded-xl px-4 py-4 shadow-lg transition-all ${
+              className={`flex min-h-12 shrink-0 touch-manipulation items-center justify-center rounded-xl px-4 py-3.5 shadow-lg transition-all sm:py-4 xl:min-h-0 ${
                 mostrarAvanzado
                   ? 'border border-white/10 bg-[#1a1a1a] text-[#24B6C1]'
                   : 'bg-gray-600/60 text-white hover:bg-gray-500'
@@ -491,11 +547,11 @@ const SearchBar = () => {
             initial={{ opacity: 0, y: -20, height: 0 }}
             animate={{ opacity: 1, y: 0, height: "auto" }}
             exit={{ opacity: 0, y: -20, height: 0 }}
-            className="relative z-30 mx-auto mt-4 max-w-5xl rounded-2xl border border-white/10 bg-[#1a1a1a]/95 p-4 shadow-2xl backdrop-blur-2xl sm:p-6 md:rounded-[30px] md:p-8"
+            className="relative z-30 mx-auto mt-4 w-full max-w-5xl overflow-hidden rounded-2xl border border-white/10 bg-[#1a1a1a]/95 p-4 shadow-2xl backdrop-blur-2xl sm:p-6 md:rounded-[30px] md:p-8"
           >
             <button 
               onClick={() => setMostrarAvanzado(false)}
-              className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"
+              className="absolute right-3 top-3 flex min-h-11 min-w-11 touch-manipulation items-center justify-center rounded-full text-gray-400 transition-colors hover:bg-white/5 hover:text-white sm:right-4 sm:top-4 xl:min-h-0 xl:min-w-0 xl:rounded-none xl:hover:bg-transparent"
             >
               <X size={20} />
             </button>
@@ -565,7 +621,7 @@ const SearchBar = () => {
             <div className="mt-8 flex justify-end">
               <button 
                 onClick={aplicarFiltrosAvanzados} 
-                className="w-full sm:w-auto px-10 py-3 bg-[#24B6C1] hover:bg-cyan-600 text-white rounded-xl flex items-center justify-center gap-2 transition-all group shadow-[0_0_15px_rgba(36,182,193,0.3)] font-bold tracking-wide"
+                className="group flex min-h-12 w-full touch-manipulation items-center justify-center gap-2 rounded-xl bg-[#24B6C1] px-6 py-3 font-bold tracking-wide text-white shadow-[0_0_15px_rgba(36,182,193,0.3)] transition-all hover:bg-cyan-600 sm:w-auto sm:px-10"
               >
                 APLICAR FILTROS
                 <Search size={16} className="group-hover:translate-x-1 transition-transform" />

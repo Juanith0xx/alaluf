@@ -48,7 +48,7 @@ const NavbarDesktop = ({
   openToolsDropdown, setOpenToolsDropdown,
   searchCode, setSearchCode, onSearch 
 }) => (
-  <nav className="fixed w-full z-50 bg-black/50 text-white font-[Outfit] pt-8 hidden lg:block">
+  <nav className="fixed w-full z-50 bg-black/50 text-white font-[Outfit] pt-8 hidden xl:block">
     <div className="max-w-7xl mx-auto px-6 py-4 flex items-center">
 
       <div className="flex items-center flex-1">
@@ -162,7 +162,7 @@ const NavbarDesktop = ({
         </div>
       </div>
 
-      <div className="hidden lg:flex items-center bg-white/10 px-4 py-2 rounded-xl backdrop-blur-md border border-white/10 hover:border-teal-400/50 transition ml-10">
+      <div className="hidden xl:flex items-center bg-white/10 px-4 py-2 rounded-xl backdrop-blur-md border border-white/10 hover:border-teal-400/50 transition ml-10">
         <input
           type="text"
           placeholder="Ingresar código"
@@ -198,16 +198,22 @@ const NavbarMobile = ({
   setSearchCode,
   onSearch
 }) => (
-  <nav className="fixed w-screen z-50 bg-black/60 text-white font-[Outfit] pt-6 pb-4 lg:hidden">
-    <div className="flex items-center justify-between px-6 py-4">
+  <nav className="fixed inset-x-0 top-0 z-50 w-full bg-black/60 text-white font-[Outfit] backdrop-blur-md pt-[env(safe-area-inset-top)] xl:hidden">
+    <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-3 sm:px-6 sm:py-4 md:px-8 lg:px-10">
       <Link to="/" className="flex items-center">
         <img
           src={logo}
           alt="Logo Alaluf"
-          className="h-10 w-auto object-contain hover:opacity-80 transition"
+          className="h-9 w-auto object-contain transition hover:opacity-80 sm:h-10 md:h-11"
         />
       </Link>
-      <button onClick={() => setOpenMenu(!openMenu)} className="text-white">
+      <button
+        type="button"
+        onClick={() => setOpenMenu(!openMenu)}
+        aria-label={openMenu ? "Cerrar menú" : "Abrir menú"}
+        aria-expanded={openMenu}
+        className="flex min-h-11 min-w-11 touch-manipulation items-center justify-center rounded-xl text-white transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-teal-400/70"
+      >
         {openMenu ? <X size={28} /> : <Menu size={28} />}
       </button>
     </div>
@@ -219,14 +225,14 @@ const NavbarMobile = ({
           animate={{ opacity: 1, height: "auto" }}
           exit={{ opacity: 0, height: 0 }}
           transition={{ duration: 0.3 }}
-          className="bg-black/80 backdrop-blur-2xl px-6 pb-6 border-t border-white/10"
+          className="absolute left-0 right-0 top-full max-h-[calc(100vh_-_4.5rem_-_env(safe-area-inset-top))] max-h-[calc(100dvh_-_4.5rem_-_env(safe-area-inset-top))] overflow-y-auto overscroll-contain border-t border-white/10 bg-black/90 px-4 pb-[calc(1.5rem_+_env(safe-area-inset-bottom))] backdrop-blur-2xl sm:px-6 md:px-8 lg:px-10"
         >
-          <div className="flex flex-col gap-5 text-base mt-4">
+          <div className="mx-auto mt-3 flex w-full max-w-7xl flex-col gap-2 text-base sm:mt-4 sm:gap-3 md:gap-4">
 
             <div className="flex flex-col">
               <span 
                 onClick={() => setOpenMobileServices(!openMobileServices)}
-                className="cursor-pointer hover:text-teal-400 transition flex items-center justify-between">
+                className="flex min-h-11 cursor-pointer touch-manipulation items-center justify-between rounded-lg py-2 transition hover:text-teal-400">
                 Servicios <ChevronDown
                   size={16}
                   className={`transition-transform duration-200 ${
@@ -242,7 +248,7 @@ const NavbarMobile = ({
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: "auto" }}
                     exit={{ opacity: 0, height: 0 }}
-                    className="pl-4 mt-3 space-y-3 border-l border-white/10 text-sm font-medium overflow-hidden"
+                    className="mt-1 space-y-1 overflow-hidden border-l border-white/10 pl-4 text-sm font-medium sm:mt-2 sm:space-y-2 md:pl-6"
                   >
                     <Link
                       to="/licitaciones"
@@ -250,7 +256,7 @@ const NavbarMobile = ({
                         setOpenMenu(false);
                         setOpenMobileServices(false);
                       }}
-                      className="block hover:text-teal-400 transition py-1"
+                      className="block min-h-10 rounded-lg py-2 pr-2 transition hover:text-teal-400"
                     >
                       Licitaciones
                     </Link>
@@ -261,7 +267,7 @@ const NavbarMobile = ({
                         setOpenMenu(false);
                         setOpenMobileServices(false);
                       }}
-                      className="block hover:text-teal-400 transition py-1"
+                      className="block min-h-10 rounded-lg py-2 pr-2 transition hover:text-teal-400"
                     >
                       Industrial
                     </Link>
@@ -272,7 +278,7 @@ const NavbarMobile = ({
                         setOpenMenu(false);
                         setOpenMobileServices(false);
                       }}
-                      className="block hover:text-teal-400 transition py-1"
+                      className="block min-h-10 rounded-lg py-2 pr-2 transition hover:text-teal-400"
                     >
                       Terrenos para Proyectos
                     </Link>
@@ -283,7 +289,7 @@ const NavbarMobile = ({
                         setOpenMenu(false);
                         setOpenMobileServices(false);
                       }}
-                      className="block hover:text-teal-400 transition py-1"
+                      className="block min-h-10 rounded-lg py-2 pr-2 transition hover:text-teal-400"
                     >
                       Comercial
                     </Link>
@@ -294,7 +300,7 @@ const NavbarMobile = ({
                         setOpenMenu(false);
                         setOpenMobileServices(false);
                       }}
-                      className="block hover:text-teal-400 transition py-1"
+                      className="block min-h-10 rounded-lg py-2 pr-2 transition hover:text-teal-400"
                     >
                       Residencial
                     </Link>
@@ -305,7 +311,7 @@ const NavbarMobile = ({
                         setOpenMenu(false);
                         setOpenMobileServices(false);
                       }}
-                      className="block hover:text-teal-400 transition py-1"
+                      className="block min-h-10 rounded-lg py-2 pr-2 transition hover:text-teal-400"
                     >
                       Administración de Arriendos
                     </Link>
@@ -316,7 +322,7 @@ const NavbarMobile = ({
                         setOpenMenu(false);
                         setOpenMobileServices(false);
                       }}
-                      className="block hover:text-teal-400 transition py-1"
+                      className="block min-h-10 rounded-lg py-2 pr-2 transition hover:text-teal-400"
                     >
                       Tasación de Activos
                     </Link>
@@ -327,7 +333,7 @@ const NavbarMobile = ({
                         setOpenMenu(false);
                         setOpenMobileServices(false);
                       }}
-                      className="block hover:text-teal-400 transition py-1"
+                      className="block min-h-10 rounded-lg py-2 pr-2 transition hover:text-teal-400"
                     >
                       Club Deals e Inversiones
                     </Link>
@@ -335,13 +341,13 @@ const NavbarMobile = ({
                 )}
               </AnimatePresence>
             </div>
-            <Link to="/nosotros" onClick={() => setOpenMenu(false)} className="hover:text-teal-400 transition">Nosotros</Link>
-            <a href="https://alaluf.cl/pressroom2.php" className="hover:text-teal-400 transition">Newsletter</a>
+            <Link to="/nosotros" onClick={() => setOpenMenu(false)} className="flex min-h-11 items-center rounded-lg py-2 transition hover:text-teal-400">Nosotros</Link>
+            <a href="https://alaluf.cl/pressroom2.php" className="flex min-h-11 items-center rounded-lg py-2 transition hover:text-teal-400">Newsletter</a>
             
             <div className="flex flex-col">
               <span 
                 onClick={() => setOpenMobileTools(!openMobileTools)} 
-                className="cursor-pointer hover:text-teal-400 transition flex items-center justify-between">
+                className="flex min-h-11 cursor-pointer touch-manipulation items-center justify-between rounded-lg py-2 transition hover:text-teal-400">
                 Herramientas <ChevronDown size={16} className={`transition-transform duration-200 ${openMobileTools ? "rotate-180 text-teal-400" : "opacity-70"}`} />
               </span>
               <AnimatePresence>
@@ -350,12 +356,12 @@ const NavbarMobile = ({
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: "auto" }}
                     exit={{ opacity: 0, height: 0 }}
-                    className="pl-4 mt-3 space-y-3 border-l border-white/10 text-sm font-medium overflow-hidden"
+                    className="mt-1 space-y-1 overflow-hidden border-l border-white/10 pl-4 text-sm font-medium sm:mt-2 sm:space-y-2 md:pl-6"
                   >
                     <Link 
                       to="/simulador-hipotecario" 
                       onClick={() => { setOpenMenu(false); setOpenMobileTools(false); }}
-                      className="block hover:text-teal-400 transition py-1"
+                      className="block min-h-10 rounded-lg py-2 pr-2 transition hover:text-teal-400"
                     >
                       Simulador Hipotecario
                     </Link>
@@ -368,25 +374,25 @@ const NavbarMobile = ({
             <Link 
               to="/contacto" 
               onClick={() => setOpenMenu(false)} 
-              className="hover:text-teal-400 transition"
+              className="flex min-h-11 items-center rounded-lg py-2 transition hover:text-teal-400"
             >
               Contacto
             </Link>
             
-            <a href="https://alaluf.cl/mialaluf/" className="hover:text-teal-400 transition font-semibold">Mi Alaluf</a>
+            <a href="https://alaluf.cl/mialaluf/" className="flex min-h-11 items-center rounded-lg py-2 font-semibold transition hover:text-teal-400">Mi Alaluf</a>
 
-            <div className="flex items-center bg-white/10 px-4 py-2 rounded-xl mt-4">
+            <div className="mt-3 flex min-w-0 items-center rounded-xl border border-white/10 bg-white/10 px-4 py-2.5 sm:mt-4 md:max-w-md">
               <input
                 type="text"
                 placeholder="Ingresar código"
                 value={searchCode}
                 onChange={(e) => setSearchCode(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && onSearch()}
-                className="bg-transparent outline-none text-sm placeholder-gray-300 w-full"
+                className="min-w-0 w-full bg-transparent text-base outline-none placeholder-gray-300"
               />
               <Search 
                 size={18} 
-                className="ml-2 opacity-70 cursor-pointer" 
+                className="ml-2 shrink-0 cursor-pointer opacity-70 transition hover:text-teal-400" 
                 onClick={onSearch}
               />
             </div>

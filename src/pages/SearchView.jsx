@@ -14,6 +14,7 @@ import PropertyCard from "../components/PropertyCard";
 const MapView = lazy(() => import("../components/MapView"));
 
 import FiltrosAvanzados from "../components/FiltrosAvanzados"; 
+import comunasDataset from "../data/comunas";
 
 // IMPORTACIÓN DEL ASSET LOCAL
 import fondoMarmol from '../assets/Marmol.jpg';
@@ -28,6 +29,59 @@ const MapaFallback = () => (
       Cargando mapa...
     </div>
   </div>
+);
+
+
+const PropertyCardSkeleton = ({ index }) => (
+  <motion.article
+    initial={{ opacity: 0, y: 14 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{
+      duration: 0.35,
+      delay: index * 0.06,
+      ease: "easeOut",
+    }}
+    className={`overflow-hidden rounded-[26px] border border-white/10 bg-white shadow-2xl sm:rounded-[30px] ${
+      index > 1 ? "hidden md:block" : ""
+    }`}
+    aria-hidden="true"
+  >
+    <div className="relative h-56 overflow-hidden bg-gray-200 sm:h-64">
+      <motion.div
+        className="absolute inset-y-0 w-2/3 bg-gradient-to-r from-transparent via-white/70 to-transparent"
+        initial={{ x: "-140%" }}
+        animate={{ x: "230%" }}
+        transition={{
+          duration: 1.35,
+          repeat: Infinity,
+          ease: "linear",
+          delay: index * 0.12,
+        }}
+      />
+    </div>
+
+    <div className="space-y-5 p-5 sm:p-6">
+      <div className="space-y-3">
+        <div className="h-6 w-3/4 animate-pulse rounded-lg bg-gray-200" />
+        <div className="h-4 w-1/2 animate-pulse rounded-md bg-gray-100" />
+      </div>
+
+      <div className="flex flex-wrap gap-2">
+        <div className="h-8 w-24 animate-pulse rounded-lg bg-gray-100" />
+        <div className="h-8 w-20 animate-pulse rounded-lg bg-gray-100" />
+        <div className="h-8 w-16 animate-pulse rounded-lg bg-gray-100" />
+      </div>
+
+      <div className="border-t border-gray-100 pt-5">
+        <div className="mb-2 h-3 w-20 animate-pulse rounded bg-[#24B6C1]/15" />
+        <div className="h-8 w-36 animate-pulse rounded-lg bg-gray-200" />
+      </div>
+
+      <div className="flex justify-end">
+        <div className="h-11 w-28 animate-pulse rounded-xl bg-[#24B6C1]/25" />
+      </div>
+    </div>
+  </motion.article>
 );
 
 const SearchView = () => {
@@ -47,8 +101,12 @@ const SearchView = () => {
   const [propiedadesData, setPropiedadesData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedProperty, setSelectedProperty] = useState(null);
-  const [tiempoBusqueda, setTiempoBusqueda] = useState(null);
   const [totalPropiedades, setTotalPropiedades] = useState(0);
+
+  // ESTADOS EXCLUSIVOS DEL MAPA EN DESKTOP
+  const [desktopMapLoading, setDesktopMapLoading] = useState(false);
+  const [desktopMapError, setDesktopMapError] = useState("");
+  const [desktopMapFocusRequest, setDesktopMapFocusRequest] = useState(0);
 
   // ESTADO DE PAGINACIÓN
   const [totalPaginas, setTotalPaginas] = useState(1);
@@ -60,6 +118,7 @@ const SearchView = () => {
   const [selectedComuna, setSelectedComuna] = useState(null);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [openDropdown, setOpenDropdown] = useState(false);
+  const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1);
   
   const [accionActiva, setAccionActiva] = useState(() => {
     return searchParams.get("obj") === "2" ? "Arrendar" : "Comprar";
@@ -67,6 +126,52 @@ const SearchView = () => {
   
   const dropdownRef = useRef(null);
   const suggestionRef = useRef(null);
+  const suggestionItemRefs = useRef([]);
+
+  const normalizarTexto = (valor) =>
+    String(valor || "")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .trim();
+
+  /*
+   * Sincroniza el buscador interno con la búsqueda creada por SearchBar.
+   * De esta forma la comuna seleccionada se conserva al entrar a /buscar.
+   */
+  useEffect(() => {
+    const codigoPropiedad = searchParams.get("q");
+    const comunaId = searchParams.get("comuna");
+    const comunaNombre = searchParams.get("comuna_nombre");
+
+    if (codigoPropiedad) {
+      setSearchQueryInput(codigoPropiedad);
+      setSelectedComuna(null);
+      return;
+    }
+
+    if (!comunaId) {
+      setSelectedComuna(null);
+      setSearchQueryInput("");
+      return;
+    }
+
+    const comunaEncontrada = comunasDataset.find(
+      (comuna) => String(comuna.id) === String(comunaId)
+    );
+
+    const comunaDesdeUrl =
+      comunaEncontrada ||
+      (comunaNombre
+        ? {
+            id: comunaId,
+            label: comunaNombre,
+          }
+        : null);
+
+    setSelectedComuna(comunaDesdeUrl);
+    setSearchQueryInput(comunaDesdeUrl?.label || "");
+  }, [searchParams.toString()]);
 
   useEffect(() => {
     const currentScroll = window.scrollY;
@@ -79,10 +184,6 @@ const SearchView = () => {
       });
     }
   }, [paginaActual]);
-
-  const comunasDataset = [
-    { label: "Santiago", id: "13101" }, { label: "Cerrillos", id: "13102" }, { label: "Cerro Navia", id: "13103" }, { label: "Conchalí", id: "13104" }, { label: "El Bosque", id: "13105" }, { label: "Estación Central", id: "13106" }, { label: "Huechuraba", id: "13107" }, { label: "Independencia", id: "13108" }, { label: "La Cisterna", id: "13109" }, { label: "La Florida", id: "13110" }, { label: "La Granja", id: "13111" }, { label: "La Pintana", id: "13112" }, { label: "La Reina", id: "13113" }, { label: "Las Condes", id: "13114" }, { label: "Lo Barnechea", id: "13115" }, { label: "Lo Espejo", id: "13116" }, { label: "Lo Prado", id: "13117" }, { label: "Macul", id: "13118" }, { label: "Maipú", id: "13119" }, { label: "Ñuñoa", id: "13120" }, { label: "Providencia", id: "13123" }, { label: "Vitacura", id: "13132" }, { label: "Colina", id: "13301" },
-  ];
 
   const categoriasPropiedades = [
     { nombre: "Residencial", sub: [{ label: "Casas", id: 1 }, { label: "Departamentos", id: 2 }] },
@@ -100,9 +201,118 @@ const SearchView = () => {
     return "Propiedades";
   };
 
-  const filteredComunas = searchQueryInput.length > 1 
-    ? comunasDataset.filter(c => c.label.toLowerCase().includes(searchQueryInput.toLowerCase()))
-    : [];
+  const filteredComunas =
+    searchQueryInput.trim().length > 1
+      ? comunasDataset.filter((comuna) =>
+          normalizarTexto(comuna.label).includes(
+            normalizarTexto(searchQueryInput)
+          )
+        )
+      : [];
+
+
+  const seleccionarComuna = (comuna) => {
+    setSearchQueryInput(comuna.label);
+    setSelectedComuna(comuna);
+    setShowSuggestions(false);
+    setActiveSuggestionIndex(-1);
+  };
+
+  const handleComunaKeyDown = (event) => {
+    if (event.key === "ArrowDown") {
+      event.preventDefault();
+
+      if (!showSuggestions) {
+        setShowSuggestions(true);
+      }
+
+      if (filteredComunas.length === 0) return;
+
+      setActiveSuggestionIndex((current) =>
+        current < filteredComunas.length - 1 ? current + 1 : 0
+      );
+
+      return;
+    }
+
+    if (event.key === "ArrowUp") {
+      event.preventDefault();
+
+      if (!showSuggestions) {
+        setShowSuggestions(true);
+      }
+
+      if (filteredComunas.length === 0) return;
+
+      setActiveSuggestionIndex((current) =>
+        current > 0 ? current - 1 : filteredComunas.length - 1
+      );
+
+      return;
+    }
+
+    if (event.key === "Enter") {
+      if (
+        showSuggestions &&
+        activeSuggestionIndex >= 0 &&
+        filteredComunas[activeSuggestionIndex]
+      ) {
+        event.preventDefault();
+        seleccionarComuna(filteredComunas[activeSuggestionIndex]);
+        return;
+      }
+
+      event.preventDefault();
+      handleSearch();
+      return;
+    }
+
+    if (event.key === "Escape") {
+      event.preventDefault();
+      setShowSuggestions(false);
+      setActiveSuggestionIndex(-1);
+    }
+  };
+
+  useEffect(() => {
+    const activeElement =
+      suggestionItemRefs.current[activeSuggestionIndex];
+
+    if (
+      activeSuggestionIndex < 0 ||
+      !showSuggestions ||
+      !activeElement
+    ) {
+      return;
+    }
+
+    activeElement.scrollIntoView({
+      block: "nearest",
+      behavior: "smooth",
+    });
+  }, [activeSuggestionIndex, showSuggestions]);
+
+  useEffect(() => {
+    suggestionItemRefs.current =
+      suggestionItemRefs.current.slice(
+        0,
+        filteredComunas.length
+      );
+
+    if (filteredComunas.length === 0) {
+      setActiveSuggestionIndex(-1);
+      return;
+    }
+
+    if (activeSuggestionIndex >= filteredComunas.length) {
+      setActiveSuggestionIndex(
+        filteredComunas.length - 1
+      );
+    }
+  }, [
+    filteredComunas.length,
+    activeSuggestionIndex,
+  ]);
 
   const handleSearch = () => {
     const textInput = searchQueryInput.trim();
@@ -114,10 +324,25 @@ const SearchView = () => {
       return;
     }
 
-    const objID = (accionActiva === "Comprar" || accionActiva === "Vender") ? 1 : 2;
-    const comunaID = selectedComuna?.id || "";
-    const comunaNombre = selectedComuna?.label || "";
-    const tipoID = tipoPropiedad?.id || "";
+    const objID =
+      accionActiva === "Comprar" || accionActiva === "Vender"
+        ? 1
+        : 2;
+
+    const comunaCoincidente =
+      selectedComuna ||
+      comunasDataset.find(
+        (comuna) =>
+          normalizarTexto(comuna.label) ===
+          normalizarTexto(textInput)
+      );
+
+    const comunaID = comunaCoincidente?.id || "";
+    const comunaNombre = comunaCoincidente?.label || "";
+    const tipoID =
+      tipoPropiedad?.id ||
+      searchParams.get("tipo_prop") ||
+      "";
 
     setSearchParams({ 
       ...(tipoID && { tipo_prop: tipoID }), 
@@ -128,12 +353,247 @@ const SearchView = () => {
     });
   };
 
-  const handlePropertyClick = (prop) => {
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        suggestionRef.current &&
+        !suggestionRef.current.contains(event.target)
+      ) {
+        setShowSuggestions(false);
+        setActiveSuggestionIndex(-1);
+      }
+
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target)
+      ) {
+        setOpenDropdown(false);
+      }
+    };
+
+    document.addEventListener(
+      "mousedown",
+      handleClickOutside
+    );
+
+    return () => {
+      document.removeEventListener(
+        "mousedown",
+        handleClickOutside
+      );
+    };
+  }, []);
+
+  const convertirCoordenada = (valor) => {
+    if (valor === null || valor === undefined || valor === "") {
+      return null;
+    }
+
+    const valorNormalizado =
+      typeof valor === "string"
+        ? valor.trim().replace(",", ".")
+        : valor;
+
+    const numero = Number(valorNormalizado);
+
+    return Number.isFinite(numero) ? numero : null;
+  };
+
+  const obtenerCoordenadasPropiedad = (propiedad) => {
+    if (!propiedad) return null;
+
+    const lat = convertirCoordenada(
+      propiedad.coords?.lat ??
+      propiedad.coords?.latitude ??
+      propiedad.lat ??
+      propiedad.latitude ??
+      propiedad.latitud ??
+      propiedad.ubicacion?.lat ??
+      propiedad.ubicacion?.latitude ??
+      propiedad.ubicacion?.latitud
+    );
+
+    const lng = convertirCoordenada(
+      propiedad.coords?.lng ??
+      propiedad.coords?.lon ??
+      propiedad.coords?.longitude ??
+      propiedad.lng ??
+      propiedad.lon ??
+      propiedad.longitude ??
+      propiedad.longitud ??
+      propiedad.ubicacion?.lng ??
+      propiedad.ubicacion?.lon ??
+      propiedad.ubicacion?.longitude ??
+      propiedad.ubicacion?.longitud
+    );
+
+    const coordenadasValidas =
+      lat !== null &&
+      lng !== null &&
+      lat >= -90 &&
+      lat <= 90 &&
+      lng >= -180 &&
+      lng <= 180 &&
+      !(lat === 0 && lng === 0);
+
+    return coordenadasValidas ? { lat, lng } : null;
+  };
+
+  const normalizarPropiedadParaMapa = (propiedad) => {
+    const coordenadas = obtenerCoordenadasPropiedad(propiedad);
+
+    if (!coordenadas) return propiedad;
+
+    return {
+      ...propiedad,
+      coords: {
+        ...(propiedad.coords || {}),
+        lat: coordenadas.lat,
+        lng: coordenadas.lng,
+      },
+    };
+  };
+
+  const extraerPropiedadRespuesta = (respuesta) => {
+    const candidatos = [
+      respuesta?.data?.propiedad,
+      respuesta?.propiedad,
+      respuesta?.data,
+      respuesta,
+    ];
+
+    for (const candidato of candidatos) {
+      if (Array.isArray(candidato) && candidato.length > 0) {
+        return candidato[0];
+      }
+
+      if (
+        candidato &&
+        typeof candidato === "object" &&
+        !Array.isArray(candidato)
+      ) {
+        return candidato;
+      }
+    }
+
+    return null;
+  };
+
+  const combinarPropiedadConDetalle = (propiedadLista, detalle) => ({
+    ...propiedadLista,
+    ...detalle,
+    ubicacion: {
+      ...(propiedadLista?.ubicacion || {}),
+      ...(detalle?.ubicacion || {}),
+    },
+    coords: {
+      ...(propiedadLista?.coords || {}),
+      ...(detalle?.coords || {}),
+    },
+    precios: {
+      ...(propiedadLista?.precios || {}),
+      ...(detalle?.precios || {}),
+    },
+    detalles: {
+      ...(propiedadLista?.detalles || {}),
+      ...(detalle?.detalles || {}),
+    },
+    imagenes:
+      detalle?.imagenes?.length > 0
+        ? detalle.imagenes
+        : propiedadLista?.imagenes || [],
+  });
+
+  const handlePropertyClick = async (prop) => {
     if (window.innerWidth < 1024) {
       const idParaNavegar = prop.codigo || prop.id;
       navigate(`/propiedad/${idParaNavegar}`);
-    } else {
-      setSelectedProperty(prop);
+      return;
+    }
+
+    // Marca inmediatamente la tarjeta seleccionada.
+    setSelectedProperty(prop);
+    setDesktopMapError("");
+
+    const coordenadasListado = obtenerCoordenadasPropiedad(prop);
+
+    if (coordenadasListado) {
+      setSelectedProperty(normalizarPropiedadParaMapa(prop));
+      setDesktopMapFocusRequest((current) => current + 1);
+      return;
+    }
+
+    const codigoPropiedad = prop.codigo || prop.id;
+
+    if (!codigoPropiedad) {
+      setDesktopMapError(
+        "La propiedad seleccionada no tiene un código válido."
+      );
+      return;
+    }
+
+    setDesktopMapLoading(true);
+
+    try {
+      const response = await fetch(
+        `${API_URL}/api/propiedades/codigo/${encodeURIComponent(
+          codigoPropiedad
+        )}`,
+        {
+          headers: {
+            Accept: "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        const payload = await response.json().catch(() => ({}));
+
+        throw new Error(
+          payload.error ||
+          payload.message ||
+          `No fue posible obtener la ubicación (${response.status}).`
+        );
+      }
+
+      const respuestaDetalle = await response.json();
+      const detalle = extraerPropiedadRespuesta(respuestaDetalle);
+
+      if (!detalle) {
+        throw new Error(
+          "El backend no entregó el detalle de la propiedad."
+        );
+      }
+
+      const propiedadCompleta = normalizarPropiedadParaMapa(
+        combinarPropiedadConDetalle(prop, detalle)
+      );
+
+      const coordenadasDetalle =
+        obtenerCoordenadasPropiedad(propiedadCompleta);
+
+      if (!coordenadasDetalle) {
+        throw new Error(
+          "La propiedad no tiene latitud y longitud registradas."
+        );
+      }
+
+      setSelectedProperty(propiedadCompleta);
+
+      // Obliga a MapView a reconstruirse y centrar la coordenada nueva.
+      setDesktopMapFocusRequest((current) => current + 1);
+    } catch (error) {
+      console.error(
+        "Error obteniendo geolocalización de la propiedad:",
+        error
+      );
+
+      setDesktopMapError(
+        error.message ||
+        "No fue posible ubicar la propiedad seleccionada."
+      );
+    } finally {
+      setDesktopMapLoading(false);
     }
   };
 
@@ -142,8 +602,6 @@ const SearchView = () => {
 
     const fetchResultados = async () => {
       setLoading(true);
-      const startTime = performance.now();
-
       try {
         const tipo_prop = searchParams.get("tipo_prop");
         const obj = searchParams.get("obj");
@@ -198,10 +656,6 @@ const SearchView = () => {
 
         if (controller.signal.aborted) return;
 
-        const endTime = performance.now();
-        const tiempoEnSegundos = ((endTime - startTime) / 1000).toFixed(2);
-        setTiempoBusqueda(tiempoEnSegundos);
-
         if (json.paginacion && Array.isArray(json.data)) {
           setPropiedadesData(json.data);
           setTotalPropiedades(json.paginacion.totalPropiedades || 0);
@@ -250,6 +704,21 @@ const SearchView = () => {
     backgroundAttachment: 'fixed' 
   };
 
+  const selectedDesktopCoordinates =
+    obtenerCoordenadasPropiedad(selectedProperty);
+
+  const propiedadesConCoordenadas = propiedadesData
+    .map(normalizarPropiedadParaMapa)
+    .filter((propiedad) => obtenerCoordenadasPropiedad(propiedad));
+
+  // Solo muestra la propiedad seleccionada cuando ya posee coordenadas.
+  // Mientras se obtiene el detalle, conserva los puntos disponibles.
+  const propiedadesMapaDesktop =
+    selectedProperty && selectedDesktopCoordinates
+      ? [normalizarPropiedadParaMapa(selectedProperty)]
+      : propiedadesConCoordenadas;
+
+
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white font-[Outfit]">
       <Navbar />
@@ -264,13 +733,6 @@ const SearchView = () => {
             <h1 className="text-lg lg:!text-2xl font-bold !font-[Outfit] tracking-tighter uppercase italic leading-tight">
               Total {obtenerLabelPorId(searchParams.get("tipo_prop"))} encontradas <span className="text-[#24B6C1]"> {totalPropiedades}</span> 
             </h1>
-            
-            {tiempoBusqueda && (
-              <div className="flex items-center gap-1.5 bg-[#24B6C1]/10 border border-[#24B6C1]/30 text-[#24B6C1] px-3 py-1 rounded-full text-xs font-bold tracking-wider w-fit">
-                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                {tiempoBusqueda}s
-              </div>
-            )}
           </div>
         </div>
       </div>
@@ -343,24 +805,73 @@ const SearchView = () => {
                     value={searchQueryInput} 
                     onChange={(e) => {
                       setSearchQueryInput(e.target.value);
+                      setActiveSuggestionIndex(-1);
                       setShowSuggestions(true);
-                      if (selectedComuna) setSelectedComuna(null);
+
+                      if (selectedComuna) {
+                        setSelectedComuna(null);
+                      }
                     }}
-                    onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                    onFocus={() => {
+                      setShowSuggestions(true);
+                      setOpenDropdown(false);
+                    }}
+                    onKeyDown={handleComunaKeyDown}
+                    role="combobox"
+                    aria-autocomplete="list"
+                    aria-expanded={
+                      showSuggestions &&
+                      filteredComunas.length > 0
+                    }
+                    aria-controls="search-view-comuna-suggestions"
+                    aria-activedescendant={
+                      activeSuggestionIndex >= 0
+                        ? `search-view-comuna-${activeSuggestionIndex}`
+                        : undefined
+                    }
                     placeholder="Comuna, ciudad o código..."
                     className="w-full px-6 py-3.5 bg-white/5 border border-white/10 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-[#24B6C1]"
                   />
                   <AnimatePresence>
                     {showSuggestions && filteredComunas.length > 0 && (
-                      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                      <motion.div
+                        id="search-view-comuna-suggestions"
+                        role="listbox"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
                         className="absolute top-full mt-2 left-0 w-full bg-[#1a1a1a] border border-white/10 rounded-xl shadow-2xl z-50 max-h-64 overflow-y-auto"
                       >
-                        {filteredComunas.map((c) => (
-                          <div key={c.id} onClick={() => { setSearchQueryInput(c.label); setSelectedComuna(c); setShowSuggestions(false); }}
-                            className="px-6 py-4 lg:py-3 hover:bg-[#24B6C1]/20 cursor-pointer text-xs text-gray-300 flex justify-between"
+                        {filteredComunas.map((comuna, index) => (
+                          <button
+                            type="button"
+                            id={`search-view-comuna-${index}`}
+                            role="option"
+                            aria-selected={
+                              activeSuggestionIndex === index
+                            }
+                            ref={(element) => {
+                              suggestionItemRefs.current[index] =
+                                element;
+                            }}
+                            key={`${comuna.id}-${index}`}
+                            onMouseEnter={() =>
+                              setActiveSuggestionIndex(index)
+                            }
+                            onClick={() =>
+                              seleccionarComuna(comuna)
+                            }
+                            className={`flex w-full cursor-pointer justify-between px-6 py-4 text-left text-xs transition lg:py-3 ${
+                              activeSuggestionIndex === index
+                                ? "bg-[#24B6C1]/20 text-[#24B6C1]"
+                                : "text-gray-300 hover:bg-[#24B6C1]/20"
+                            }`}
                           >
-                            {c.label} <span className="text-[10px] text-gray-600">ID: {c.id}</span>
-                          </div>
+                            <span>{comuna.label}</span>
+                            <span className="text-[10px] text-gray-600">
+                              ID: {comuna.id}
+                            </span>
+                          </button>
                         ))}
                       </motion.div>
                     )}
@@ -400,7 +911,35 @@ const SearchView = () => {
             {/* GRILLA DE RESULTADOS */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 relative z-10">
               {loading ? (
-                <div className="col-span-1 md:col-span-2 py-40 text-center"><div className="w-12 h-12 border-4 border-[#24B6C1] border-t-transparent rounded-full animate-spin inline-block"></div></div>
+                <>
+                  <motion.div
+                    initial={{ opacity: 0, y: -8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="col-span-1 flex items-center gap-3 rounded-2xl border border-[#24B6C1]/25 bg-black/55 px-4 py-3 shadow-xl backdrop-blur-md md:col-span-2 sm:px-5"
+                    role="status"
+                    aria-live="polite"
+                  >
+                    <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#24B6C1]/10">
+                      <div className="h-5 w-5 animate-spin rounded-full border-2 border-[#24B6C1]/30 border-t-[#24B6C1]" />
+                    </div>
+
+                    <div className="min-w-0">
+                      <p className="text-sm font-bold text-white sm:text-base">
+                        Buscando propiedades
+                      </p>
+                      <p className="truncate text-xs text-white/50 sm:text-sm">
+                        Estamos preparando las mejores coincidencias para ti.
+                      </p>
+                    </div>
+                  </motion.div>
+
+                  {Array.from({ length: 4 }, (_, index) => (
+                    <PropertyCardSkeleton
+                      key={`property-skeleton-${index}`}
+                      index={index}
+                    />
+                  ))}
+                </>
               ) : propiedadesData.length > 0 ? (
                 propiedadesData.map((prop) => {
                   const esActiva = selectedProperty && (
@@ -480,12 +1019,44 @@ const SearchView = () => {
             <div className="lg:sticky lg:top-28 space-y-8">
               <div className="hidden lg:block h-[480px] relative overflow-hidden shadow-2xl rounded-[40px] border border-white/20 bg-black">
                 <Suspense fallback={<MapaFallback />}>
-                  <MapView 
-                    propiedades={propiedadesData} 
-                    selectedProperty={selectedProperty}
-                    setSelectedProperty={setSelectedProperty} 
+                  <MapView
+                    propiedades={propiedadesMapaDesktop}
+                    selectedProperty={
+                      selectedDesktopCoordinates
+                        ? normalizarPropiedadParaMapa(selectedProperty)
+                        : null
+                    }
+                    setSelectedProperty={setSelectedProperty}
+                    focusRequest={desktopMapFocusRequest}
+                    focusZoom={15.5}
+                    focusDuration={1600}
+                    focusDesktopOnly
                   />
                 </Suspense>
+
+                <AnimatePresence>
+                  {desktopMapLoading && (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="absolute inset-0 z-20 flex items-center justify-center bg-black/45 backdrop-blur-[2px]"
+                    >
+                      <div className="flex items-center gap-3 rounded-2xl border border-white/15 bg-black/75 px-5 py-4 shadow-2xl">
+                        <div className="h-5 w-5 animate-spin rounded-full border-2 border-[#24B6C1]/30 border-t-[#24B6C1]" />
+                        <span className="text-sm font-bold text-white">
+                          Ubicando propiedad...
+                        </span>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {!desktopMapLoading && desktopMapError && (
+                  <div className="absolute bottom-4 left-4 right-4 z-20 rounded-2xl border border-amber-300/30 bg-black/80 px-4 py-3 text-xs font-medium text-white shadow-xl backdrop-blur-md">
+                    {desktopMapError}
+                  </div>
+                )}
               </div>
 
               {/* FORMULARIO */}
