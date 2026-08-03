@@ -7,7 +7,195 @@ import {
   FaCheckCircle, FaDoorClosed 
 } from "react-icons/fa";
 
-const PropertyCard = ({ item, onSelect, isActive }) => {
+const API_URL =
+  import.meta.env.VITE_API_URL ||
+  "http://localhost:5000";
+
+const propertyDetailCache = new Map();
+
+const extraerDetalleRespuesta = (payload) => {
+  const candidatos = [
+    payload?.data?.propiedad,
+    payload?.propiedad,
+    payload?.data,
+    payload,
+  ];
+
+  return (
+    candidatos.find(
+      (candidato) =>
+        candidato &&
+        typeof candidato === "object" &&
+        !Array.isArray(candidato)
+    ) || null
+  );
+};
+
+const combinarPropiedadConDetalle = (
+  resumen,
+  detalle
+) => {
+  if (!detalle) return resumen;
+
+  const camposDetalle = [
+    ...(Array.isArray(detalle.campos_especificos)
+      ? detalle.campos_especificos
+      : []),
+    ...(Array.isArray(detalle.camposEspecificos)
+      ? detalle.camposEspecificos
+      : []),
+    ...(Array.isArray(detalle.caracteristicasExtra)
+      ? detalle.caracteristicasExtra
+      : []),
+    ...(Array.isArray(
+      detalle.detalles?.caracteristicasExtra
+    )
+      ? detalle.detalles.caracteristicasExtra
+      : []),
+  ];
+
+  const camposResumen = [
+    ...(Array.isArray(resumen.campos_especificos)
+      ? resumen.campos_especificos
+      : []),
+    ...(Array.isArray(resumen.camposEspecificos)
+      ? resumen.camposEspecificos
+      : []),
+    ...(Array.isArray(resumen.caracteristicasExtra)
+      ? resumen.caracteristicasExtra
+      : []),
+    ...(Array.isArray(
+      resumen.detalles?.caracteristicasExtra
+    )
+      ? resumen.detalles.caracteristicasExtra
+      : []),
+  ];
+
+  const imagenes =
+    Array.isArray(detalle.imagenes) &&
+    detalle.imagenes.length > 0
+      ? detalle.imagenes
+      : Array.isArray(detalle.fotos) &&
+          detalle.fotos.length > 0
+        ? detalle.fotos
+        : resumen.imagenes || [];
+
+  return {
+    ...resumen,
+    ...detalle,
+
+    codigo:
+      resumen.codigo ||
+      detalle.codigo ||
+      detalle.codigo_interno ||
+      detalle.codigo_propiedad ||
+      detalle.id_propiedad,
+
+    tipoPropiedad:
+      detalle.tipoPropiedad ||
+      detalle.desc_tipo ||
+      detalle.desc_tipo_prop ||
+      resumen.tipoPropiedad ||
+      resumen.tipo ||
+      resumen.titulo,
+
+    ubicacion: {
+      ...(resumen.ubicacion || {}),
+      ...(detalle.ubicacion || {}),
+
+      sector:
+        detalle.ubicacion?.sector ||
+        detalle.sector_cercano ||
+        resumen.ubicacion?.sector,
+
+      comuna:
+        detalle.ubicacion?.comuna ||
+        detalle.com_nombre ||
+        detalle.comuna ||
+        resumen.ubicacion?.comuna,
+
+      region:
+        detalle.ubicacion?.region ||
+        detalle.region ||
+        resumen.ubicacion?.region,
+    },
+
+    precios: {
+      venta: {
+        ...(resumen.precios?.venta || {}),
+        ...(detalle.precios?.venta || {}),
+
+        valor:
+          detalle.precios?.venta?.valor ??
+          detalle.valor_venta ??
+          resumen.precios?.venta?.valor,
+
+        moneda:
+          detalle.precios?.venta?.moneda ||
+          detalle.moneda_venta ||
+          resumen.precios?.venta?.moneda,
+      },
+
+      arriendo: {
+        ...(resumen.precios?.arriendo || {}),
+        ...(detalle.precios?.arriendo || {}),
+
+        valor:
+          detalle.precios?.arriendo?.valor ??
+          detalle.valor_arriendo ??
+          resumen.precios?.arriendo?.valor,
+
+        moneda:
+          detalle.precios?.arriendo?.moneda ||
+          detalle.moneda_arriendo ||
+          resumen.precios?.arriendo?.moneda,
+      },
+    },
+
+    detalles: {
+      ...(resumen.detalles || {}),
+      ...(detalle.detalles || {}),
+
+      dormitorios:
+        detalle.detalles?.dormitorios ??
+        detalle.dormitorios ??
+        resumen.detalles?.dormitorios,
+
+      banos:
+        detalle.detalles?.banos ??
+        detalle.banos ??
+        resumen.detalles?.banos,
+
+      estacionamientos:
+        detalle.detalles?.estacionamientos ??
+        detalle.estacionamientos ??
+        resumen.detalles?.estacionamientos,
+
+      caracteristicasExtra: [
+        ...camposResumen,
+        ...camposDetalle,
+      ],
+    },
+
+    campos_especificos: [
+      ...camposResumen,
+      ...camposDetalle,
+    ],
+
+    caracteristicasExtra: [
+      ...camposResumen,
+      ...camposDetalle,
+    ],
+
+    imagenes,
+  };
+};
+
+const PropertyCard = ({
+  item: itemInicial,
+  onSelect,
+  isActive,
+}) => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -28,7 +216,93 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
     };
   }, []);
 
-  if (!item) return null;
+  const codigoInicial =
+    itemInicial?.codigo ||
+    itemInicial?.codigo_interno ||
+    itemInicial?.codigo_propiedad ||
+    itemInicial?.id;
+
+  const [
+    detallePropiedad,
+    setDetallePropiedad,
+  ] = useState(null);
+
+  useEffect(() => {
+    if (!codigoInicial) {
+      setDetallePropiedad(null);
+      return undefined;
+    }
+
+    const cacheKey = String(codigoInicial);
+    const cached =
+      propertyDetailCache.get(cacheKey);
+
+    if (cached) {
+      setDetallePropiedad(cached);
+      return undefined;
+    }
+
+    const controller = new AbortController();
+    let mounted = true;
+
+    const cargarDetalle = async () => {
+      try {
+        const response = await fetch(
+          `${API_URL}/api/propiedades/codigo/${encodeURIComponent(
+            codigoInicial
+          )}`,
+          {
+            signal: controller.signal,
+            headers: {
+              Accept: "application/json",
+            },
+          }
+        );
+
+        if (!response.ok) return;
+
+        const payload = await response.json();
+        const detalle =
+          extraerDetalleRespuesta(payload);
+
+        if (!detalle) return;
+
+        propertyDetailCache.set(
+          cacheKey,
+          detalle
+        );
+
+        if (
+          mounted &&
+          !controller.signal.aborted
+        ) {
+          setDetallePropiedad(detalle);
+        }
+      } catch (error) {
+        if (error?.name !== "AbortError") {
+          console.warn(
+            `No fue posible completar los TAG de la propiedad ${codigoInicial}:`,
+            error?.message || error
+          );
+        }
+      }
+    };
+
+    cargarDetalle();
+
+    return () => {
+      mounted = false;
+      controller.abort();
+    };
+  }, [codigoInicial]);
+
+  if (!itemInicial) return null;
+
+  const item =
+    combinarPropiedadConDetalle(
+      itemInicial,
+      detallePropiedad
+    );
 
   const imagenes = item.imagenes || [];
   const tieneArriendo = item.precios?.arriendo?.valor && item.precios.arriendo.valor !== "0";
@@ -51,10 +325,79 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
     setCurrentImageIndex((prev) => (prev === 0 ? imagenes.length - 1 : prev - 1));
   };
 
-  const obtenerCampoExtra = (termino) => {
-    if (!item.caracteristicasExtra) return null;
-    const campo = item.caracteristicasExtra.find(c => c.label.toLowerCase().includes(termino.toLowerCase()));
-    return campo && campo.value !== null ? campo.value : null;
+  const normalizarEtiqueta = (valor) =>
+    String(valor || "")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .replace(/²/g, "2")
+      .replace(/\s+/g, " ")
+      .trim();
+
+  const obtenerCampoExtra = (...terminos) => {
+    const campos = [
+      ...(Array.isArray(
+        item.campos_especificos
+      )
+        ? item.campos_especificos
+        : []),
+      ...(Array.isArray(
+        item.camposEspecificos
+      )
+        ? item.camposEspecificos
+        : []),
+      ...(Array.isArray(
+        item.caracteristicasExtra
+      )
+        ? item.caracteristicasExtra
+        : []),
+      ...(Array.isArray(
+        item.detalles?.caracteristicasExtra
+      )
+        ? item.detalles.caracteristicasExtra
+        : []),
+    ];
+
+    const busquedas =
+      terminos.map(normalizarEtiqueta);
+
+    const campo = campos.find(
+      (campoActual) => {
+        const etiqueta =
+          normalizarEtiqueta(
+            campoActual?.label ||
+            campoActual?.nombre ||
+            campoActual?.campo
+          );
+
+        return busquedas.some(
+          (busqueda) =>
+            etiqueta.includes(busqueda)
+        );
+      }
+    );
+
+    const valor =
+      campo?.value ??
+      campo?.valor ??
+      null;
+
+    return valor === "" ? null : valor;
+  };
+
+  const obtenerPrimerValor = (...valores) =>
+    valores.find(
+      (valor) =>
+        valor !== null &&
+        valor !== undefined &&
+        valor !== "" &&
+        valor !== 0 &&
+        valor !== "0"
+    ) ?? null;
+
+  const tieneValorPositivo = (valor) => {
+    const numero = Number.parseFloat(valor);
+    return Number.isFinite(numero) && numero > 0;
   };
 
   // 🌟 FUNCIÓN FORMATO INTELIGENTE: 2 decimales si existen, ninguno si es entero
@@ -84,10 +427,66 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
     const banos = item.detalles?.banos || 0;
     const estac = item.detalles?.estacionamientos || 0;
     
-    const m2Construidos = obtenerCampoExtra("construidos") || item.detalles?.superficie || "0";
-    const m2Terreno = obtenerCampoExtra("terreno") || item.detalles?.superficie || "0";
-    const m2Utiles = obtenerCampoExtra("útiles") || item.detalles?.superficie || "0";
-    const m2Totales = obtenerCampoExtra("totales") || item.detalles?.superficie || "0";
+    const superficieGeneral =
+      item.detalles?.superficie;
+
+    const m2Construidos =
+      obtenerPrimerValor(
+        obtenerCampoExtra(
+          "m2 construidos",
+          "construidos"
+        ),
+        item.detalles?.m2Construidos,
+        item.detalles?.m2_construidos,
+        item.m2_construidos,
+        superficieGeneral
+      );
+
+    /*
+     * Terreno debe existir explícitamente.
+     * No reutilizamos la superficie construida.
+     */
+    const m2TerrenoEspecifico =
+      obtenerPrimerValor(
+        obtenerCampoExtra(
+          "m2 terreno",
+          "superficie terreno"
+        ),
+        item.detalles?.m2Terreno,
+        item.detalles?.m2_terreno,
+        item.m2_terreno
+      );
+
+    const m2Terreno =
+      m2TerrenoEspecifico ||
+      (
+        tipo.includes("terreno")
+          ? superficieGeneral
+          : null
+      );
+
+    const m2Utiles =
+      obtenerPrimerValor(
+        obtenerCampoExtra(
+          "m2 utiles",
+          "utiles"
+        ),
+        item.detalles?.m2Utiles,
+        item.detalles?.m2_utiles,
+        item.m2_utiles
+      );
+
+    const m2Totales =
+      obtenerPrimerValor(
+        obtenerCampoExtra(
+          "m2 totales",
+          "totales"
+        ),
+        item.detalles?.m2Totales,
+        item.detalles?.m2_totales,
+        item.m2_totales,
+        superficieGeneral
+      );
 
     const InfoItem = ({ icon: Icon, text }) => (
       <div className="flex items-center gap-1.5 bg-gray-50 px-2 py-1 rounded-md border border-gray-100">
@@ -99,8 +498,18 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
     if (tipo.includes("casa") && !tipo.includes("comercial")) {
       return (
         <div className="flex flex-wrap gap-2 mt-3 font-[Outfit]">
-          <InfoItem icon={FaRulerCombined} text={`${formatearPrecio(m2Construidos)} m² Const.`} />
-          <InfoItem icon={FaRulerCombined} text={`${formatearPrecio(m2Terreno)} m² Terr.`} />
+          {tieneValorPositivo(m2Construidos) && (
+            <InfoItem
+              icon={FaRulerCombined}
+              text={`${formatearPrecio(m2Construidos)} m² Const.`}
+            />
+          )}
+          {tieneValorPositivo(m2Terreno) && (
+            <InfoItem
+              icon={FaRulerCombined}
+              text={`${formatearPrecio(m2Terreno)} m² Terr.`}
+            />
+          )}
           {dorms > 0 && <InfoItem icon={FaBed} text={`${dorms} Dorm`} />}
           {banos > 0 && <InfoItem icon={FaBath} text={`${banos} Baños`} />}
         </div>
@@ -110,8 +519,18 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
     if (tipo.includes("departamento")) {
       return (
         <div className="flex flex-wrap gap-2 mt-3 font-[Outfit]">
-          <InfoItem icon={FaRulerCombined} text={`${formatearPrecio(m2Totales)} m² Totales`} />
-          <InfoItem icon={FaRulerCombined} text={`${formatearPrecio(m2Utiles)} m² Útiles`} />
+          {tieneValorPositivo(m2Totales) && (
+            <InfoItem
+              icon={FaRulerCombined}
+              text={`${formatearPrecio(m2Totales)} m² Totales`}
+            />
+          )}
+          {tieneValorPositivo(m2Utiles) && (
+            <InfoItem
+              icon={FaRulerCombined}
+              text={`${formatearPrecio(m2Utiles)} m² Útiles`}
+            />
+          )}
           {dorms > 0 && <InfoItem icon={FaBed} text={`${dorms} Dorm`} />}
           {banos > 0 && <InfoItem icon={FaBath} text={`${banos} Baños`} />}
         </div>
@@ -125,7 +544,12 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
 
       return (
         <div className="flex flex-wrap gap-2 mt-3 font-[Outfit]">
-          <InfoItem icon={FaRulerCombined} text={`${formatearPrecio(m2Construidos)} m²`} />
+          {tieneValorPositivo(m2Construidos) && (
+            <InfoItem
+              icon={FaRulerCombined}
+              text={`${formatearPrecio(m2Construidos)} m²`}
+            />
+          )}
           {habilitada && <InfoItem icon={FaCheckCircle} text={`Habitada: ${habilitada}`} />}
           {tipoEdificio && <InfoItem icon={FaBuilding} text={`Edificio ${tipoEdificio}`} />}
           {privados !== null && parseInt(privados) > 0 && (
@@ -141,7 +565,12 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
 
       return (
         <div className="flex flex-wrap gap-2 mt-3 font-[Outfit]">
-          <InfoItem icon={FaRulerCombined} text={`${formatearPrecio(m2Construidos)} m²`} />
+          {tieneValorPositivo(m2Construidos) && (
+            <InfoItem
+              icon={FaRulerCombined}
+              text={`${formatearPrecio(m2Construidos)} m²`}
+            />
+          )}
           {habilitado && <InfoItem icon={FaCheckCircle} text={`Habilitado: ${habilitado}`} />}
           {estac > 0 && <InfoItem icon={FaCar} text={`${estac} Estac.`} />}
           {banosLocal > 0 && <InfoItem icon={FaBath} text={`${banosLocal} Baños`} />}
@@ -152,8 +581,18 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
     if (tipo.includes("comercial")) {
       return (
         <div className="flex flex-wrap gap-2 mt-3 font-[Outfit]">
-          <InfoItem icon={FaRulerCombined} text={`${formatearPrecio(m2Construidos)} m² Const.`} />
-          <InfoItem icon={FaRulerCombined} text={`${formatearPrecio(m2Terreno)} m² Terr.`} />
+          {tieneValorPositivo(m2Construidos) && (
+            <InfoItem
+              icon={FaRulerCombined}
+              text={`${formatearPrecio(m2Construidos)} m² Const.`}
+            />
+          )}
+          {tieneValorPositivo(m2Terreno) && (
+            <InfoItem
+              icon={FaRulerCombined}
+              text={`${formatearPrecio(m2Terreno)} m² Terr.`}
+            />
+          )}
           {estac > 0 && <InfoItem icon={FaCar} text={`${estac} Estac.`} />}
         </div>
       );
@@ -165,7 +604,12 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
 
       return (
         <div className="flex flex-wrap gap-2 mt-3 font-[Outfit]">
-          <InfoItem icon={FaRulerCombined} text={`${formatearPrecio(m2Terreno)} m²`} />
+          {tieneValorPositivo(m2Terreno) && (
+            <InfoItem
+              icon={FaRulerCombined}
+              text={`${formatearPrecio(m2Terreno)} m²`}
+            />
+          )}
           {frente && <InfoItem icon={FaRulerVertical} text={`Frente: ${frente} mts`} />}
           {fondo && <InfoItem icon={FaRulerVertical} text={`Fondo: ${fondo} mts`} />}
         </div>
@@ -179,7 +623,12 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
 
       return (
         <div className="flex flex-wrap gap-2 mt-3 font-[Outfit]">
-          <InfoItem icon={FaRulerCombined} text={`${formatearPrecio(m2Terreno)} m²`} />
+          {tieneValorPositivo(m2Terreno) && (
+            <InfoItem
+              icon={FaRulerCombined}
+              text={`${formatearPrecio(m2Terreno)} m²`}
+            />
+          )}
           {uso && <InfoItem icon={FaTag} text={uso} />}
           {densidad && <InfoItem icon={FaBuilding} text={`Densidad: ${densidad}`} />}
           {altura && <InfoItem icon={FaRulerVertical} text={`Altura: ${altura}`} />}
@@ -193,8 +642,18 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
 
       return (
         <div className="flex flex-wrap gap-2 mt-3 font-[Outfit]">
-          <InfoItem icon={FaRulerCombined} text={`${formatearPrecio(m2Construidos)} m² Const.`} />
-          <InfoItem icon={FaRulerCombined} text={`${formatearPrecio(m2Terreno)} m² Terr.`} />
+          {tieneValorPositivo(m2Construidos) && (
+            <InfoItem
+              icon={FaRulerCombined}
+              text={`${formatearPrecio(m2Construidos)} m² Const.`}
+            />
+          )}
+          {tieneValorPositivo(m2Terreno) && (
+            <InfoItem
+              icon={FaRulerCombined}
+              text={`${formatearPrecio(m2Terreno)} m² Terr.`}
+            />
+          )}
           {trifasica && <InfoItem icon={FaCheckCircle} text={`Trifásica: ${trifasica}`} />}
           {alturaGalpon && <InfoItem icon={FaRulerVertical} text={`Altura: ${alturaGalpon}`} />}
         </div>
@@ -208,7 +667,11 @@ const PropertyCard = ({ item, onSelect, isActive }) => {
     );
   };
 
-  const codigoPropiedad = item.codigo || item.id;
+  const codigoPropiedad =
+    item.codigo ||
+    item.codigo_interno ||
+    item.codigo_propiedad ||
+    item.id;
 
   const irAlDetalle = () => {
     if (!codigoPropiedad) return;
