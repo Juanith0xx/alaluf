@@ -112,6 +112,55 @@ const SearchView = () => {
   const [totalPaginas, setTotalPaginas] = useState(1);
   const paginaActual = parseInt(searchParams.get("page")) || 1;
 
+  /*
+   * Muestra un máximo de siete elementos de paginación.
+   * Esto elimina la necesidad de scroll horizontal.
+   */
+  const paginasVisibles = (() => {
+    const total = Math.max(totalPaginas, 1);
+
+    if (total <= 7) {
+      return Array.from(
+        { length: total },
+        (_, index) => index + 1
+      );
+    }
+
+    if (paginaActual <= 4) {
+      return [
+        1,
+        2,
+        3,
+        4,
+        5,
+        "ellipsis-right",
+        total,
+      ];
+    }
+
+    if (paginaActual >= total - 3) {
+      return [
+        1,
+        "ellipsis-left",
+        total - 4,
+        total - 3,
+        total - 2,
+        total - 1,
+        total,
+      ];
+    }
+
+    return [
+      1,
+      "ellipsis-left",
+      paginaActual - 1,
+      paginaActual,
+      paginaActual + 1,
+      "ellipsis-right",
+      total,
+    ];
+  })();
+
   // --- ESTADOS DEL BUSCADOR ---
   const [tipoPropiedad, setTipoPropiedad] = useState(null);
   const [searchQueryInput, setSearchQueryInput] = useState(searchParams.get("q") || ""); 
@@ -976,18 +1025,45 @@ const SearchView = () => {
                   <FaArrowLeft size={10} className="hidden sm:block" /> Ant
                 </button>
                 
-                <div className="flex gap-1 overflow-x-auto max-w-[150px] sm:max-w-[250px] scrollbar-hide px-2">
-                  {Array.from({ length: totalPaginas }, (_, index) => (
-                    <button
-                      key={index + 1}
-                      onClick={() => setSearchParams({ ...Object.fromEntries(searchParams), page: index + 1 })}
-                      className={`min-w-[32px] h-8 lg:min-w-[36px] lg:h-9 rounded-lg font-bold transition-all text-xs flex items-center justify-center shrink-0 ${
-                        paginaActual === index + 1 ? 'bg-[#24B6C1] text-white shadow-md' : 'bg-white/5 text-gray-300 hover:bg-white/10'
-                      }`}
-                    >
-                      {index + 1}
-                    </button>
-                  ))}
+                <div className="flex flex-wrap items-center justify-center gap-1 px-1 sm:px-2">
+                  {paginasVisibles.map((pagina, index) => {
+                    if (typeof pagina === "string") {
+                      return (
+                        <span
+                          key={`${pagina}-${index}`}
+                          className="flex h-8 min-w-[24px] items-center justify-center text-xs font-bold text-white/40 lg:h-9"
+                          aria-hidden="true"
+                        >
+                          …
+                        </span>
+                      );
+                    }
+
+                    return (
+                      <button
+                        key={pagina}
+                        type="button"
+                        onClick={() =>
+                          setSearchParams({
+                            ...Object.fromEntries(searchParams),
+                            page: pagina,
+                          })
+                        }
+                        aria-current={
+                          paginaActual === pagina
+                            ? "page"
+                            : undefined
+                        }
+                        className={`flex h-8 min-w-[32px] items-center justify-center rounded-lg text-xs font-bold transition-all lg:h-9 lg:min-w-[36px] ${
+                          paginaActual === pagina
+                            ? "bg-[#24B6C1] text-white shadow-md"
+                            : "bg-white/5 text-gray-300 hover:bg-white/10"
+                        }`}
+                      >
+                        {pagina}
+                      </button>
+                    );
+                  })}
                 </div>
                 
                 <button
