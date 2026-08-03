@@ -256,15 +256,11 @@ const PropertyDetail = ({ property }) => {
     : null;
 
   /*
-   * El video queda como quinto elemento para que siempre sea visible
-   * en el mosaico principal cuando existen varias fotografías.
+   * La galería mantiene primero todas las fotografías y deja el video
+   * como último elemento.
    */
   const galeria = elementoVideo
-    ? [
-        ...elementosImagen.slice(0, 4),
-        elementoVideo,
-        ...elementosImagen.slice(4)
-      ]
+    ? [...elementosImagen, elementoVideo]
     : [...elementosImagen];
 
   if (galeria.length === 0) {
@@ -671,6 +667,41 @@ const PropertyDetail = ({ property }) => {
     );
   };
 
+
+  const VideoThumbnailGaleria = ({ media }) => {
+    if (!media) return null;
+
+    return (
+      <>
+        <img
+          src={
+            media.thumbnailUrl ||
+            imagenPrincipal.url ||
+            "/placeholder.jpg"
+          }
+          className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+          alt={media.alt || "Video de la propiedad"}
+        />
+
+        <div className="absolute inset-0 flex items-center justify-center bg-black/35 transition-colors group-hover:bg-black/45">
+          <span className="flex h-14 w-14 items-center justify-center rounded-full border border-white/30 bg-black/65 text-white shadow-xl backdrop-blur-md transition-transform group-hover:scale-110">
+            <FaPlay
+              size={18}
+              className="ml-1 text-[#24B6C1]"
+            />
+          </span>
+        </div>
+
+        <div className="absolute bottom-3 left-3 z-10">
+          <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-black/70 px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-white backdrop-blur-md">
+            <FaPlay size={9} className="text-[#24B6C1]" />
+            Ver video
+          </span>
+        </div>
+      </>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-cover bg-center bg-fixed font-[Outfit] pb-20 text-gray-900" style={{ backgroundImage: `url(${fondoMarmol})` }}>
       
@@ -687,44 +718,71 @@ const PropertyDetail = ({ property }) => {
         <div className="col-span-1 lg:col-span-7 space-y-6">
           
           <section className="relative grid grid-cols-1 md:grid-cols-4 md:grid-rows-2 gap-2 md:gap-3 rounded-[24px] md:rounded-[40px] overflow-hidden shadow-2xl bg-black/5 h-auto md:h-[400px] lg:h-[480px]">
-            {/* Si la propiedad tiene video, este ocupa el espacio principal grande.
-                Si no tiene video, se mantiene la imagen principal original. */}
-            {elementoVideo ? (
-              <div className="col-span-1 md:col-span-2 md:row-span-2 relative overflow-hidden h-64 sm:h-80 md:h-full bg-black">
-                <VideoEnGaleria media={elementoVideo} />
-              </div>
-            ) : (
-              <button
-                type="button"
-                className="col-span-1 md:col-span-2 md:row-span-2 relative overflow-hidden group cursor-pointer h-64 sm:h-80 md:h-full text-left"
-                onClick={() => {
-                  const indicePrincipal = galeria.findIndex(
-                    item =>
-                      item.tipo === "imagen" &&
-                      item.url === imagenPrincipal.url
-                  );
+            {/* La fotografía principal siempre ocupa el bloque grande. */}
+            <button
+              type="button"
+              className="col-span-1 md:col-span-2 md:row-span-2 relative overflow-hidden group cursor-pointer h-64 sm:h-80 md:h-full text-left"
+              onClick={() => {
+                const indicePrincipal = galeria.findIndex(
+                  item =>
+                    item.tipo === "imagen" &&
+                    item.url === imagenPrincipal.url
+                );
 
-                  openLightbox(
-                    indicePrincipal >= 0 ? indicePrincipal : 0
-                  );
-                }}
-                aria-label="Abrir imagen principal"
-              >
-                <GalleryItem item={imagenPrincipal} />
-              </button>
-            )}
+                openLightbox(
+                  indicePrincipal >= 0 ? indicePrincipal : 0
+                );
+              }}
+              aria-label="Abrir imagen principal"
+            >
+              <GalleryItem item={imagenPrincipal} />
+            </button>
 
-            {/* Las cuatro posiciones pequeñas quedan reservadas para fotografías. */}
+            {/* Las miniaturas siguientes muestran fotografías y dejan el video al final. */}
             {[0, 1, 2, 3].map((idx) => {
-              const imagen = elementosImagen[idx] || imagenPrincipal;
+              const esUltimaPosicion = idx === 3;
+              const mostrarVideo =
+                Boolean(elementoVideo) && esUltimaPosicion;
+
+              if (mostrarVideo) {
+                return (
+                  <button
+                    type="button"
+                    key="video-galeria-ultimo"
+                    className="hidden md:block md:col-span-1 relative overflow-hidden group cursor-pointer h-52 sm:h-64 md:h-full text-left bg-black"
+                    onClick={() => {
+                      if (indiceVideo >= 0) {
+                        openLightbox(indiceVideo);
+                      }
+                    }}
+                    aria-label="Abrir video de la propiedad"
+                  >
+                    <VideoThumbnailGaleria
+                      media={elementoVideo}
+                    />
+                  </button>
+                );
+              }
+
+              const imagen =
+                elementosImagen[idx + 1] ||
+                elementosImagen[idx] ||
+                imagenPrincipal;
+
               const indiceGaleria = galeria.findIndex(
                 item =>
                   item.tipo === "imagen" &&
                   item.url === imagen.url
               );
 
-              const esUltimaVisible = idx === 3;
-              const hayMasFotos = elementosImagen.length > 4;
+              const ultimaFotoVisible =
+                elementoVideo ? idx === 2 : idx === 3;
+
+              const cantidadFotosVisibles =
+                elementoVideo ? 4 : 5;
+
+              const hayMasFotos =
+                elementosImagen.length > cantidadFotosVisibles;
 
               return (
                 <button
@@ -737,20 +795,22 @@ const PropertyDetail = ({ property }) => {
                   } md:col-span-1 relative overflow-hidden group cursor-pointer h-52 sm:h-64 md:h-full text-left`}
                   onClick={() =>
                     openLightbox(
-                      indiceGaleria >= 0 ? indiceGaleria : 0
+                      indiceGaleria >= 0
+                        ? indiceGaleria
+                        : 0
                     )
                   }
                   aria-label={
-                    esUltimaVisible && hayMasFotos
+                    ultimaFotoVisible && hayMasFotos
                       ? "Abrir galería completa"
-                      : `Abrir imagen ${idx + 1}`
+                      : `Abrir imagen ${idx + 2}`
                   }
                 >
                   <GalleryItem
                     item={imagen}
                     fallbackItem={imagenPrincipal}
                     mostrarBotonVerMas={
-                      esUltimaVisible && hayMasFotos
+                      ultimaFotoVisible && hayMasFotos
                     }
                   />
                 </button>
