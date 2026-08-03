@@ -111,7 +111,14 @@ const NavbarDesktop = ({
               </AnimatePresence>
             </div>
 
-            <Link to="/nosotros" className="hover:text-teal-400 transition duration-300 font-medium">Nosotros</Link>
+            <Link
+              to="/nosotros"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-teal-400 transition duration-300 font-medium"
+            >
+              Nosotros
+            </Link>
             <a href="https://alaluf.cl/pressroom2.php" className="hover:text-teal-400 transition duration-300 font-medium">Newsletter</a>
             
             <div
@@ -156,7 +163,12 @@ const NavbarDesktop = ({
             </Link>
           </div>
 
-          <a href="https://alaluf.cl/mialaluf/" className="ml-auto hover:text-teal-400 transition duration-300 font-medium">
+          <a
+            href="https://alaluf.cl/mialaluf/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="ml-auto hover:text-teal-400 transition duration-300 font-medium"
+          >
             Mi Alaluf
           </a>
         </div>
@@ -341,7 +353,15 @@ const NavbarMobile = ({
                 )}
               </AnimatePresence>
             </div>
-            <Link to="/nosotros" onClick={() => setOpenMenu(false)} className="flex min-h-11 items-center rounded-lg py-2 transition hover:text-teal-400">Nosotros</Link>
+            <Link
+              to="/nosotros"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => setOpenMenu(false)}
+              className="flex min-h-11 items-center rounded-lg py-2 transition hover:text-teal-400"
+            >
+              Nosotros
+            </Link>
             <a href="https://alaluf.cl/pressroom2.php" className="flex min-h-11 items-center rounded-lg py-2 transition hover:text-teal-400">Newsletter</a>
             
             <div className="flex flex-col">
@@ -379,7 +399,15 @@ const NavbarMobile = ({
               Contacto
             </Link>
             
-            <a href="https://alaluf.cl/mialaluf/" className="flex min-h-11 items-center rounded-lg py-2 font-semibold transition hover:text-teal-400">Mi Alaluf</a>
+            <a
+              href="https://alaluf.cl/mialaluf/"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => setOpenMenu(false)}
+              className="flex min-h-11 items-center rounded-lg py-2 font-semibold transition hover:text-teal-400"
+            >
+              Mi Alaluf
+            </a>
 
             <div className="mt-3 flex min-w-0 items-center rounded-xl border border-white/10 bg-white/10 px-4 py-2.5 sm:mt-4 md:max-w-md">
               <input
