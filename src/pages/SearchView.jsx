@@ -393,12 +393,25 @@ const SearchView = () => {
       searchParams.get("tipo_prop") ||
       "";
 
+    const ordenBusqueda =
+      searchParams.get("orden") || "nuevas";
+
+    const direccionBusqueda =
+      (
+        searchParams.get("dir") ||
+        "DESC"
+      ).toUpperCase();
+
     setSearchParams({ 
       ...(tipoID && { tipo_prop: tipoID }), 
       obj: objID, 
       ...(comunaID && { comuna: comunaID }),
-      ...(comunaNombre && { comuna_nombre: comunaNombre }),
-      page: 1 
+      ...(comunaNombre && {
+        comuna_nombre: comunaNombre,
+      }),
+      orden: ordenBusqueda,
+      dir: direccionBusqueda,
+      page: 1,
     });
   };
 
@@ -662,8 +675,23 @@ const SearchView = () => {
         const supHasta = searchParams.get("sup_hasta") || "";
         const precioDesde = searchParams.get("precio_desde") || "";
         const precioHasta = searchParams.get("precio_hasta") || "";
-        const moneda = searchParams.get("moneda") || "CLP";
-        const orden = searchParams.get("orden") || "reciente";
+        const moneda =
+          searchParams.get("moneda") ||
+          "CLP";
+
+        /*
+         * Orden predeterminado:
+         * primero las propiedades más nuevas y luego las antiguas.
+         */
+        const orden =
+          searchParams.get("orden") ||
+          "nuevas";
+
+        const dir =
+          (
+            searchParams.get("dir") ||
+            "DESC"
+          ).toUpperCase();
 
         if (tipo_prop && (!tipoPropiedad || tipoPropiedad.id != tipo_prop)) {
           setTipoPropiedad({ label: obtenerLabelPorId(tipo_prop), id: tipo_prop });
@@ -685,11 +713,24 @@ const SearchView = () => {
             precio_hasta: precioHasta,
             moneda,
             orden,
+            dir,
             page: String(paginaActual),
-            limit: "10"
+            limit: "10",
           });
 
           url = `${API_URL}/api/propiedades/buscar?${params.toString()}`;
+
+          if (import.meta.env.DEV) {
+            console.log(
+              "🔽 Búsqueda ordenada desde la propiedad más nueva:",
+              {
+                orden,
+                dir,
+                pagina: paginaActual,
+                url,
+              }
+            );
+          }
         }
 
         const response = await fetch(url, {
@@ -803,9 +844,31 @@ const SearchView = () => {
                         navigate('/vender');
                       } else {
                         const params = new URLSearchParams(searchParams);
-                        params.set("obj", accion === "Comprar" ? "1" : "2");
+                        params.set(
+                          "obj",
+                          accion === "Comprar"
+                            ? "1"
+                            : "2"
+                        );
+
+                        if (!params.get("orden")) {
+                          params.set(
+                            "orden",
+                            "nuevas"
+                          );
+                        }
+
+                        if (!params.get("dir")) {
+                          params.set(
+                            "dir",
+                            "DESC"
+                          );
+                        }
+
                         params.set("page", "1");
-                        navigate(`/buscar?${params.toString()}`);
+                        navigate(
+                          `/buscar?${params.toString()}`
+                        );
                       }
                     }}
                       className={`flex-1 lg:flex-none px-2 sm:px-6 py-2.5 rounded-lg text-[11px] sm:text-xs font-bold transition-all ${accionActiva === accion ? "bg-[#24B6C1] text-white shadow-lg" : "text-white/40 hover:text-white"}`}
